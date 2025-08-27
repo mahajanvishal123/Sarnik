@@ -196,7 +196,7 @@ function AddTimeLog() {
                       name="taskDescription"
                       value={formData.taskDescription}
                       onChange={handleInputChange}
-                      required
+                  
                     ></textarea>
                   </div>
                 </div>
