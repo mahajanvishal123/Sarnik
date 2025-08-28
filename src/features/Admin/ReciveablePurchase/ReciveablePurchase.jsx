@@ -331,7 +331,12 @@ const getStatusClass = (status) => {
                   <Button
                     variant="outline-primary"
                     size="sm"
-                    onClick={() => handleToBeInvoiced(po)}
+                    // onClick={() => handleToBeInvoiced(po)}
+                    onClick={() => 
+                      po.POStatus === "Pending" 
+                        ? handleToBeInvoiced(po) 
+                        : navigate("/admin/Invoicing_Billing")
+                    }
                     className="px-3 py-1 fw-semibold border-2"
                     style={{
                       transition: 'all 0.3s ease',

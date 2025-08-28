@@ -741,9 +741,9 @@ const filteredEstimates = invocing?.InvoicingBilling
               <td>{invoice.date ? new Date(invoice.date).toLocaleDateString("en-GB") : 'N/A'}</td>
               <td>
                 <div className="d-flex gap-2">
-                  {/* <button className="btn btn-sm btn-outline-primary" onClick={() => UpdateInvocing(invoice)}>
+                  <button className="btn btn-sm btn-outline-primary" onClick={() => UpdateInvocing(invoice)}>
                     <FaEdit />
-                  </button> */}
+                  </button>
                   {/* <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(invoice._id)}>
                       <FaTrash />
                     </button> */}

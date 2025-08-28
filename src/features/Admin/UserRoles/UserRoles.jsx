@@ -189,7 +189,7 @@ function UserRoles() {
                 </tr>
               </thead>
               <tbody>
-                {currentUsers.map(user => (
+                {currentUsers.filter((item) => item?._id != "685e6f6364a81f874cd99761").map(user => (
                   <tr key={user._id}>
                     <td>
                       <div className="d-flex align-items-center">
