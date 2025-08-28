@@ -65,6 +65,7 @@ import ProjectInvoiceBilling from "../features/Admin/ProjectList/ProjectTabs/Pro
 import Pluginss from "../assets/css/Pluginss/Pluginss.jsx";
 import DReciveablePurchase from "../features/Admin/Dashbord/DReciveablePurchase.jsx";
 import Addnotifiction from "../features/Admin/Notiifcations/Addnotifiction.jsx";
+import ReturnedJobs from "../features/Admin/CompletedJobs/CompleteJobs.jsx";
 
 function Admin() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
@@ -153,6 +154,7 @@ function Admin() {
             <Route path="/approval" element={<ProtectedRoute><WaitingApproval/></ProtectedRoute>} />
             <Route path="/ProjectInvoiceBilling" element={<ProtectedRoute><ProjectInvoiceBilling/></ProtectedRoute>} />
             <Route path="/DReciveablePurchase" element={<ProtectedRoute><DReciveablePurchase/></ProtectedRoute>} />
+            <Route path="/Completed" element={<ProtectedRoute><ReturnedJobs/></ProtectedRoute>} />
           </Routes>
         </div>
       </div>

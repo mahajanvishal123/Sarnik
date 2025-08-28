@@ -12,9 +12,12 @@ import stamp from "../../../assets/stamp.png"
 
 function Invoicing_Billing() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
+  const [dateRange, setDateRange] = useState({
+    from: '',
+    to: ''
+  });
   const [selectedProject, setSelectedProject] = useState('All Projects');
-   const [selectedClient, setSelectedClient] = useState("All Clients");
+  const [selectedClient, setSelectedClient] = useState("All Clients");
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
   const dispatch = useDispatch();
@@ -67,8 +70,6 @@ function Invoicing_Billing() {
         return "bg-light text-dark";       // Fallback style
     }
   };
-
-
 
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
@@ -439,27 +440,6 @@ function Invoicing_Billing() {
     return words.trim();
   };
 
-  //   const handleDownloadPDF = async (invoice) => {
-  //   try {
-  //     const response = await axiosInstance.get(
-  //       `/pdf/invoice?InvoiceBillingId=${invoice._id}`,
-  //       {
-  //         responseType: "blob",
-  //       }
-  //     );
-  //     const url = window.URL.createObjectURL(new Blob([response.data]));
-  //     const link = document.createElement("a");
-  //     link.href = url;
-  //     link.setAttribute("download", `${invoice.invoiceNumber || "invoice"}.pdf`);
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     link.remove();
-  //   } catch (error) {
-  //     console.error("❌ Error downloading invoice PDF:", error);
-  //     alert("Failed to download invoice PDF.");
-  //   } 
-  // };
-
   const { invocing, loading, error } = useSelector((state) => state.InvoicingBilling);
   console.log(invocing?.InvoicingBilling);
 
@@ -470,61 +450,66 @@ function Invoicing_Billing() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
 
+  const filteredEstimates = invocing?.InvoicingBilling
+    ?.slice()
+    .reverse()
+    .filter((invoice) => {
+      const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+      const invoiceNumber = (invoice.invoiceNumber || '').toLowerCase();
+      const clientName = (invoice.clientId?.clientName || '').toLowerCase();
+      const projectName = (invoice.projectId?.[0]?.projectName || '').toLowerCase();
+      const status = (invoice.status || '').toLowerCase();
+      const amount = (invoice.lineItems?.[0]?.amount || '').toString().toLowerCase();
 
-const filteredEstimates = invocing?.InvoicingBilling
-  ?.slice()
-  .reverse()
-  .filter((invoice) => {
-    const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
-    const invoiceNumber = (invoice.invoiceNumber || '').toLowerCase();
-    const clientName = (invoice.clientId?.clientName || '').toLowerCase();
-    const projectName = (invoice.projectId?.[0]?.projectName || '').toLowerCase();
-    const status = (invoice.status || '').toLowerCase();
-    const amount = (invoice.lineItems?.[0]?.amount || '').toString().toLowerCase();
+      const fields = [
+        invoiceNumber,
+        clientName,
+        projectName,
+        status,
+        amount
+      ];
 
-    const fields = [
-      invoiceNumber,
-      clientName,
-      projectName,
-      status,
-      amount
-    ];
+      // 🔍 Search Filter
+      const matchesSearch =
+        terms.length === 0 || terms.every(term =>
+          fields.some(field => field.includes(term))
+        );
 
-    // 🔍 Search Filter
-    const matchesSearch =
-      terms.length === 0 || terms.every(term =>
-        fields.some(field => field.includes(term))
-      );
+      // 📂 Project Filter
+      const matchesProject =
+        selectedProject === 'All Projects' ||
+        invoice.projectId?.[0]?.projectName === selectedProject;
 
-    // 📂 Project Filter
-    const matchesProject =
-      selectedProject === 'All Projects' ||
-      invoice.projectId?.[0]?.projectName === selectedProject;
+      // 👤 Client Filter
+      const matchesClient =
+        selectedClient === 'All Clients' ||
+        invoice.clientId?.clientName === selectedClient;
 
-    // 👤 Client Filter
-    const matchesClient =
-      selectedClient === 'All Clients' ||
-      invoice.clientId?.clientName === selectedClient;
+      // 📅 Date Range Filter
+      const invoiceDate = new Date(invoice.date);
+      const fromDate = dateRange.from ? new Date(dateRange.from) : null;
+      const toDate = dateRange.to ? new Date(dateRange.to) : null;
+      
+      // Adjust toDate to include the entire day
+      if (toDate) {
+        toDate.setHours(23, 59, 59, 999);
+      }
+      
+      const matchesDateRange = 
+        (!fromDate && !toDate) || // No date range selected
+        (fromDate && !toDate && invoiceDate >= fromDate) || // Only from date selected
+        (!fromDate && toDate && invoiceDate <= toDate) || // Only to date selected
+        (fromDate && toDate && invoiceDate >= fromDate && invoiceDate <= toDate); // Both dates selected
 
-    // 📅 Date Filter
-    const matchesDate =
-      !selectedDate ||
-      new Date(invoice.date).toLocaleDateString() ===
-      new Date(selectedDate).toLocaleDateString();
+      // ✅ Final Combined Return
+      return matchesSearch && matchesProject && matchesClient && matchesDateRange;
+    });
 
-    // ✅ Final Combined Return
-    return matchesSearch && matchesProject && matchesClient && matchesDate;
-  });
-
-
-    
-    
   const totalItems = filteredEstimates?.length || 0;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const paginatedEstimates = filteredEstimates
     ?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
 
   const handleDelete = (_id) => {
     Swal.fire({
@@ -557,19 +542,12 @@ const filteredEstimates = invocing?.InvoicingBilling
   };
 
   const [showFilters, setShowFilters] = useState(false);
+  
   return (
     <div className="p-4 m-3" style={{ backgroundColor: "white", borderRadius: "10px" }}>
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <h2>Invoicing & Billing</h2>
-        {/* Desktop generate button only */}
-        {/* <div className="d-none d-md-block">
-          <Link to={"/admin/AddInvoice"}>
-            <button id="All_btn" className="btn btn-dark">
-              Generate New Invoice
-            </button>
-          </Link>
-        </div> */}
       </div>
 
       <div
@@ -591,19 +569,36 @@ const filteredEstimates = invocing?.InvoicingBilling
             />
           </div>
         </div>
+        
+        {/* Date Range Filters */}
         <div className="col-md-3">
           <div className="input-group">
             <span className="input-group-text bg-white border-end-0">
-              {/* <FaCalendarAlt className="text-muted" /> */}
+              From
             </span>
             <input
               type="date"
               className="form-control border-start-0"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              value={dateRange.from}
+              onChange={(e) => setDateRange({...dateRange, from: e.target.value})}
             />
           </div>
         </div>
+        
+        <div className="col-md-3">
+          <div className="input-group">
+            <span className="input-group-text bg-white border-end-0">
+              To
+            </span>
+            <input
+              type="date"
+              className="form-control border-start-0"
+              value={dateRange.to}
+              onChange={(e) => setDateRange({...dateRange, to: e.target.value})}
+            />
+          </div>
+        </div>
+        
         <div className="col-md-3" style={{display:"flex"}}>
           <Dropdown>
             <Dropdown.Toggle variant="light" id="project-dropdown" className="w-100">
@@ -623,56 +618,28 @@ const filteredEstimates = invocing?.InvoicingBilling
             </Dropdown.Menu>            
           </Dropdown>
 
-         <Dropdown>
-  <Dropdown.Toggle variant="light" id="client-dropdown" className="w-100">
-    {selectedClient}
-  </Dropdown.Toggle>
-  <Dropdown.Menu>
-    <Dropdown.Item onClick={() => setSelectedClient("All Clients")}>
-      All Clients
-    </Dropdown.Item>
-    {[...new Set((invocing?.InvoicingBilling || []).map((invoice) =>
-      invoice.clientId?.clientName || "N/A"
-    ))]
-      .filter(name => name !== "N/A")
-      .map((clientName, index) => (
-        <Dropdown.Item
-          key={index}
-          onClick={() => setSelectedClient(clientName)}
-        >
-          {clientName}
-        </Dropdown.Item>
-      ))}
-  </Dropdown.Menu>
-</Dropdown>
-
-            {/* <Dropdown className="filter-dropdown">
-                      <Dropdown.Toggle
-                        variant="light"
-                        id="client-dropdown"
-                        className="custom-dropdown"
-                      >
-                        {selectedClient}
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => setSelectedClient("All Clients")}>All Clients</Dropdown.Item>
-                        {[...new Set(estimates?.costEstimates?.map(po => po.clients?.[0]?.clientName).filter(Boolean))]
-                          .map((clientName, index) => (
-                            <Dropdown.Item key={index} onClick={() => setSelectedClient(clientName)}>
-                              {clientName}
-                            </Dropdown.Item>
-                          ))}
-                      </Dropdown.Menu>
-                    </Dropdown> */}
-        </div>
-        <div className="col-md-3">
-          <div className="input-group">
-            {/* <Link to={"/admin/AddInvoice"}><button
-              className="btn btn-outline-secondary "
-              type="button"
-            >+ Invoicing
-            </button></Link> */}
-          </div>
+          <Dropdown>
+            <Dropdown.Toggle variant="light" id="client-dropdown" className="w-100">
+              {selectedClient}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => setSelectedClient("All Clients")}>
+                All Clients
+              </Dropdown.Item>
+              {[...new Set((invocing?.InvoicingBilling || []).map((invoice) =>
+                invoice.clientId?.clientName || "N/A"
+              ))]
+                .filter(name => name !== "N/A")
+                .map((clientName, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() => setSelectedClient(clientName)}
+                  >
+                    {clientName}
+                  </Dropdown.Item>
+                ))}
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
       </div>
 
@@ -690,9 +657,23 @@ const filteredEstimates = invocing?.InvoicingBilling
               placeholder="Search invoices..." value={searchQuery} onChange={handleSearch} />
           </InputGroup>
 
-          {/* <Form.Select className="mb-2">
-            <option>All Clients</option>
-          </Form.Select> */}
+          {/* Date Range Filters for Mobile */}
+          <Form.Label>Date From</Form.Label>
+          <Form.Control
+            type="date"
+            className="mb-2"
+            value={dateRange.from}
+            onChange={(e) => setDateRange({...dateRange, from: e.target.value})}
+          />
+          
+          <Form.Label>Date To</Form.Label>
+          <Form.Control
+            type="date"
+            className="mb-2"
+            value={dateRange.to}
+            onChange={(e) => setDateRange({...dateRange, to: e.target.value})}
+          />
+
           <Form.Select className="mb-2">
             <option>All Status</option>
           </Form.Select>
@@ -726,7 +707,7 @@ const filteredEstimates = invocing?.InvoicingBilling
         <tbody>
           {paginatedEstimates?.map((invoice, index) => (
             <tr key={invoice.invoiceNumber || index}>
-              <td style={{ whiteSpace: "nowrap" }} /* onClick={() => JobDetails(invoice._id)} */>
+              <td style={{ whiteSpace: "nowrap" }}>
                 {invoice.InvoiceNo || "N/A"}
               </td>
               <td style={{ whiteSpace: "nowrap" }}>{invoice.projectId?.[0]?.projectName || "N/A"}</td>
@@ -741,12 +722,6 @@ const filteredEstimates = invocing?.InvoicingBilling
               <td>{invoice.date ? new Date(invoice.date).toLocaleDateString("en-GB") : 'N/A'}</td>
               <td>
                 <div className="d-flex gap-2">
-                  {/* <button className="btn btn-sm btn-outline-primary" onClick={() => UpdateInvocing(invoice)}>
-                    <FaEdit />
-                  </button> */}
-                  {/* <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(invoice._id)}>
-                      <FaTrash />
-                    </button> */}
                   <button
                     className="btn btn-sm btn-outline-primary"
                     onClick={() => handleDownloadPDF(invoice)} // Pass current invoice

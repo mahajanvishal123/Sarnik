@@ -209,11 +209,11 @@ function TimeLogs() {
               <FaPlus /> ExtraTime
             </Button> */}
           </Link>
-          <Link to={"/admin/AddTimesheetWorklog"} className="text-decoration-none">
+          {/* <Link to={"/admin/AddTimesheetWorklog"} className="text-decoration-none">
             <button id='All_btn' className="btn btn-dark d-flex align-items-center gap-2">
               <FaPlus /> Add Time Log
             </button>
-          </Link>
+          </Link> */}
           {/* <Link to={"/admin/AddTimelog"} className="text-decoration-none">
             <button id='All_btn' className="btn btn-dark d-flex align-items-center gap-2">
               <FaPlus /> Add Time Log

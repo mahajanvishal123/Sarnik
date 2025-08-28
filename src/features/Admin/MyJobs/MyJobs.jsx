@@ -19,6 +19,10 @@ function MyJobs() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
+  // Get user role from Redux store or authentication context
+  const { user } = useSelector((state) => state.auth || {});
+  const isDesigner = user?.role === "designer";
 
   const handleReturnJob = () => {
     const hasTimesheet = false;
@@ -66,8 +70,7 @@ function MyJobs() {
       case "in_progress":
         return "bg-warning text-dark";
       case "review":
-      case "waitingapproval":  // lowercase me likho
-        return "bg-info text-dark";
+      case "waitingapproval":
         return "bg-info text-dark";
       case "not started":
         return "bg-secondary text-white";
@@ -77,7 +80,7 @@ function MyJobs() {
         return "bg-primary text-white";
       case "cancelled":
         return "bg-dark text-white";
-      case "rejected": // ✅ Added for "Rejected"
+      case "rejected":
         return "bg-danger text-white";
       default:
         return "bg-light text-dark";
@@ -153,9 +156,16 @@ function MyJobs() {
     const matchesEmployee =
       selectedEmployee === "All Employees" ||
       employeeName === selectedEmployee.toLowerCase();
+      
+    // Fix status filtering to match actual status values
+    const assignmentStatus = firstValidJob?.jobId?.Status?.toLowerCase() || '';
     const matchesStatus =
       selectedStatus === "All Status" ||
-      (firstValidJob?.jobId?.Status?.toLowerCase() === selectedStatus.toLowerCase());
+      (selectedStatus.toLowerCase() === "in_progress" && assignmentStatus === "in_progress") ||
+      (selectedStatus.toLowerCase() === "review" && assignmentStatus === "review") ||
+      (selectedStatus.toLowerCase() === "active" && assignmentStatus === "active") ||
+      (selectedStatus.toLowerCase() === "completed" && assignmentStatus === "completed") ||
+      (selectedStatus.toLowerCase() === assignmentStatus);
 
     return matchesSearch && matchesEmployee && matchesStatus;
   });
@@ -234,7 +244,7 @@ function MyJobs() {
               {selectedStatus}
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              {["All Status", "In_progress", "Review", "active", "Completed"].map((item) => (
+              {["All Status", "In_progress", "Review", "Active", "Completed"].map((item) => (
                 <Dropdown.Item key={item} onClick={() => setSelectedStatus(item)}>
                   {item}
                 </Dropdown.Item>
@@ -242,19 +252,12 @@ function MyJobs() {
             </Dropdown.Menu>
           </Dropdown>
         </Col>
-
-        {/* <Col xs={12} lg={3} className="text-lg-end d-flex flex-wrap justify-content-lg-end gap-2">
-          <Button id="All_btn" variant="dark" className="w-lg-auto" onClick={handleReturnJob}>
-            Return Job
-          </Button>
-        </Col> */}
       </Row>
 
       <div className="table-responsive">
         <Table hover className="align-middle sticky-header">
           <thead className="bg-light">
             <tr>
-              {/* <th><input type="checkbox" onChange={handleSelectAll} /></th> */}
               <th>EmployeeName</th>
               <th>EmployeeEmail</th>
               <th>Description</th>
@@ -267,7 +270,7 @@ function MyJobs() {
               <th>Priority</th>
               <th>Due Date</th>
               <th>Assign</th>
-              <th>Actions</th>
+              {isDesigner && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -276,7 +279,6 @@ function MyJobs() {
               return (
                 <React.Fragment key={assignment._id}>
                   <tr onClick={() => handleRowClick(assignment._id)} style={{ cursor: "pointer" }}>
-                    {/* <td><input type="checkbox" onChange={handleSelectAll} /></td> */}
                     <td style={{ whiteSpace: 'nowrap' }}>
                       {assignment.employeeId
                         ? `${assignment.employeeId.firstName} ${assignment.employeeId.lastName}`
@@ -298,38 +300,40 @@ function MyJobs() {
                     <td>{new Date(assignment.createdAt).toLocaleDateString("en-GB")}</td>
                     <td style={{ whiteSpace: "nowrap" }}>{assignment.selectDesigner}</td>
                    
-                    <td className="d-flex gap-2">
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        style={{ display: 'none' }}
-                        onChange={handleFileChange}
-                      />
-                      <Button
-                        size="sm"
-                        variant="dark"
-                        className="me-2 d-flex"
-                        onClick={handleUploadClick}
-                        id="All_btn"
-                      >
-                        <FaUpload className="me-1" />
-                        Upload
-                      </Button>
-                      <Link to={"/admin/MyJobsHolidayPackageDesign"}></Link>
-                      <Button
-                        id="All_btn"
-                        size="sm"
-                        variant="dark"
-                        onClick={() => handleCopyFileName(assignment, index, currentPage, itemsPerPage)}
-                      >
-                        CopyFN
-                      </Button>
-                    </td>
+                    {isDesigner && (
+                      <td className="d-flex gap-2">
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          style={{ display: 'none' }}
+                          onChange={handleFileChange}
+                        />
+                        <Button
+                          size="sm"
+                          variant="dark"
+                          className="me-2 d-flex"
+                          onClick={handleUploadClick}
+                          id="All_btn"
+                        >
+                          <FaUpload className="me-1" />
+                          Upload
+                        </Button>
+                        <Link to={"/admin/MyJobsHolidayPackageDesign"}></Link>
+                        <Button
+                          id="All_btn"
+                          size="sm"
+                          variant="dark"
+                          onClick={() => handleCopyFileName(assignment, index, currentPage, itemsPerPage)}
+                        >
+                          CopyFN
+                        </Button>
+                      </td>
+                    )}
                   </tr>
 
                   {expandedJob === assignment._id && (
                     <tr>
-                      <td colSpan="19">
+                      <td colSpan={isDesigner ? "13" : "12"}>
                         <div className="table-responsive">
                           <Table hover className="align-middle sticky-header">
                             <thead className="bg-light">
@@ -377,7 +381,7 @@ function MyJobs() {
       {!loading && !error && (
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div className="text-muted small">
-            Showing {(currentPage - 1) * itemsPerPage + 1} of {filteredProjects.length}
+            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredProjects.length)} of {filteredProjects.length} entries
           </div>
           <ul className="pagination pagination-sm mb-0">
             <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>

@@ -149,13 +149,15 @@ const paginatedProjects = filteredProjects.slice(
 
 
   return (
-    <div className="container bg-white p-4 mt-4 rounded shadow-sm">
+    <div className="container-fluid bg-white p-4 mt-4 rounded shadow-sm">
       {/* Title */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="fw-bold m-0">Jobs In Progress</h5>
         {/* <Button id="All_btn" variant="dark" onClick={() => setShowDesignerModal(true)}>Change Designer</Button> */}
       </div>
 
+
+<div className="d-flex justify-content-between align-items-center mb-3">
          {/* Filters */}
          <div className="d-flex flex-wrap gap-2 mb-3 align-items-center">
         <Form.Control
@@ -183,7 +185,10 @@ const paginatedProjects = filteredProjects.slice(
           </Dropdown.Menu>
         </Dropdown>
       </div>
-
+      <div>
+        <button className="btn btn-primary">Assigned Change</button>
+      </div>
+</div>
       {/* Table */}
       <div className="table-responsive">
         <Table hover className="align-middle sticky-header">

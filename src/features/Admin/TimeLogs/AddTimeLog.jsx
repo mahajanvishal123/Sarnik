@@ -48,8 +48,6 @@ function AddTimeLog() {
     }
   }, [log]);
 
-
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -90,6 +88,9 @@ function AddTimeLog() {
     }
   };
 
+  // Filter jobs based on selected project
+  const filteredJobs = reversedJobList.filter(j => j.projectId?._id === formData.projectsId);
+
   return (
     <div className="container mt-5">
       <div className="card shadow-sm">
@@ -112,6 +113,7 @@ function AddTimeLog() {
                       ...formData,
                       projectsId: selectedId,
                       projectName: selectedProject?.projectName || "",
+                      jobId: '' // reset jobId on project change
                     });
                   }}
                   required
@@ -125,7 +127,7 @@ function AddTimeLog() {
                 </select>
               </div>
 
-              {/* Jobs Dropdown */}
+              {/* Jobs Dropdown (Filtered by Project) */}
               <div className="col-md-6">
                 <label className="form-label">Jobs</label>
                 <select
@@ -134,7 +136,7 @@ function AddTimeLog() {
                   value={formData.jobId}
                   onChange={(e) => {
                     const selectedId = e.target.value;
-                    const selectedJob = reversedJobList.find(j => j._id === selectedId);
+                    const selectedJob = filteredJobs.find(j => j._id === selectedId);
                     setFormData({
                       ...formData,
                       jobId: selectedId,
@@ -144,9 +146,9 @@ function AddTimeLog() {
                   required
                 >
                   <option value="">Select a job</option>
-                  {reversedJobList.map((j) => (
+                  {filteredJobs.map((j) => (
                     <option key={j._id} value={j._id}>
-                      {j?.jobName || j.brandName + " " + j.subBrand}
+                      {j.jobNo} - {j?.jobName || `${j.brandName} ${j.subBrand}`}
                     </option>
                   ))}
                 </select>
@@ -189,7 +191,6 @@ function AddTimeLog() {
                   onChange={handleInputChange}
                   placeholder="Enter task details"
                   rows="3"
-                  required
                 ></textarea>
               </div>
 

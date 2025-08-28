@@ -37,6 +37,7 @@ export const adminMenuItems = [
     submenu: [
       { title: "Projects", path: "/admin/projectList" },
       { title: "Job Tracker", path: "/admin/JobTracker" },
+      { title: "Completed Producation jobs", path: "/admin/Completed" },
     ],
   },
   {
@@ -54,7 +55,7 @@ export const adminMenuItems = [
     title: "Designer Panel",
     icon: <FaPencilRuler className="menu-icon" />,
     submenu: [
-      { title: "My Jobs", path: "/admin/MyJobs" },
+      { title: "Assigned Jobs", path: "/admin/MyJobs" },
       { title: "Time Logs", path: "/admin/TimeLogs" },
 
     ],
@@ -131,6 +132,7 @@ export const employeeMenuItems = [
     icon: <FaProjectDiagram className="menu-icon" />,
     submenu: [
       { title: "Projects", path: "/employee/projectList" },
+      { title: "Job Trackers", path: "/employee/employeeJobsTracker" },
     ],
   },
   {

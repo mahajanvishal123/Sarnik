@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Table, Dropdown } from "react-bootstrap";
-import { FaFilePdf, FaUpload, FaLink, FaClock, FaEdit } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchjobs } from "../../../redux/slices/JobsSlice";
 
-function JobTracker() {
+function EmployeeJobTracker() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProject, setSelectedProject] = useState("All Projects");
   const [selectedPriority, setSelectedPriority] = useState("All Priorities");
   const [selectedStatus, setSelectedStatus] = useState("All Status");
-  const [selectedJobs, setSelectedJobs] = useState({});
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -19,16 +18,15 @@ function JobTracker() {
 
   const { job, loading, error } = useSelector((state) => state.jobs);
 
+  // 🔹 yaha se apna employeeId lo (auth state/localStorage se)
+  // Example: agar aap redux me auth rakhe ho
+  const employeeId = useSelector((state) => state.auth?.user?._id); 
+  // Agar localStorage me h to use this:
+  // const employeeId = localStorage.getItem("employeeId");
+
   useEffect(() => {
     dispatch(fetchjobs());
   }, [dispatch]);
-
-  const handleCheckboxChange = (jobId) => {
-    setSelectedJobs((prevSelectedJobs) => ({
-      ...prevSelectedJobs,
-      [jobId]: !prevSelectedJobs[jobId],
-    }));
-  };
 
   const getPriorityClass = (priority) => {
     switch ((priority || "").toLowerCase()) {
@@ -44,19 +42,19 @@ function JobTracker() {
   };
 
   const getStatusClass = (status) => {
-    switch (status.toLowerCase().trim()) {
+    switch ((status || "").toLowerCase().trim()) {
       case "in progress":
       case "in_progress":
-        return "bg-warning text-dark"; // Yellow
+        return "bg-warning text-dark";
       case "completed":
-        return "bg-success text-white"; // Green
+        return "bg-success text-white";
       case "cancelled":
-      case "waitingapproval": // lowercase me likho
-        return "bg-info text-dark";
-        return "bg-danger text-white"; // Red
+      case "waitingapproval":
+        return "bg-danger text-white";
       case "active":
-        return "bg-primary text-white"; // Blue
+        return "bg-primary text-white";
       case "reject":
+      case "rejected":
         return "bg-danger text-white";
       case "review":
         return "bg-info text-dark";
@@ -64,16 +62,20 @@ function JobTracker() {
         return "bg-secondary text-white";
       case "open":
         return "bg-primary text-white";
-      case "rejected": // ✅ Added for "Rejected"
-        return "bg-danger text-white";
       default:
         return "bg-light text-dark";
     }
   };
 
-  const filteredJobs = (job?.jobs || []).filter((j) => {
-    // Split searchQuery by spaces, ignore empty terms
+  // 🔹 Pehle employee ke jobs filter karo
+  const employeeJobs = (job?.jobs || []).filter(
+    (j) => (j.assignedTo?._id || j.assign) === employeeId
+  );
+
+  // 🔹 Uske baad filters aur search lagao
+  const filteredJobs = employeeJobs.filter((j) => {
     const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
+
     if (terms.length === 0)
       return (
         (selectedProject === "All Projects" ||
@@ -86,7 +88,7 @@ function JobTracker() {
           (j.Status || "").toLowerCase().trim() ===
             selectedStatus.toLowerCase().trim())
       );
-    // Prepare searchable fields as strings
+
     const fields = [
       j.JobNo,
       j.projectId?.[0]?.projectName,
@@ -97,7 +99,9 @@ function JobTracker() {
       j.packSize,
       j.packCode,
       j.priority,
-      j.createdAt ? new Date(j.createdAt).toLocaleDateString("en-GB") : "",
+      j.createdAt
+        ? new Date(j.createdAt).toLocaleDateString("en-GB")
+        : "",
       j.assignedTo,
       j.updatedAt
         ? new Date(j.updatedAt).toLocaleTimeString("en-US", {
@@ -107,21 +111,24 @@ function JobTracker() {
         : "",
       j.Status,
     ].map((f) => (f || "").toString().toLowerCase());
-    // Every term must be found in at least one field
+
     const matchesSearch = terms.every((term) =>
       fields.some((field) => field.includes(term.toLowerCase()))
     );
+
     const matchesProject =
       selectedProject === "All Projects" ||
       (j.projectId?.[0]?.projectName || "").toLowerCase() ===
         selectedProject.toLowerCase();
     const matchesPriority =
       selectedPriority === "All Priorities" ||
-      (j.priority || "").toLowerCase() === selectedPriority.toLowerCase();
+      (j.priority || "").toLowerCase() ===
+        selectedPriority.toLowerCase();
     const matchesStatus =
       selectedStatus === "All Status" ||
       (j.Status || "").toLowerCase().trim() ===
         selectedStatus.toLowerCase().trim();
+
     return matchesSearch && matchesProject && matchesPriority && matchesStatus;
   });
 
@@ -131,7 +138,6 @@ function JobTracker() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
 
   const paginatedProjects = filteredJobs.slice(
@@ -149,7 +155,7 @@ function JobTracker() {
       style={{ backgroundColor: "white", borderRadius: "10px" }}
     >
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="job-title mb-0">Job Tracker</h2>
+        <h2 className="job-title mb-0">My Job Tracker</h2>
       </div>
 
       <div className="filters d-flex flex-wrap gap-2 mb-4">
@@ -169,20 +175,16 @@ function JobTracker() {
             <Dropdown.Item onClick={() => setSelectedProject("All Projects")}>
               All Projects
             </Dropdown.Item>
-            {[
-              ...new Set(
-                (job?.jobs || []).map(
-                  (j) => j.projectId?.[0]?.projectName || "N/A"
-                )
-              ),
-            ].map((projectName, index) => (
-              <Dropdown.Item
-                key={index}
-                onClick={() => setSelectedProject(projectName)}
-              >
-                {projectName}
-              </Dropdown.Item>
-            ))}
+            {[...new Set(employeeJobs.map((j) => j.projectId?.[0]?.projectName || "N/A"))].map(
+              (projectName, index) => (
+                <Dropdown.Item
+                  key={index}
+                  onClick={() => setSelectedProject(projectName)}
+                >
+                  {projectName}
+                </Dropdown.Item>
+              )
+            )}
           </Dropdown.Menu>
         </Dropdown>
 
@@ -214,7 +216,10 @@ function JobTracker() {
               "Not Started",
               "Completed",
             ].map((item) => (
-              <Dropdown.Item key={item} onClick={() => setSelectedStatus(item)}>
+              <Dropdown.Item
+                key={item}
+                onClick={() => setSelectedStatus(item)}
+              >
                 {item}
               </Dropdown.Item>
             ))}
@@ -246,7 +251,7 @@ function JobTracker() {
             {paginatedProjects
               .slice()
               .reverse()
-              .map((job, index) => (
+              .map((job) => (
                 <tr key={job._id}>
                   <td onClick={() => JobDetails(job)}>
                     <Link style={{ textDecoration: "none" }}>{job.JobNo}</Link>
@@ -268,21 +273,10 @@ function JobTracker() {
                       {job.priority}
                     </span>
                   </td>
-                  <td style={{ whiteSpace: "nowrap" }}>
-                    {job?.assign &&
-                    job.assign.trim().toLowerCase() !== "not assign"
-                      ? job.assign
-                      : "Unassigned"}
+                  <td style={{ whiteSpace: "nowrap" }}>{job?.assign}</td>
+                  <td>
+                    {new Date(job.createdAt).toLocaleDateString("en-GB")}
                   </td>
-
-                  <td>{new Date(job.createdAt).toLocaleDateString("en-GB")}</td>
-                  {/* <td>
-                      {new Date(job.updatedAt).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false
-                      })}
-                    </td> */}
                   <td>
                     <span
                       className={`badge ${getStatusClass(
@@ -294,10 +288,6 @@ function JobTracker() {
                   </td>
                   <td>
                     <div className="d-flex gap-2">
-                      {/* <Button id="icone_btn" size="sm"><FaFilePdf /></Button>
-                    <Button id="icone_btn" size="sm"><FaUpload /></Button>
-                    <Button id="icone_btn" size="sm"><FaLink /></Button>
-                    <Button id="icone_btn" size="sm"><FaClock /></Button> */}
                       <Button
                         id="icone_btn"
                         size="sm"
@@ -324,7 +314,9 @@ function JobTracker() {
             <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
               <button
                 className="page-link"
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.max(prev - 1, 1))
+                }
               >
                 &laquo;
               </button>
@@ -363,4 +355,4 @@ function JobTracker() {
   );
 }
 
-export default JobTracker;
+export default EmployeeJobTracker;
