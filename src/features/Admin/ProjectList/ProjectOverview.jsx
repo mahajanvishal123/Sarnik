@@ -6,19 +6,42 @@ import ProjectDocumentsTab from './ProjectTabs/ProjectDocumentsTab';
 import ProjectTeamTab from './ProjectTabs/ProjectTeamTab';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
+import { FaEdit } from 'react-icons/fa';
+import { Table } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 function ProjectOverview() {
   const location = useLocation();
-  const { id, openTab, projectDatah ,projectNo,projectName,clientName} = location.state || {};
-
-
-
+  const { id, openTab, projectDatah, projectNo, projectName, clientName } = location.state || {};
   const [activeTab, setActiveTab] = useState('overview');
+  const navigate = useNavigate();
+  
   useEffect(() => {
     if (location.state?.openTab) {
       setActiveTab(location.state.openTab);
     }
   }, [location.state]);
+  
+  // 定义状态样式函数
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'Active Project':
+        return 'bg-success';
+      case 'Completed':
+        return 'bg-primary';
+      case 'On Hold':
+        return 'bg-warning text-dark';
+      case 'Cancelled':
+        return 'bg-danger';
+      default:
+        return 'bg-secondary';
+    }
+  };
+  
+  // 修改处理编辑的函数，确保传递projectDatah
+  const handleUpdate = (project) => {
+    navigate(`/admin/AddProjectList`, { state: { project: project || projectDatah } });
+  };
 
   const projectData = {
     title: 'Saaranik',
@@ -55,7 +78,7 @@ function ProjectOverview() {
       totalValue: '$35,000'
     }
   };
-
+  
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
@@ -72,7 +95,7 @@ function ProjectOverview() {
         return <ProjectOverviewTab projectData={projectData} />;
     }
   };
-
+  
   return (
     <div className="container-fluid py-4">
       {/* Project Header */}
@@ -88,7 +111,6 @@ function ProjectOverview() {
             <button className="btn btn-outline-secondary">← Back to Projects</button>
           </Link>
         </div>
-
       </div>
 
       {/* Tabs for Desktop */}
@@ -105,7 +127,7 @@ function ProjectOverview() {
           </li>
         ))}
       </ul>
-
+      
       {/* Dropdown for Mobile */}
       <div className="d-block d-md-none mb-4">
         <div className="dropdown">
@@ -137,10 +159,75 @@ function ProjectOverview() {
           </ul>
         </div>
       </div>
-
-
+      
       {/* Tab Content */}
       {renderTabContent()}
+      
+      {/* Project Details Table */}
+      <div className="mb-4">
+        <h5 className="mb-3">Project Details</h5>
+        <Table responsive className="project-table">
+          <thead>
+            <tr>
+              <th style={{ whiteSpace: 'nowrap' }}>Project No</th>
+              <th style={{ textWrap: 'nowrap' }}>Project Name</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Start Date</th>
+              <th style={{ whiteSpace: 'nowrap' }}>End Date</th>
+              <th>Client</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Project Requirements</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Priority</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {projectDatah && (
+              <tr>
+                <td>{projectDatah.projectNo}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{projectDatah.projectName}</td>
+                <td>
+                  {projectDatah.startDate 
+                    ? new Date(projectDatah.startDate).toLocaleDateString('en-GB').replace(/\/20/, '/') 
+                    : 'N/A'}
+                </td>
+                <td>
+                  {projectDatah.endDate 
+                    ? new Date(projectDatah.endDate).toLocaleDateString('en-GB').replace(/\/20/, '/') 
+                    : 'N/A'}
+                </td>
+                <td style={{ whiteSpace: 'nowrap' }}>{projectDatah?.clientId?.clientName || 'N/A'}</td>
+                <td>
+                  {projectDatah.projectRequirements && projectDatah.projectRequirements.length > 0
+                    ? Object.entries(projectDatah.projectRequirements[0])
+                      .filter(([_, value]) => value === true)
+                      .map(([key]) => key)
+                      .join(', ')
+                    : 'N/A'}
+                </td>
+                <td>{projectDatah.projectPriority || 'N/A'}</td>    
+                <td>
+                  <span className={`badge ${getStatusClass(projectDatah.status)} px-2 py-1`}>
+                    {projectDatah.status || 'N/A'}
+                  </span>
+                </td>
+                <td>
+                  <div className="action-buttons d-flex">
+                    {/* 修改这里：传递projectDatah参数 */}
+                    <Button 
+                      style={{ color: "#0d6efd" }} 
+                      variant="link" 
+                      className="p-0 me-2" 
+                      onClick={() => handleUpdate(projectDatah)}
+                    >
+                      <FaEdit />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
+      </div>
     </div>
   );
 }
