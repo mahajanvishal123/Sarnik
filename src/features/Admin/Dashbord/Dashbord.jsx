@@ -26,37 +26,66 @@ function Dashbord() {
     },
   };
 
-  const recentActivities = [
-    { type: 'new', title: 'New project created', description: 'Premium Packaging Design - Client XYZ', time: '2 hours ago' },
-    { type: 'completed', title: 'Project completed', description: 'Eco-friendly Bag Design - Client ABC', time: '1 day ago' },
-    { type: 'po', title: 'New PO received', description: 'Design Update - Client DEF', time: '1 day ago' },
-  ];
+  // const recentActivities = [
+  //   { type: 'new', title: 'New project created', description: 'Premium Packaging Design - Client XYZ', time: '2 hours ago' },
+  //   { type: 'completed', title: 'Project completed', description: 'Eco-friendly Bag Design - Client ABC', time: '1 day ago' },
+  //   { type: 'po', title: 'New PO received', description: 'Design Update - Client DEF', time: '1 day ago' },
+  // ];
   const navigate = useNavigate();
 
-  const handleClick = (type) => {
-    if (type === 'new') {
-      navigate('/admin/projectList');
-    } else if (type === 'completed') {
-      navigate('/admin/completedJobs');
-    } else if (type === 'po') {
-      navigate('/admin/receivable');
-    }
-  };
+// destructure properly
+const { project = [], status, error } = useSelector((state) => state.projects);
+
+// always ensure it's an array
+const projects = Array.isArray(project?.data) ? project.data : Array.isArray(project) ? project : [];
+
+
+useEffect(() => {
+  dispatch(fetchProject());
+}, [dispatch]);
+
+// ✅ Convert projects → activities
+const recentActivities = projects
+  .map((proj) => ({
+    type:
+      proj.status === "Completed"
+        ? "completed"
+        : proj.status === "Active Project"
+        ? "new"
+        : "po",
+    title: proj.projectName,
+    description: `Client: ${proj.clientId?.clientName || "Unknown"} | Budget: ${
+      proj.budgetAmount
+    } ${proj.currency}`,
+    time: new Date(proj.createdAt).toLocaleDateString(),
+  }))
+  .slice(0, 5);
+
+
   // Fetch jobs on component mount
   useEffect(() => {
     dispatch(fetchjobs());
   }, [dispatch]);
+  // ✅ keep your click function same
+  const handleClick = (type) => {
+    if (type === "new") {
+      navigate("/admin/projectList");
+    } else if (type === "completed") {
+      navigate("/admin/completedJobs");
+    } else if (type === "po") {
+      navigate("/admin/receivable");
+    }
+  };
 
   // Job In Progress 
-  const { job, loading, error } = useSelector((state) => state.jobs);
-  const { project } = useSelector((state) => state.projects);
+  const { job, loading } = useSelector((state) => state.jobs);
+  // const { project } = useSelector((state) => state.projects);
   const { estimates } = useSelector((state) => state.costEstimates);
   const { purchases } = useSelector((state) => state.receivablePurchases);
 
 
   useEffect(() => {
     dispatch(fetchjobs());
-    dispatch(fetchProject());
     dispatch(fetchCostEstimates());
     dispatch(fetchReceivablePurchases());
   }, [dispatch]);
@@ -81,7 +110,7 @@ function Dashbord() {
   const ReceivablePurchasesCount = filteredEstimates.length;
 
 
-    const filteredEstimatesCostPOStatus = estimates.costEstimates?.filter(
+  const filteredEstimatesCostPOStatus = estimates.costEstimates?.filter(
     (proj) =>
       (proj.CostPOStatus || "").toLowerCase().replace(/\s|_/g, "") === "pending"
   ) || [];
@@ -106,8 +135,7 @@ function Dashbord() {
   });
   const todaysJobsCount = todaysJobs.length;
 
-  // Sample filtered data
-  const projects = project?.data || [];
+
 
   // Count for each status
   const activeProjectsCount = projects.filter(
@@ -123,7 +151,7 @@ function Dashbord() {
   ).length;
 
 
- 
+
 
   // Chart data
   const projectStatusData = {
@@ -218,7 +246,7 @@ function Dashbord() {
           </Link>
         </Col>
 
-         <Col md={4} lg={4}>
+        <Col md={4} lg={4}>
           <Link to="/admin/DReciveablePurchase" className="text-decoration-none w-100 d-block">
             <Card className="h-100 shadow-sm">
               <Card.Body className="d-flex align-items-center">
@@ -302,29 +330,41 @@ function Dashbord() {
           </Card>
         </Col>
 
-        {/* Recent Activity */}
         <Col md={6}>
           <Card className="h-100 shadow-sm">
             <Card.Body>
               <h5 className="card-title mb-4">Recent Activity</h5>
+
+              {status === "loading" && <p>Loading...</p>}
+              {status === "failed" && <p className="text-danger">{error}</p>}
+              {status === "succeeded" && recentActivities.length === 0 && (
+                <p>No recent activities found.</p>
+              )}
+
               {recentActivities.map((activity, index) => (
                 <div
                   key={index}
                   className="d-flex align-items-start mb-3"
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                   onClick={() => handleClick(activity.type)}
                 >
                   <div
-                    className={`rounded-circle p-2 bg-light-${activity.type === 'new'
-                      ? 'blue'
-                      : activity.type === 'completed'
-                        ? 'green'
-                        : 'yellow'
-                      } me-3`}
+                    className={`rounded-circle p-2 me-3 ${activity.type === "new"
+                        ? "bg-primary"
+                        : activity.type === "completed"
+                          ? "bg-success"
+                          : "bg-warning"
+                      }`}
                   >
-                    {activity.type === 'new' && <FaProjectDiagram className="text-primary" />}
-                    {activity.type === 'completed' && <FaClipboardCheck className="text-success" />}
-                    {activity.type === 'po' && <FaFileInvoiceDollar className="text-warning" />}
+                    {activity.type === "new" && (
+                      <FaProjectDiagram className="text-white" />
+                    )}
+                    {activity.type === "completed" && (
+                      <FaClipboardCheck className="text-white" />
+                    )}
+                    {activity.type === "po" && (
+                      <FaFileInvoiceDollar className="text-white" />
+                    )}
                   </div>
                   <div>
                     <h6 className="mb-1">{activity.title}</h6>
@@ -336,6 +376,8 @@ function Dashbord() {
             </Card.Body>
           </Card>
         </Col>
+
+
       </Row>
     </Container>
   );

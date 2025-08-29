@@ -17,6 +17,7 @@ import ChangePassword from '../features/Layouts/ChangePassword.jsx';
 import UpdateProfile from '../features/Employee/Profile/UpdateProfile.jsx';
 import OvervieJobsTracker from '../features/Employee/JobTracker/OvervieJobsTracker.jsx';
 import Pluginss from '../assets/css/Pluginss/Pluginss.jsx';
+import EmployeeJobTracker from '../features/Employee/EmployeeJobTrackers/EmployeeJobTrackers.jsx';
 
 function Employee() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
@@ -51,6 +52,7 @@ function Employee() {
             <Route path="/changePassword" element={<ProtectedRoute><ChangePassword/></ProtectedRoute>} />
             <Route path="/UpdateProfile" element={<ProtectedRoute><UpdateProfile/></ProtectedRoute>} />
             <Route path="/OvervieJobsTracker" element={<ProtectedRoute><OvervieJobsTracker/></ProtectedRoute>} />
+            <Route path="/employeeJobsTracker" element={<ProtectedRoute><EmployeeJobTracker/></ProtectedRoute>} />
           </Routes>
         </div>
       </div>

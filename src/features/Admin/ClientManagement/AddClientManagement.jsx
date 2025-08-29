@@ -540,16 +540,34 @@ const validatePhone = () => {
              <div className="col-md-6">
   <label className="form-label">Phone Number</label>
   <div className="input-group">
-    <select
-      className="form-select"
-      style={{ maxWidth: "100px" }}
-      value={userData.countryCode}
-      onChange={(e) => setUserData({ ...userData, countryCode: e.target.value })}
-    >
-      <option value="+44">🇬🇧 +44</option>
-      <option value="+91">🇮🇳 +91</option>
-      <option value="+1">🇺🇸 +1</option>
-    </select>
+  <select
+  className="form-select"
+  style={{ maxWidth: "120px" }}
+  value={userData.countryCode}
+  onChange={(e) => setUserData({ ...userData, countryCode: e.target.value })}
+>
+  <option value="+44">🇬🇧 +44</option>
+  <option value="+91">🇮🇳 +91</option>
+  <option value="+1">🇺🇸 +1</option>
+  <option value="+61">🇦🇺 +61</option>     {/* Australia */}
+  <option value="+81">🇯🇵 +81</option>     {/* Japan */}
+  <option value="+49">🇩🇪 +49</option>     {/* Germany */}
+  <option value="+33">🇫🇷 +33</option>     {/* France */}
+  <option value="+39">🇮🇹 +39</option>     {/* Italy */}
+  <option value="+971">🇦🇪 +971</option>   {/* UAE */}
+  <option value="+92">🇵🇰 +92</option>     {/* Pakistan */}
+  <option value="+880">🇧🇩 +880</option>   {/* Bangladesh */}
+  <option value="+94">🇱🇰 +94</option>     {/* Sri Lanka */}
+  <option value="+60">🇲🇾 +60</option>     {/* Malaysia */}
+  <option value="+65">🇸🇬 +65</option>     {/* Singapore */}
+  <option value="+34">🇪🇸 +34</option>     {/* Spain */}
+  <option value="+7">🇷🇺 +7</option>       {/* Russia */}
+  <option value="+86">🇨🇳 +86</option>     {/* China */}
+  <option value="+82">🇰🇷 +82</option>     {/* South Korea */}
+  <option value="+55">🇧🇷 +55</option>     {/* Brazil */}
+  <option value="+20">🇪🇬 +20</option>     {/* Egypt */}
+</select>
+
 
     <input
       type="tel"

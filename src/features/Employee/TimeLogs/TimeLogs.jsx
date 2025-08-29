@@ -455,32 +455,23 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { FaSearch, FaCalendarAlt, FaPencilAlt, FaTrashAlt, FaPlus, FaFilter } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { FaSearch, FaPlus, FaFilter } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteTimeLogs, fetchTimeLogss, updateExtraHours } from '../../../redux/slices/TimeLogsSlice';
-import { Button, Form, Modal, Dropdown } from "react-bootstrap";
-import Swal from 'sweetalert2';
+import { Button, Dropdown } from "react-bootstrap";
 import { fetchTimesheetWorklogs } from '../../../redux/slices/TimesheetWorklogSlice';
 
 function TimeLogs() {
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editingLog, setEditingLog] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [selectedProject, setSelectedProject] = useState('All Projects');
   const [selectedJobs, setSelectedJobs] = useState({});
-  const [errorMessage, setErrorMessage] = useState('');
-  const [extraHours, setExtraHours] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const { timesheetWorklog, error, loading } = useSelector((state) => state.TimesheetWorklogs);
+  const { timesheetWorklog } = useSelector((state) => state.TimesheetWorklogs);
 
   useEffect(() => {
     dispatch(fetchTimesheetWorklogs());
@@ -504,7 +495,6 @@ function TimeLogs() {
     );
 
     const matchesDate =
-      (!selectedDate || new Date(log.date).toLocaleDateString() === new Date(selectedDate).toLocaleDateString()) &&
       (!fromDate || new Date(log.date) >= new Date(fromDate)) &&
       (!toDate || new Date(log.date) <= new Date(toDate));
 
@@ -521,7 +511,7 @@ function TimeLogs() {
     currentPage * itemsPerPage
   );
 
-  // Helper function to sum times
+  // Helper to sum times (hh:mm format)
   const sumTime = (timeArray) => {
     let totalMinutes = 0;
     timeArray.forEach(time => {
@@ -535,7 +525,7 @@ function TimeLogs() {
     return `${hours}:${minutes.toString().padStart(2, '0')}`;
   };
 
-  // Calculate totals
+  // Calculate totals (after filters)
   const totalTimeSum = sumTime(filteredTimeLogs.map(log => log.time));
   const overtimeSum = sumTime(filteredTimeLogs.map(log => log.overtime));
 
@@ -544,6 +534,7 @@ function TimeLogs() {
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <h3 className="mb-0">Time Logs</h3>
         <div className="d-flex gap-3 mt-4 flex-wrap align-items-center">
+          {/* Reverted: Add Time Log opens existing working page */}
           <Link to={"/employee/AddTimelog"} className="text-decoration-none">
             <button id='All_btn' className="btn btn-dark d-flex align-items-center gap-2">
               <FaPlus /> Add Time Log
@@ -561,9 +552,9 @@ function TimeLogs() {
         </div>
       </div>
 
-      {/* Total Time Row */}
+      {/* Total Time Row (Summary) */}
       <div className="d-flex justify-content-end mb-2 fw-bold">
-        <span className="me-4">Total: {totalTimeSum}</span>
+        <span className="me-4">Total Time: {totalTimeSum}</span>
         <span>Overtime: {overtimeSum}</span>
       </div>
 
@@ -590,7 +581,15 @@ function TimeLogs() {
             className="form-control"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
-            placeholder="From Date"
+          />
+        </div>
+        
+        <div className="col-md-3">
+          <input
+            type="date"
+            className="form-control"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
           />
         </div>
         
@@ -654,6 +653,14 @@ function TimeLogs() {
                     <td>{log.totalTime}</td>
                   </tr>
                 ))}
+
+                {/* Summary Row at bottom */}
+                <tr className="fw-bold bg-light">
+                  <td colSpan="4" className="text-end">Grand Total:</td>
+                  <td>{totalTimeSum}</td>
+                  <td>{overtimeSum}</td>
+                  <td>-</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -664,3 +671,4 @@ function TimeLogs() {
 }
 
 export default TimeLogs;
+

@@ -365,7 +365,7 @@ function NewJobsList() {
   );
 
   return (
-    <div className="container bg-white p-3 mt-4 rounded shadow-sm">
+    <div className="container-fluid bg-white p-3 mt-4 rounded shadow-sm">
       {/* Title */}
       <div className="d-flex justify-content-between align-items-center">
         <h5 className="fw-bold m-0">Job Assign</h5>

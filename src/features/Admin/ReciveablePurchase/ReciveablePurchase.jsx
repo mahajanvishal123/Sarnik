@@ -125,28 +125,27 @@ const getStatusClass = (status) => {
   //   });
   // };
 
-  const handleToBeInvoiced = (po) => {
-    console.log("po", po._id)
-    const ReceivablePurchaseId = po._id;
-    const client = po.ClientId?.[0];
-    const project = po.projectId?.[0];
-    const CostEstimatesId = po.CostEstimatesId?.[0];
-    // console.log("pocost",po.CostEstimatesId[0]._id)
-    const invoice = {
-      clientId: client?._id,
-      clientName: client?.clientName,
-      projectId: project?._id,
-      projectName: project?.projectName,
-      CostEstimatesId: po.CostEstimatesId[0]._id,
-      ReceivablePurchaseId: po?._id,
-    };
-    console.log("Invoice Data:", invoice);
-
-
-    navigate("/admin/AddInvoice", {
-      state: { invoice }
-    });
+const handleToBeInvoiced = (po) => {
+  console.log("po", po._id);
+  const client = po.ClientId?.[0];
+  const project = po.projectId?.[0];
+  
+  const purchaseOrderData = {
+    clientId: client?._id,
+    projectId: project?._id,
+    CostEstimatesId: po.CostEstimatesId?.[0]?._id,
+    ReceivablePurchaseId: po?._id,
   };
+  
+  console.log("Purchase Order Data:", purchaseOrderData);
+  
+  navigate("/admin/AddInvoice", {
+    state: { 
+      isFromPurchaseOrder: true,
+      purchaseOrder: purchaseOrderData
+    }
+  });
+};
   return (
     <div className="p-4 m-2"
       style={{ backgroundColor: "white", borderRadius: "10px" }}

@@ -305,6 +305,7 @@ const Login = () => {
     localStorage.setItem("encode", res.data.token.token);
     localStorage.setItem("iv", res.data.token.iv);
     localStorage.setItem("userRole", role);
+    localStorage.setItem("_id", res.data.user._id);
 
     toast.success("Logged in successfully!");
     

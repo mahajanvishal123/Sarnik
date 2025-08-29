@@ -47,44 +47,15 @@ function Completed_Jobs() {
   const params = useParams();
   const id = location.state?.id || params.id;
 
-  const jobs = [
-    {
-      id: "00001",
-      project: "PackageRedesign",
-      client: "AcmeCorp",
-      brief: "Redesign...",
-      date: "2024-02-20",
-    },
-    {
-      id: "00002",
-      project: "BrandGuidelines",
-      client: "TechSolutions",
-      brief: "Create...",
-      date: "2024-02-19",
-    },
-    {
-      id: "00003",
-      project: "MarketingMaterials",
-      client: "GlobalInc",
-      brief: "Design...",
-      date: "2024-02-18",
-    },
-  ];
-
-
   const { assigns, loading, error } = useSelector((state) => state.Assign);
   const { job} = useSelector((state) => state.jobs);
   const [Status, setStatus] = useState("Completed");
-console.log("jhhujhfe",job.jobs);
 
   useEffect(() => {
     dispatch(filterStatus(Status));
   }, [dispatch, Status]);
 
-  // ✅ Step 1: Flatten all jobId objects from the nested structure
   const flattenedJobs = assigns.data?.flatMap((item) => item.jobdata) || [];
-  console.log("Flattened Jobs:", flattenedJobs);
-
 
   const handleShowDescription = (job) => {
     setSelectedJob(job);
@@ -128,7 +99,6 @@ console.log("jhhujhfe",job.jobs);
       setTimeout(() => setErrorMessage(""), 3000);
       return;
     }
-    // dispatch(updatejob({ id: selectedJobIds, data: { Status: "Reject" } }))
     dispatch(updatejob({ id: selectedJobIds, data: { Status: "Cancelled" } }))
     setSuccessMessage("Jobs rejected successfully.");
     dispatch(fetchjobs());
@@ -141,35 +111,37 @@ console.log("jhhujhfe",job.jobs);
     setShowRejectModal(false);
   };
 
-  // const handleDelete = (_id) => {
-  //     console.log(_id);
-  //     Swal.fire({
-  //       title: "Are you sure?",
-  //       text: "You want to mark this job as Cancelled?",
-  //       icon: "warning",
-  //       showCancelButton: true,
-  //       confirmButtonColor: "#3085d6",
-  //       cancelButtonColor: "#d33",
-  //       confirmButtonText: "Yes, mark as Cancelled!",
-  //     }).then((result) => {
-  //       if (result.isConfirmed) {
-  //         // dispatch(deletejob({ id: _id, data: { status: "Cancelled" } }))
-  //         console.log(id);
-
-  //         dispatch(updatejob({ id: _id, data: { Status: "Cancelled" } }))
-  //           .unwrap()
-  //           .then(() => {
-  //             Swal.fire("Updated!", "The job has been marked as Cancelled.", "success");
-  //             dispatch(Project_job_Id(id));
-  //           })
-  //           .catch(() => {
-  //             Swal.fire("Error!", "Something went wrong while updating.", "error");
-  //           });
-  //       }
-  //     });
-  //   };
-
-
+  // Function to handle returning jobs
+  const handleReturnJobs = () => {
+    const selectedJobIds = Object.keys(selectedJobs).filter((id) => selectedJobs[id]);
+    if (selectedJobIds.length === 0) {
+      setErrorMessage("Please select at least 1 job to return.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return;
+    }
+    
+    // Get the selected job objects
+    const jobsToReturn = filteredJobs.filter(job => selectedJobIds.includes(job._id));
+    
+    // Store returned jobs in localStorage to access on the returned jobs page
+    const existingReturnedJobs = JSON.parse(localStorage.getItem('returnedJobs') || '[]');
+    const updatedReturnedJobs = [...existingReturnedJobs, ...jobsToReturn];
+    localStorage.setItem('returnedJobs', JSON.stringify(updatedReturnedJobs));
+    
+    // Update job status to "Returned"
+    selectedJobIds.forEach(jobId => {
+      dispatch(updatejob({ id: jobId, data: { Status: "Returned" } }));
+    });
+    
+    // Clear selection
+    setSelectedJobs({});
+    
+    setSuccessMessage("Jobs returned successfully. They will appear on the Returned Jobs page.");
+    setTimeout(() => setSuccessMessage(""), 3000);
+    
+    // Refresh the jobs list
+    dispatch(fetchjobs());
+  };
 
   const getPriorityClass = (priority) => {
     switch ((priority || "").toLowerCase()) {
@@ -203,17 +175,16 @@ console.log("jhhujhfe",job.jobs);
         return "bg-secondary text-white";
       case "open":
         return "bg-primary text-white";
+      case "returned":
+        return "bg-warning text-dark";     // Yellow for returned jobs
       default:
         return "bg-light text-dark";
     }
   };
 
-const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
-
-  .filter((j) => j.assignedTo === "Not Assigned")
-
+  const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
+    .filter((j) => j.assignedTo === "Not Assigned")
     .filter((j) => {
-      // Split searchQuery by spaces, ignore empty terms
       const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
       if (terms.length === 0) {
         const matchesProject =
@@ -235,7 +206,6 @@ const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
           matchesStage
         );
       }
-      // Prepare searchable fields as strings
       const fields = [
         j.JobNo,
         j.projectId?.[0]?.projectName,
@@ -251,7 +221,6 @@ const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
         j.priority,
         j.Status
       ].map(f => (f || '').toString().toLowerCase());
-      // Every term must be found in at least one field
       const matchesSearch = terms.every(term =>
         fields.some(field => field.includes(term.toLowerCase()))
       );
@@ -291,6 +260,10 @@ const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
     }));
   };
 
+  const navigateToReturnedJobs = () => {
+    navigate("/admin/ReturnedJobs");
+  };
+
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const { userAll } = useSelector((state) => state.user);
 
@@ -323,7 +296,6 @@ const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
       Status: "In Progress",
     };
     console.log("Assignment Payload:", payload);
-    // then update the job itself
     dispatch(Project_job_Id(id))
     dispatch(createAssigns(payload))
       .unwrap()
@@ -368,19 +340,30 @@ const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-  console.log("gggggggggggggggg", paginatedProjects);
-  console.log("gggggggggggggggg", paginatedProjects?.projectName);
 
   return (
-    <div className="container bg-white p-3 mt-4 rounded shadow-sm">
+    <div className="container-fluid bg-white p-3 mt-4 rounded shadow-sm">
       {/* Title */}
       <div className="d-flex justify-content-between align-items-center">
-            <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="job-title mb-0">Completed Jobs</h2>
         </div>
         <div className="d-flex gap-2 ">
-          {/* <Button onClick={handleRejectJobs} id="All_btn" className="m-2" variant="primary">
-            Cancelled Job
+          <Button 
+            id="All_btn" 
+            className="m-2" 
+            variant="primary"
+            onClick={handleReturnJobs}
+          >
+            Return
+          </Button>
+          {/* <Button 
+            id="All_btn" 
+            className="m-2" 
+            variant="info"
+            onClick={navigateToReturnedJobs}
+          >
+            View Returned Jobs
           </Button> */}
           <Button
             id="All_btn"
@@ -459,7 +442,6 @@ const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
                     setSelectedJobs(newSelectedJobs);
                   }}
                   checked={flattenedJobs.length > 0 && flattenedJobs.every((j) => selectedJobs[j._id])}
-
                 />
               </th>
               <th>JobNo</th>
@@ -480,12 +462,10 @@ const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
             </tr>
           </thead>
           <tbody>
-
             {paginatedProjects
               .slice()
               .reverse()
               .map((job, index) => (
-
                 <tr key={job._id}>
                   <td>
                     <input
@@ -562,7 +542,6 @@ const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
               >
                 <option value="">-- Select --</option>
                 <option value="Designer">Designer</option>
-                {/* <option value="Production">Production</option> */}
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
@@ -666,4 +645,4 @@ const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
   );
 }
 
-export default Completed_Jobs; 
+export default Completed_Jobs;
