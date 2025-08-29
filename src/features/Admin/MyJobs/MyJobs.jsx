@@ -193,7 +193,7 @@ function MyJobs() {
 
   return (
     <div className="p-4 m-2" style={{ backgroundColor: "white", borderRadius: "10px" }}>
-      <h5 className="fw-bold mb-3 text-start">My Jobs</h5>
+      <h5 className="fw-bold mb-3 text-start">Assigned Jobs</h5>
 
       <div className="d-lg-none mb-2 text-end">
         <Button

@@ -480,22 +480,20 @@ function AddInvoice() {
   const location = useLocation();
   const invoice = location.state?.invoice;
   const id = invoice?._id;
-
-  // const { currentInvoice } = useSelector((state) => state.InvoicingBilling);
-  // In your AddInvoice component
+  
+  // Check if we're navigating from a purchase order
+  const isFromPurchaseOrder = location.state?.isFromPurchaseOrder;
+  const purchaseOrderData = location.state?.purchaseOrder;
+  
   const { invocing, currentInvoice } = useSelector((state) => state.InvoicingBilling);
-
-  // When you need to access the list of invoices, use:
-  // invocing.data (which is an array)
   const { project } = useSelector((state) => state.projects);
   const { Clients } = useSelector((state) => state.client);
-
+  
   const [items, setItems] = useState([{ description: "", quantity: 0, rate: 0, amount: 0 }]);
   const [taxRate, setTaxRate] = useState(0.05);
-
   const [formData, setFormData] = useState({
     clientId: "",
-    projectId: [""],
+    projectsId: [""],
     CostEstimatesId: "",
     ReceivablePurchaseId: "",
     date: "",
@@ -508,10 +506,10 @@ function AddInvoice() {
 
   // Fetch single invoice when editing
   useEffect(() => {
-    if (id) {
-      dispatch(GetSingleInvoice(id)); // Pass only the invoice ID
+    if (id && !isFromPurchaseOrder) {
+      dispatch(GetSingleInvoice(id));
     }
-  }, [dispatch, id]);
+  }, [dispatch, id, isFromPurchaseOrder]);
 
   // Fetch projects and clients
   useEffect(() => {
@@ -519,14 +517,30 @@ function AddInvoice() {
     dispatch(fetchClient());
   }, [dispatch]);
 
-  // Populate form data when invoice data is available
+  // Populate form data when invoice data is available or from purchase order
   useEffect(() => {
-    if (currentInvoice && id) {
+    if (isFromPurchaseOrder && purchaseOrderData) {
+      // Populate form with purchase order data
+      setFormData({
+        clientId: purchaseOrderData.clientId || "",
+        projectsId: Array.isArray(purchaseOrderData.projectId) 
+          ? purchaseOrderData.projectId 
+          : [purchaseOrderData.projectId || ""],
+        CostEstimatesId: purchaseOrderData.CostEstimatesId || "",
+        ReceivablePurchaseId: purchaseOrderData.ReceivablePurchaseId || "",
+        date: new Date().toISOString().substring(0, 10), // Set today's date as default
+        status: "Active", // Default status
+        currency: "USD", // Default currency
+        document: "Tax Invoice", // Default document type
+        output: "PDF", // Default output format
+        InvoiceNo: `INV-${Date.now()}`, // Generate a temporary invoice number
+      });
+    } else if (currentInvoice && id) {
+      // Populate form when editing existing invoice
       const data = currentInvoice;
-
       setFormData({
         clientId: data.clientId || "",
-        projectId: Array.isArray(data.projectId) ? data.projectId : [data.projectId || ""],
+        projectsId: Array.isArray(data.projectId) ? data.projectId : [data.projectId || ""],
         CostEstimatesId: data.CostEstimatesId || "",
         ReceivablePurchaseId: data.ReceivablePurchaseId || "",
         date: data.date ? data.date.substring(0, 10) : "",
@@ -536,7 +550,7 @@ function AddInvoice() {
         output: data.output || "",
         InvoiceNo: data.InvoiceNo || "",
       });
-
+      
       // Set line items
       if (Array.isArray(data.lineItems) && data.lineItems.length > 0) {
         setItems(data.lineItems);
@@ -544,14 +558,14 @@ function AddInvoice() {
         setItems([{ description: "", quantity: 0, rate: 0, amount: 0 }]);
       }
     }
-  }, [currentInvoice, id]);
+  }, [currentInvoice, id, isFromPurchaseOrder, purchaseOrderData]);
 
   const calculateAmount = (quantity, rate) => quantity * rate;
 
   const handleItemChange = (index, field, value) => {
     const newItems = [...items];
     newItems[index][field] = value;
-
+    
     // Recalculate amount if quantity or rate changes
     if (field === "quantity" || field === "rate") {
       newItems[index].amount = calculateAmount(
@@ -559,7 +573,6 @@ function AddInvoice() {
         field === "rate" ? value : newItems[index].rate
       );
     }
-
     setItems(newItems);
   };
 
@@ -578,8 +591,6 @@ function AddInvoice() {
   };
 
   const subtotal = items.reduce((acc, item) => acc + item.amount, 0);
-  // const tax = subtotal * taxRate;
-  // const total = subtotal + tax;
   const total = subtotal;
 
   const handleSubmit = async (e) => {
@@ -589,9 +600,10 @@ function AddInvoice() {
       VATRate: taxRate * 100,
       lineItems: items,
     };
-
+    
     const isDuplicate = location.state?.isDuplicate;
-    if (isDuplicate || !id) {
+    
+    if (isDuplicate || !id || isFromPurchaseOrder) {
       dispatch(createInvoicingBilling(payload))
         .unwrap()
         .then(() => {
@@ -621,9 +633,8 @@ function AddInvoice() {
       <ToastContainer />
       <div className="container-fluid p-4" style={{ backgroundColor: "white", borderRadius: "10px" }}>
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2>{id ? "Edit Invoice" : "Generate New Invoice"}</h2>
+          <h2>{id ? "Edit Invoice" : isFromPurchaseOrder ? "Create Invoice from Purchase Order" : "Generate New Invoice"}</h2>
         </div>
-
         <form onSubmit={handleSubmit}>
           <div className="row mb-3">
             <div className="col-md-4 mb-3">
@@ -634,10 +645,9 @@ function AddInvoice() {
                 name="InvoiceNo"
                 value={formData.InvoiceNo || ""}
                 onChange={handleFormChange}
-                disabled={!!id} // Disable editing of invoice number for existing invoices
+                disabled={!!id && !isFromPurchaseOrder} // Disable editing for existing invoices but allow when from PO
               />
             </div>
-
             <div className="col-md-4 mb-3">
               <label className="form-label">Client</label>
               <select
@@ -646,7 +656,7 @@ function AddInvoice() {
                 value={formData.clientId || ""}
                 onChange={handleFormChange}
                 required
-                disabled={!!id} // Disable client selection for existing invoices
+                disabled={!!id && !isFromPurchaseOrder} // Disable for existing invoices but allow when from PO
               >
                 <option value="">Select Client</option>
                 {Clients?.data?.map((client) => (
@@ -656,13 +666,12 @@ function AddInvoice() {
                 ))}
               </select>
             </div>
-
             <div className="col-md-4 mb-3">
               <label className="form-label">Project</label>
               <select
                 className="form-select"
                 name="projectId"
-                value={formData.projectId[0] || ""}
+                value={formData.projectsId[0] || ""}
                 onChange={(e) => {
                   setFormData({
                     ...formData,
@@ -670,7 +679,7 @@ function AddInvoice() {
                   });
                 }}
                 required
-                disabled={!!id} // Disable project selection for existing invoices
+                disabled={!!id && !isFromPurchaseOrder} // Disable for existing invoices but allow when from PO
               >
                 <option value="">Select a project</option>
                 {project?.data?.map((proj) => (
@@ -680,7 +689,6 @@ function AddInvoice() {
                 ))}
               </select>
             </div>
-
             <div className="col-md-4 mb-3">
               <label className="form-label">Due Date</label>
               <input
@@ -692,7 +700,6 @@ function AddInvoice() {
                 onChange={handleFormChange}
               />
             </div>
-
             <div className="col-md-4 mb-3">
               <label className="form-label">Currency</label>
               <select
@@ -713,7 +720,6 @@ function AddInvoice() {
                 ))}
               </select>
             </div>
-
             <div className="col-md-4 mb-3">
               <label className="form-label">Document Type</label>
               <select
@@ -733,7 +739,6 @@ function AddInvoice() {
                 ))}
               </select>
             </div>
-
             <div className="col-md-4 mb-3">
               <label className="form-label">Output Format</label>
               <select
@@ -753,7 +758,6 @@ function AddInvoice() {
                 ))}
               </select>
             </div>
-
             <div className="col-md-4 mb-3">
               <label className="form-label">Status</label>
               <select
@@ -774,7 +778,6 @@ function AddInvoice() {
               </select>
             </div>
           </div>
-
           <h6 className="fw-semibold mb-3">Line Items</h6>
           {items.map((item, index) => (
             <div
@@ -832,7 +835,6 @@ function AddInvoice() {
               </div>
             </div>
           ))}
-
           <button
             type="button"
             className="btn border rounded px-3 py-1 mb-4 text-dark"
@@ -840,7 +842,6 @@ function AddInvoice() {
           >
             + Add Line Item
           </button>
-
           {/* Summary Section */}
           <div className="row justify-content-end mb-4">
             <div className="col-md-4">
@@ -849,10 +850,6 @@ function AddInvoice() {
                   <span>Subtotal:</span>
                   <span>{formData.currency} {subtotal.toFixed(2)}</span>
                 </div>
-                {/* <div className="d-flex justify-content-between mb-2">
-                  <span>Tax ({taxRate * 100}%):</span>
-                  <span>{formData.currency} {tax.toFixed(2)}</span>
-                </div> */}
                 <hr />
                 <div className="d-flex justify-content-between fw-bold">
                   <span>Total:</span>
@@ -861,7 +858,6 @@ function AddInvoice() {
               </div>
             </div>
           </div>
-
           <div className="text-end mt-4">
             <button type="button" className="btn btn-light me-2" onClick={() => navigate(-1)}>
               Cancel

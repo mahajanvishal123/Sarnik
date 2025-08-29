@@ -8,6 +8,10 @@
   --bg-light: #f8f9fa;
 }
 
+.cursor-pointer{
+  cursor: pointer;
+}
+
 a:hover {
     color: #0e4966;
   }
@@ -634,3 +638,5 @@ a:hover {
   color:white;
   border: 1px solid #0052CC;
 }
+
+

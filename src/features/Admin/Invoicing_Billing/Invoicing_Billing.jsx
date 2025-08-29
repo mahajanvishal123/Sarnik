@@ -619,7 +619,7 @@ function Invoicing_Billing() {
           </Dropdown>
 
           <Dropdown>
-            <Dropdown.Toggle variant="light" id="client-dropdown" className="w-100">
+            <Dropdown.Toggle variant="light" id="client-dropdown" className="w-100 ms-2">
               {selectedClient}
             </Dropdown.Toggle>
             <Dropdown.Menu>
@@ -697,7 +697,7 @@ function Invoicing_Billing() {
             <th onClick={() => handleSort('invoiceNumber')} style={{ whiteSpace: "nowrap", whiteSpace: 'nowrap' }}>Invoice #</th>
             <th onClick={() => handleSort('project')} style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>Project</th>
             <th onClick={() => handleSort('client')} style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>Client Name</th>
-            <th onClick={() => handleSort('email')} style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>Client Email</th>
+            {/* <th onClick={() => handleSort('email')} style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>Client Email</th> */}
             <th onClick={() => handleSort('amount')} style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>Amount</th>
             <th onClick={() => handleSort('status')} style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>Status</th>
             <th onClick={() => handleSort('dueDate')} style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>Due Date</th>
@@ -712,7 +712,7 @@ function Invoicing_Billing() {
               </td>
               <td style={{ whiteSpace: "nowrap" }}>{invoice.projectId?.[0]?.projectName || "N/A"}</td>
               <td style={{ whiteSpace: "nowrap" }}>{invoice.clients?.[0]?.clientName || "N/A"}</td>
-              <td style={{ whiteSpace: "nowrap" }}>{invoice.clientId?.contactPersons[0].email || "N/A"}</td>
+              {/* <td style={{ whiteSpace: "nowrap" }}>{invoice.clientId?.contactPersons[0].email || "N/A"}</td> */}
               <td style={{ whiteSpace: "nowrap" }}>${invoice.lineItems?.[0]?.amount || "N/A"}</td>
               <td>
                 <span className={`badge ${getStatusClass(invoice.status)} px-2 py-1`}>
