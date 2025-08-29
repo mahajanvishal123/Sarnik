@@ -12,10 +12,10 @@ import { Project_job_Id } from '../../../redux/slices/JobsSlice';
 function ProjectList() {
   const [activeTab, setActiveTab] = useState('Active Project');
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState(''); // 👈 Add search state
+  const [searchTerm, setSearchTerm] = useState('');
 
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { project, loading, error } = useSelector((state) => state.projects);
   const [selectedJobs, setSelectedJobs] = useState({});
 
@@ -42,7 +42,6 @@ function ProjectList() {
         )
         : project.data?.filter((project) => project.status === activeTab)
   )?.filter((project) => {
-    // Split searchTerm by spaces, ignore empty terms
     const terms = searchTerm.trim().split(/\s+/).filter(Boolean);
     if (terms.length === 0) return true;
     const fields = [
@@ -59,7 +58,7 @@ function ProjectList() {
           .join(', ')
         : ''
     ].map(f => (f || '').toString().toLowerCase());
-    // Every term must be found in at least one field
+
     return terms.every(term =>
       fields.some(field => field.includes(term.toLowerCase()))
     );
@@ -93,15 +92,11 @@ function ProjectList() {
           });
       }
     });
-  }
+  };
 
   const handleUpdate = (project) => {
     navigate(`/admin/AddProjectList`, { state: { project } });
   };
-
-  // const CreatJobs = (id) => {
-  //   navigate(`/admin/ProjectOverview/${id}`, { state: { id, openTab: 'jobs' } });
-  // };
 
   const CreatJobs = (project) => {
     navigate(`/admin/ProjectOverview/${project.id}`, {
@@ -162,7 +157,7 @@ function ProjectList() {
               className="form-control"
               placeholder="Search projects.."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)} // 👈 Handle input
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <div className="col-12 col-md-6 d-flex justify-content-md-end gap-2">
@@ -221,6 +216,7 @@ function ProjectList() {
           <div className="mt-2">Loading projects...</div>
         </div>
       )}
+
       {/* Error */}
       {error && (
         <div className="text-danger text-center my-5">
@@ -233,62 +229,35 @@ function ProjectList() {
         <Table responsive className="project-table mb-4">
           <thead>
             <tr>
-              {/* <th>
-                <input
-                  type="checkbox"
-                  onChange={() => {
-                    const isChecked =
-                      Object.keys(selectedJobs).length === project.data.length;
-                    const newSelectedJobs = {};
-                    project.data.forEach((project) => {
-                      newSelectedJobs[project.id] = !isChecked;
-                    });
-                    setSelectedJobs(newSelectedJobs);
-                  }}
-                />
-              </th> */}
               <th style={{ whiteSpace: 'nowrap' }}>Project No</th>
               <th style={{ textWrap: 'nowrap' }}>Project Name</th>
-              {/* <th>Description</th> */}
               <th style={{ whiteSpace: 'nowrap' }}>Start Date</th>
               <th style={{ whiteSpace: 'nowrap' }}>End Date</th>
               <th>Client</th>
-              <th style={{ whiteSpace: 'nowrap' }}>project Requirements</th>
-              <th style={{ whiteSpace: 'nowrap' }}>priority</th>
-
+              <th style={{ whiteSpace: 'nowrap' }}>Project Requirements</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Priority</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedProjects.slice().reverse().map((project, index) => (
+            {paginatedProjects.map((project, index) => (
               <tr key={project.id}>
-                {/* <td>
-                  <input
-                    type="checkbox"
-                    checked={selectedJobs[project.id] || false}
-                    onChange={() => handleCheckboxChange(project.id)}
-                  />
-                </td> */}
-                {/* <td onClick={() => CreatJobs(project.id)}>
-                  <Link style={{ textDecoration: 'none' }}>{project.projectNo}</Link>
-                </td> */}
                 <td onClick={() => CreatJobs(project)}>
                   <Link style={{ textDecoration: 'none' }}>{project.projectNo}</Link>
                 </td>
                 <td style={{ whiteSpace: 'nowrap' }}>{project.projectName}</td>
-                {/* <td style={{ whiteSpace: 'nowrap' }}>{project.description}</td> */}
                 <td>{new Date(project.startDate).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
                 <td>{new Date(project.endDate).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>{project?.clientId.clientName}</td>
-                <th>
+                <td>
                   {project.projectRequirements && project.projectRequirements.length > 0
                     ? Object.entries(project.projectRequirements[0])
                       .filter(([_, value]) => value === true)
                       .map(([key]) => key)
                       .join(', ')
                     : 'N/A'}
-                </th>
+                </td>
                 <td>{project.projectPriority || 'N/A'}</td>  
                 <td>
                   <span className={`badge ${getStatusClass(project.status)} px-2 py-1`}>
@@ -312,7 +281,9 @@ function ProjectList() {
       {!loading && !error && (
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div className="text-muted small">
-            Showing 1 to {filteredProjects?.length || 0} of {project.data?.length || 0} entries
+            Showing {filteredProjects?.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} 
+            to {(currentPage - 1) * itemsPerPage + paginatedProjects?.length} 
+            of {project.data?.length || 0} entries
           </div>
           <ul className="pagination pagination-sm mb-0">
             <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
