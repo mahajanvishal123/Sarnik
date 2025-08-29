@@ -493,7 +493,7 @@ function AddInvoice() {
   const [taxRate, setTaxRate] = useState(0.05);
   const [formData, setFormData] = useState({
     clientId: "",
-    projectId: [""],
+    projectsId: [""],
     CostEstimatesId: "",
     ReceivablePurchaseId: "",
     date: "",
@@ -523,7 +523,7 @@ function AddInvoice() {
       // Populate form with purchase order data
       setFormData({
         clientId: purchaseOrderData.clientId || "",
-        projectId: Array.isArray(purchaseOrderData.projectId) 
+        projectsId: Array.isArray(purchaseOrderData.projectId) 
           ? purchaseOrderData.projectId 
           : [purchaseOrderData.projectId || ""],
         CostEstimatesId: purchaseOrderData.CostEstimatesId || "",
@@ -540,7 +540,7 @@ function AddInvoice() {
       const data = currentInvoice;
       setFormData({
         clientId: data.clientId || "",
-        projectId: Array.isArray(data.projectId) ? data.projectId : [data.projectId || ""],
+        projectsId: Array.isArray(data.projectId) ? data.projectId : [data.projectId || ""],
         CostEstimatesId: data.CostEstimatesId || "",
         ReceivablePurchaseId: data.ReceivablePurchaseId || "",
         date: data.date ? data.date.substring(0, 10) : "",
@@ -671,7 +671,7 @@ function AddInvoice() {
               <select
                 className="form-select"
                 name="projectId"
-                value={formData.projectId[0] || ""}
+                value={formData.projectsId[0] || ""}
                 onChange={(e) => {
                   setFormData({
                     ...formData,

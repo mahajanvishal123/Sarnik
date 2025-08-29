@@ -1,254 +1,236 @@
-  import React, { useEffect, useState, useRef } from "react";
-  import { Modal, Form, Table, Badge, Dropdown, Button } from "react-bootstrap";
-  import { BsPlusLg, BsPencil, BsTrash, BsUpload, BsClipboard } from "react-icons/bs";
-  import { Link, useNavigate } from "react-router-dom";
-  import { deleteCostEstimate, fetchCostEstimates, updateCostEstimate } from "../../../redux/slices/costEstimatesSlice";
-  import { useDispatch, useSelector } from "react-redux";
-  import { FaDownload, FaTrash } from "react-icons/fa";
-  import Swal from 'sweetalert2';
-  import { fetchProject } from "../../../redux/slices/ProjectsSlice";
-  import { fetchClient } from "../../../redux/slices/ClientSlice";
-  import { createReceivablePurchase, fetchReceivablePurchases, imagelogoreceivablePurchase } from "../../../redux/slices/receivablePurchaseSlice";
-  import { jsPDF } from "jspdf";
-  import autoTable from 'jspdf-autotable';
-  import { FaRegCopy } from "react-icons/fa";
-  import axios from "axios";
-  import axiosInstance from "../../../redux/utils/axiosInstance";
+import React, { useEffect, useState, useRef } from "react";
+import { Modal, Form, Table, Badge, Dropdown, Button } from "react-bootstrap";
+import { BsPlusLg, BsPencil, BsTrash, BsUpload, BsClipboard } from "react-icons/bs";
+import { Link, useNavigate } from "react-router-dom";
+import { deleteCostEstimate, fetchCostEstimates, updateCostEstimate } from "../../../redux/slices/costEstimatesSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { FaDownload, FaTrash } from "react-icons/fa";
+import Swal from 'sweetalert2';
+import { fetchProject } from "../../../redux/slices/ProjectsSlice";
+import { fetchClient } from "../../../redux/slices/ClientSlice";
+import { createReceivablePurchase, fetchReceivablePurchases, imagelogoreceivablePurchase } from "../../../redux/slices/receivablePurchaseSlice";
+import { jsPDF } from "jspdf";
+import autoTable from 'jspdf-autotable';
+import { FaRegCopy } from "react-icons/fa";
+import axios from "axios";
+import axiosInstance from "../../../redux/utils/axiosInstance";
 
-  function CostEstimates() {
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
+function CostEstimates() {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  // State declarations
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedPOStatus, setSelectedPOStatus] = useState("All PO Status");
+  const [selectedStatus, setSelectedStatus] = useState("All Status");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [selectedPO, setSelectedPO] = useState(null);
+  const [showAddPOModal, setShowAddPOModal] = useState(false);
+  const [stampFile, setStampFile] = React.useState(null);
+  const fileInputRef = useRef(null);
+  // PO Form states
+  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [selectedClientId, setSelectedClientId] = useState("");
+  const [costEstimatesId, setCostEstimatesId] = useState("");
+  const [poDate, setPODate] = useState("");
+  const [POStatus, setPOStatus] = useState("");
+  const [amount, setAmount] = useState("");
+  const [poDocument, setPODocument] = useState(null);
 
-    // State declarations
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedClient, setSelectedClient] = useState("All Clients");
-    const [selectedPOStatus, setSelectedPOStatus] = useState("All PO Status");
-    const [selectedStatus, setSelectedStatus] = useState("All Status");
-    const [selectedDate, setSelectedDate] = useState("");
-    const [showInvoiceModal, setShowInvoiceModal] = useState(false);
-    const [selectedPO, setSelectedPO] = useState(null);
-    const [showAddPOModal, setShowAddPOModal] = useState(false);
-    const [stampFile, setStampFile] = React.useState(null);
-    const fileInputRef = useRef(null);
+  const { project } = useSelector((state) => state.projects);
+  const { Clients } = useSelector((state) => state.client);
+  const statuses = ["pending ", "Received", "Cancelled", "Completed", "open", "invoiced"];
+  const { logoreceivablePurchase } = useSelector((state) => state.receivablePurchases);
+  console.log("gg", logoreceivablePurchase.image);
 
-    // PO Form states
-    const [selectedProjectId, setSelectedProjectId] = useState("");
-    const [selectedClientId, setSelectedClientId] = useState("");
-    const [costEstimatesId, setCostEstimatesId] = useState("");
+  useEffect(() => {
+    dispatch(fetchProject());
+    dispatch(fetchClient());
+    dispatch(fetchCostEstimates());
+    dispatch(imagelogoreceivablePurchase())
+  }, [dispatch]);
 
-    const [poDate, setPODate] = useState("");
-    const [POStatus, setPOStatus] = useState("");
-    const [amount, setAmount] = useState("");
-    const [poDocument, setPODocument] = useState(null);
-
-    const { project } = useSelector((state) => state.projects);
-    const { Clients } = useSelector((state) => state.client);
-    const statuses = ["pending ", "Received", "Cancelled", "Completed", "open", "invoiced"];
-    const { logoreceivablePurchase } = useSelector((state) => state.receivablePurchases);
-    console.log("gg", logoreceivablePurchase.image);
-
-
-    useEffect(() => {
-      dispatch(fetchProject());
-      dispatch(fetchClient());
-      dispatch(fetchCostEstimates());
-      dispatch(imagelogoreceivablePurchase())
-    }, [dispatch]);
-
-
-    useEffect(() => {
-      if (Clients && project?.data?.length) {
-        const foundProject = project.data.find(p => p._id === selectedClientId);
-        if (foundProject) {
-          setSelectedProjectId(foundProject._id);
-        }
+  useEffect(() => {
+    if (Clients && project?.data?.length) {
+      const foundProject = project.data.find(p => p._id === selectedClientId);
+      if (foundProject) {
+        setSelectedProjectId(foundProject._id);
       }
-    }, [Clients, project, selectedClientId]);
+    }
+  }, [Clients, project, selectedClientId]);
 
-    const handleFileUpload = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        if (file.size > 10 * 1024 * 1024) {
-          Swal.fire({
-            icon: "error",
-            title: "File too large",
-            text: "Please upload a file smaller than 10MB",
-          });
-          return;
-        }
-        setPODocument(file);
-        setStampFile(file); 
-        console.log("stamp",stampFile)
-      }
-    };
-
-
-    const handleSavePO = async () => {
-      if (!selectedProjectId || !selectedClientId || !poDate || !amount) {
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
         Swal.fire({
-          icon: 'error',
-          title: 'Required Fields Missing',
-          text: 'Please fill all required fields'
+          icon: "error",
+          title: "File too large",
+          text: "Please upload a file smaller than 10MB",
         });
         return;
       }
+      setPODocument(file);
+      setStampFile(file); 
+      console.log("stamp",stampFile)
+    }
+  };
 
-      const formData = new FormData();
-      formData.append('projectsId', JSON.stringify([selectedProjectId]));
-      formData.append('ClientId', selectedClientId);
-      formData.append('ReceivedDate', poDate);
-      formData.append('POStatus', POStatus || "Pending");
+  const handleSavePO = async () => {
+    if (!selectedProjectId || !selectedClientId || !poDate || !amount) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Required Fields Missing',
+        text: 'Please fill all required fields'
+      });
+      return;
+    }
 
-      formData.append('Amount', amount);
-      formData.append('CostEstimatesId', JSON.stringify([costEstimatesId]));
-      console.log("kkkkkk", costEstimatesId)
-      if (poDocument) {
-        formData.append('image', poDocument);
-      }
+    const formData = new FormData();
+    formData.append('projectsId', JSON.stringify([selectedProjectId]));
+    formData.append('ClientId', selectedClientId);
+    formData.append('ReceivedDate', poDate);
+    formData.append('POStatus', POStatus || "Pending");
+    formData.append('Amount', amount);
+    formData.append('CostEstimatesId', JSON.stringify([costEstimatesId]));
+    console.log("kkkkkk", costEstimatesId)
 
-      try {
-        const result = await dispatch(createReceivablePurchase(formData));
-        // Agar API success ho jaye tab fetch karo
-        if (createReceivablePurchase.fulfilled.match(result)) {
-          Swal.fire({
-            icon: 'success',
-            title: 'PO Created',
-            text: 'Purchase order created successfully'
-          });
+    if (poDocument) {
+      formData.append('image', poDocument);
+    }
 
-          // Reset fields
-          setSelectedProjectId("");
-          setSelectedClientId("");
-          setCostEstimatesId("");
-          setPODate("");
-          setPOStatus("Pending");
-          setAmount("");
-          setPODocument(null);
-          setShowAddPOModal(false);
-
-          dispatch(updateCostEstimate({
-            id: costEstimatesId,
-            data: {
-              projectId: selectedProjectId,
-              clientId: selectedClientId,
-              CostPOStatus: "Received"
-            }
-          }))
-
-          // ✅ Now fetch updated list
-          dispatch(fetchReceivablePurchases());
-          navigate("/admin/receivable");
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Creation Failed',
-            text: 'Failed to create purchase order.'
-          });
-        }
-      } catch (err) {
-        console.error("Error creating PO:", err);
+    try {
+      const result = await dispatch(createReceivablePurchase(formData));
+      // Agar API success ho jaye tab fetch karo
+      if (createReceivablePurchase.fulfilled.match(result)) {
+        Swal.fire({
+          icon: 'success',
+          title: 'PO Created',
+          text: 'Purchase order created successfully'
+        });
+        // Reset fields
+        setSelectedProjectId("");
+        setSelectedClientId("");
+        setCostEstimatesId("");
+        setPODate("");
+        setPOStatus("Pending");
+        setAmount("");
+        setPODocument(null);
+        setShowAddPOModal(false);
+        dispatch(updateCostEstimate({
+          id: costEstimatesId,
+          data: {
+            projectId: selectedProjectId,
+            clientId: selectedClientId,
+            CostPOStatus: "Received"
+          }
+        }))
+        // ✅ Now fetch updated list
+        dispatch(fetchReceivablePurchases());
+        navigate("/admin/receivable");
+      } else {
         Swal.fire({
           icon: 'error',
-          title: 'Error',
-          text: 'Something went wrong while creating purchase order.'
+          title: 'Creation Failed',
+          text: 'Failed to create purchase order.'
         });
       }
-    };
+    } catch (err) {
+      console.error("Error creating PO:", err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Something went wrong while creating purchase order.'
+      });
+    }
+  };
 
+  // Convert to Invoice handler
+  const handleConvertToInvoice = (po) => {
+    setSelectedPO(po);
+    setShowInvoiceModal(true);
+  };
 
-    // Convert to Invoice handler
-    const handleConvertToInvoice = (po) => {
-      setSelectedPO(po);
-      setShowInvoiceModal(true);
-    };
+  const Ponamehandle = (po) => {
+    console.log(po.clients[0].clientName, po.projects[0].projectName, "ddd");
+    console.log(po);
+    setSelectedClientId(po.clients[0]?.clientId || "");
+    setSelectedProjectId(po.projects[0]?.projectId || "");
+    setPOStatus("Pending"); // ✅ Default status set here
+    setSelectedPO(po);
+    setShowAddPOModal(true);
+  };
 
-
-    const Ponamehandle = (po) => {
-      console.log(po.clients[0].clientName, po.projects[0].projectName, "ddd");
-      console.log(po);
-      setSelectedClientId(po.clients[0]?.clientId || "");
-      setSelectedProjectId(po.projects[0]?.projectId || "");
-      setPOStatus("Pending"); // ✅ Default status set here
-      setSelectedPO(po);
-      setShowAddPOModal(true);
-    };
-
-
-    // Add PO Modal
-    const renderAddPOModal = () => (
-      <Modal show={showAddPOModal} onHide={() => setShowAddPOModal(false)} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Add Purchase Order</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-2">
+  // Add PO Modal
+  const renderAddPOModal = () => (
+    <Modal show={showAddPOModal} onHide={() => setShowAddPOModal(false)} size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>Add Purchase Order</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form>
+          <Form.Group className="mb-2">
+            <div className="row justify-content-center">
+              {/* <div className="col-md-6">
+                <Form.Label className="d-block ">Project</Form.Label>
+                <Form.Select
+                  value={selectedProjectId}
+                  onChange={(e) => setSelectedProjectId(e.target.value)}
+                  className="form-control"
+                  required>
+                  <option value="">-- Select Project --</option>
+                  {project?.data?.map((proj) => (
+                    <option key={proj._id} value={proj._id}>
+                      {proj.projectName || proj.name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </div>
+              <div className="col-md-6">
+                <Form.Label className="d-block ">Client</Form.Label>
+                <Form.Select
+                  value={selectedClientId}
+                  onChange={(e) => setSelectedClientId(e.target.value)}
+                  className="form-control"
+                  required>
+                  <option value="">-- Select Client --</option>
+                  {Clients?.data?.map((client) => (
+                    <option key={client._id} value={client._id}>
+                      {client.clientName}
+                    </option>
+                  ))}
+                </Form.Select>
+              </div> */}
               <div className="row justify-content-center">
-                {/* <div className="col-md-6">
-                  <Form.Label className="d-block ">Project</Form.Label>
+                <div className="col-md-6">
+                  <Form.Label className="d-block">Project</Form.Label>
                   <Form.Select
                     value={selectedProjectId}
-                    onChange={(e) => setSelectedProjectId(e.target.value)}
+                    disabled
                     className="form-control"
-                    required>
-                    <option value="">-- Select Project --</option>
-                    {project?.data?.map((proj) => (
-                      <option key={proj._id} value={proj._id}>
-                        {proj.projectName || proj.name}
-                      </option>
-                    ))}
+                  >
+                    <option value="">
+                      {selectedPO?.projects?.find(p => p.projectId === selectedProjectId)?.projectName || "-- No Project --"}
+                    </option>
                   </Form.Select>
                 </div>
                 <div className="col-md-6">
-                  <Form.Label className="d-block ">Client</Form.Label>
+                  <Form.Label className="d-block">Client</Form.Label>
                   <Form.Select
                     value={selectedClientId}
-                    onChange={(e) => setSelectedClientId(e.target.value)}
+                    disabled
                     className="form-control"
-                    required>
-                    <option value="">-- Select Client --</option>
-                    {Clients?.data?.map((client) => (
-                      <option key={client._id} value={client._id}>
-                        {client.clientName}
-                      </option>
-                    ))}
+                  >
+                    <option value="">
+                      {selectedPO?.clients?.find(c => c.clientId === selectedClientId)?.clientName || "-- No Client --"}
+                    </option>
                   </Form.Select>
-                </div> */}
-                <div className="row justify-content-center">
-                  <div className="col-md-6">
-                    <Form.Label className="d-block">Project</Form.Label>
-                    <Form.Select
-                      value={selectedProjectId}
-                      disabled
-                      className="form-control"
-                    >
-                      <option value="">
-                        {selectedPO?.projects?.find(p => p.projectId === selectedProjectId)?.projectName || "-- No Project --"}
-                      </option>
-                    </Form.Select>
-                  </div>
-
-                  <div className="col-md-6">
-                    <Form.Label className="d-block">Client</Form.Label>
-                    <Form.Select
-                      value={selectedClientId}
-                      disabled
-                      className="form-control"
-                    >
-                      <option value="">
-                        {selectedPO?.clients?.find(c => c.clientId === selectedClientId)?.clientName || "-- No Client --"}
-                      </option>
-                    </Form.Select>
-                  </div>
                 </div>
-
               </div>
-            </Form.Group>
-
-
+            </div>
+          </Form.Group>
         <Form.Group className="mb-3">
     <div className="row justify-content-center align-items-start">
-
       {/* PO Amount Field */}
       <div className="col-md-6 mb-3 mb-md-0">
         <Form.Label className="d-block">PO Amount</Form.Label>
@@ -261,7 +243,6 @@
           required
         />
       </div>
-
       {/* File Upload Field */}
       <div className="col-md-6">
         <Form.Label className="d-block">Add Stamp</Form.Label>
@@ -279,7 +260,6 @@
             <BsUpload className="me-2" /> Upload a file (PDF, DOC up to 10MB)
           </small>
         </div>
-
         <div className="mt-3">
           <label className="form-label fw-bold">Or Select From Gallery</label>
           <div className="d-flex align-items-center">
@@ -293,7 +273,6 @@
                   const isSelected =
                     stampFile?.name === `stamp_${index}.jpg` ||
                     stampFile?.preview === imgUrl;
-
                   return (
                     <div
                       className={`card border ${isSelected ? "border-primary" : "border-light"}`}
@@ -305,17 +284,13 @@
                         const selectedFile = new File([blob], `stamp_${index}.jpg`, {
                           type: blob.type,
                         });
-
                         // Add a preview property for UI matching
                         selectedFile.preview = imgUrl;
-
                         // Update state
                         setStampFile(selectedFile);
                         setPODocument(selectedFile);
-
                         // Trigger file upload handler
                         handleFileUpload({ target: { files: [selectedFile] } });
-
                         // Force file input update
                         const dataTransfer = new DataTransfer();
                         dataTransfer.items.add(selectedFile);
@@ -339,7 +314,6 @@
       </div>
     </div>
   </Form.Group>
-
             <Form.Group className="mb-3">
               <div className="">
                 <div className="col-md-6">
@@ -352,7 +326,6 @@
                     required
                   />
                 </div>
-
                 {/* <div className="col-md-6">
                   <Form.Label className="d-block">PO Status</Form.Label>
                   <Form.Select
@@ -376,8 +349,6 @@
         </Modal.Footer>
       </Modal>
     );
-
-
     // //////////
     const { estimates, loading, error } = useSelector((state) => state.costEstimates);
     console.log("Cost Estimates:", estimates.costEstimates);
@@ -385,7 +356,6 @@
     useEffect(() => {
       dispatch(fetchCostEstimates());
     }, [dispatch]);
-
 
     // ye ok code hai 
     const getStatusClass = (status) => {
@@ -479,14 +449,11 @@
         state: {
           po,
         }
-      });
+      })
     }
-
     //     const Duplicate =(po)=>{    
     //  navigate(`/duplicate/AddCostEstimates/${po._id}`, { state: { po}});
     //   }
-
-
     // PAGINATION SETUP FOR ESTIMATES
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 7;
@@ -504,7 +471,7 @@
         const clientName = (estimate.clients?.[0]?.clientName || '').toLowerCase();
         const projectNames = (estimate.projects || []).map(project => (project.projectName || project.name || '').toLowerCase()).join(' ');
         const status = (estimate.Status || '').toLowerCase();
-        const poStatus = (estimate.POStatus || '').toLowerCase();
+        const poStatus = (estimate.CostPOStatus || '').toLowerCase();
         const fields = [
           estimateRef,
           clientName,
@@ -516,22 +483,26 @@
         const matchesSearch = terms.length === 0 || terms.every(term =>
           fields.some(field => field.includes(term))
         );
-        const matchesClient = selectedClient === "All Clients" ||
-          estimate.clients?.[0]?.clientName === selectedClient;
-        const matchesPOStatus = selectedPOStatus === "All PO Status" ||
-          estimate.POStatus === selectedPOStatus;
+        
+        // Fix: Correctly map filter values to actual data values
+        let matchesPOStatus = true;
+        if (selectedPOStatus === "Open") {
+          matchesPOStatus = poStatus === "pending";
+        } else if (selectedPOStatus === "Active") {
+          matchesPOStatus = poStatus === "active" || poStatus === "received";
+        } // else "All PO Status" will match all
+        
         const matchesStatus = selectedStatus === "All Status" ||
           estimate.Status === selectedStatus;
         // FIX: Compare date in 'YYYY-MM-DD' format
         const estimateDateStr = estimate.estimateDate ? estimate.estimateDate.slice(0, 10) : "";
         const matchesDate = !selectedDate || estimateDateStr === selectedDate;
-        return matchesSearch && matchesClient && matchesPOStatus && matchesStatus && matchesDate;
+        return matchesSearch && matchesPOStatus && matchesStatus && matchesDate;
       });
 
     // Update pagination to use filtered data
     const totalItems = filteredEstimates?.length || 0;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
-
     const paginatedEstimates = filteredEstimates
       ?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -556,30 +527,22 @@
     //         clientId: po.clientId?.map(c => c._id),
     //       }
     //     );
-
     //     const estimate = response.data?.data?.[0];
     //     if (!estimate) throw new Error("No estimate data found");
-
     //     const client = estimate.clientId || {};
     //     const project = estimate.projectId || {};
-
-
     //     const lineItems = estimate.lineItems || [];
-
     //     const doc = new jsPDF('p', 'pt', 'a4');
     //     const pageWidth = doc.internal.pageSize.width;
-
     //     // === HEADER ===
     //     doc.setFillColor(229, 62, 62); // Red banner
     //     doc.rect(40, 40, 200, 50, 'F');
     //     doc.setTextColor(255, 255, 255);
     //     doc.setFontSize(14);
     //     // Insert logo image instead of text
-
     //     const logoUrl = estimate.image[0];
     //     const logoBase64 = await getImageBase64(logoUrl);
     //     doc.addImage(logoBase64, 'PNG', 45, 45, 60, 40);
-
     //     doc.setFont('helvetica', 'bold');
     //     doc.text("SAARANIK", 110, 60);
     //     // (image, format, x, y, width, height
@@ -595,7 +558,6 @@
     //     doc.setFont('helvetica', 'normal');
     //     doc.text(`Date: ${new Date(estimate.estimateDate).toLocaleDateString("en-GB")}`, 350, 65);
     //     doc.text(`Req. Ref.: --`, 350, 80);
-
     //     // === Client Info ===
     //     let currentY = 120;
     //     doc.setFontSize(10);
@@ -611,11 +573,9 @@
     //     currentY += 14;
     //     doc.text(`Email: ${client?.contactPersons[0].email || "email"}`, 40, currentY);
     //     console.log("kkk", client?.contactPersons[0].email);
-
     //     currentY += 14;
     //     doc.text(`Phone: ${client?.contactPersons[0].phone || "Phone"}`, 40, currentY);
     //     currentY += 25;
-
     //     // === Table Data ===
     //     const tableData = lineItems.map((item, index) => [
     //       (index + 1).toString(),
@@ -624,10 +584,8 @@
     //       (item.rate || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 }),
     //       ((item.quantity || 0) * (item.rate || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2 })
     //     ]);
-
     //     // Add blank rows
     //     for (let i = 0; i < 15; i++) tableData.push(['', '', '', '', '']);
-
     //     let finalY;
     //     autoTable(doc, {
     //       startY: currentY,
@@ -658,12 +616,10 @@
     //       theme: 'grid',
     //       didDrawPage: data => { finalY = data.cursor.y; }
     //     });
-
     //     // === Totals Section ===
     //     const subTotal = lineItems.reduce((sum, item) => sum + ((item.quantity || 0) * (item.rate || 0)), 0);
     //     const vat = (subTotal * (estimate.VATRate || 0)) / 100;
     //     const total = subTotal + vat;
-
     //     const totalsBoxX = pageWidth - 160;
     //     const totalsBoxY = finalY + 20;
     //     doc.rect(totalsBoxX, totalsBoxY, 120, 45);
@@ -676,7 +632,6 @@
     //     doc.setFont('helvetica', 'bold');
     //     doc.text('TOTAL', totalsBoxX + 5, totalsBoxY + 38);
     //     doc.text(total.toFixed(2), totalsBoxX + 115, totalsBoxY + 38, { align: 'right' });
-
     //     // === Footer Notes ===
     //     const footerY = totalsBoxY + 65;
     //     doc.setFont('helvetica', 'normal');
@@ -687,7 +642,6 @@
     //     doc.text(`For Your Company Name`, 40, footerY + 40);
     //     doc.setFont('helvetica', 'normal');
     //     doc.text('(This is system generated document, hence not signed.)', 40, footerY + 55);
-
     //     // === Save PDF ===
     //     doc.save(`Cost_Estimate_${estimate.estimateRef || 'Estimate'}.pdf`);
     //   } catch (error) {
@@ -696,7 +650,6 @@
     //   }
     // };
     // ... existing code ...
-
     const handleDownloadPDF = async (po) => {
       try {
         const response = await axiosInstance.post(
@@ -706,37 +659,30 @@
             clientId: po.clientId?.map((c) => c._id),
           }
         );
-
         const estimate = response.data?.data?.[0];
         if (!estimate) throw new Error("No estimate data found");
-
         const client = estimate.clientId || {};
         const project = estimate.projectId || {};
         const lineItems = estimate.lineItems || [];
-
         const doc = new jsPDF("p", "pt", "a4");
         const pageWidth = doc.internal.pageSize.width;
         const pageHeight = doc.internal.pageSize.height;
         const marginLeft = 40;
         const contentWidth = pageWidth - marginLeft * 2;
-
         // === HEADER ===
         doc.setFillColor(229, 62, 62);
         doc.rect(marginLeft, 40, 200, 50, "F");
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(14);
-
         const logoUrl = estimate.image[0];
         const logoBase64 = await getImageBase64(logoUrl);
         doc.addImage(logoBase64, "PNG", marginLeft + 5, 45, 60, 40);
-
         doc.setFont("helvetica", "bold");
         doc.text("SAARANIK", marginLeft + 70, 60);
         doc.setFontSize(8);
         doc.setFont("helvetica", "normal");
         doc.text("COMPANY ADDRESS DETAILS", marginLeft + 70, 75);
         doc.setTextColor(0, 0, 0);
-
         // === Estimate Info (Right) ===
         doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
@@ -753,7 +699,6 @@
           65
         );
         doc.text(`Req. Ref.: --`, pageWidth - marginLeft - 180, 80);
-
         // === Client Info ===
         let currentY = 120;
         doc.setFontSize(10);
@@ -798,7 +743,6 @@
           currentY
         );
         currentY += 25;
-
         // === Table Data ===
         const tableData = lineItems.map((item, index) => [
           (index + 1).toString(),
@@ -811,9 +755,7 @@
             minimumFractionDigits: 2,
           }),
         ]);
-
         for (let i = 0; i < 15; i++) tableData.push(["", "", "", "", ""]);
-
         let finalY;
         autoTable(doc, {
           startY: currentY,
@@ -855,7 +797,6 @@
             finalY = data.cursor.y;
           },
         });
-
         // === Totals Section ===
         const subTotal = lineItems.reduce(
           (sum, item) =>
@@ -864,7 +805,6 @@
         );
         const vat = (subTotal * (estimate.VATRate || 0)) / 100;
         const total = subTotal + vat;
-
         const totalsBoxX = pageWidth - marginLeft - 120;
         const totalsBoxY = finalY + 20;
         // doc.rect(totalsBoxX, totalsBoxY, 120, 45);
@@ -883,7 +823,6 @@
         // doc.text(total.toFixed(2), totalsBoxX + 115, totalsBoxY + 38, {
         //   align: "right",
         // });
-
         // === Footer Notes ===
         const footerY = totalsBoxY + 65;
         doc.setFont("helvetica", "normal");
@@ -902,7 +841,6 @@
           marginLeft,
           footerY + 55
         );
-
         // === Save PDF ===
         doc.save(`Cost_Estimate_${estimate.estimateRef || "Estimate"}.pdf`);
       } catch (error) {
@@ -911,10 +849,10 @@
       }
     };
 
-
     const CostEstimatesDetails = (po) => {
       navigate(`/admin/OvervieCostEstimates`, { state: { po } });
     };
+
     return (
       <div
         className="p-4 m-2"
@@ -949,23 +887,17 @@
             <Dropdown className="filter-dropdown">
               <Dropdown.Toggle
                 variant="light"
-                id="client-dropdown"
+                id="po-status-dropdown"
                 className="custom-dropdown"
               >
-                {selectedClient}
+                {selectedPOStatus}
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <Dropdown.Item onClick={() => setSelectedClient("All Clients")}>All Clients</Dropdown.Item>
-                {[...new Set(estimates?.costEstimates?.map(po => po.clients?.[0]?.clientName).filter(Boolean))]
-                  .map((clientName, index) => (
-                    <Dropdown.Item key={index} onClick={() => setSelectedClient(clientName)}>
-                      {clientName}
-                    </Dropdown.Item>
-                  ))}
+                <Dropdown.Item onClick={() => setSelectedPOStatus("All PO Status")}>All PO Status</Dropdown.Item>
+                <Dropdown.Item onClick={() => setSelectedPOStatus("Open")}>Open</Dropdown.Item>
+                <Dropdown.Item onClick={() => setSelectedPOStatus("Active")}>Active</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-
-
             <Dropdown className="filter-dropdown">
               <Dropdown.Toggle
                 variant="light"
@@ -982,11 +914,8 @@
                 <Dropdown.Item onClick={() => setSelectedStatus("Completed")}>Completed</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-
-
           </div>
         </div>
-
         <div className="table-responsive" style={{ maxHeight: "900px", overflowY: "auto" }}>
           <Table hover className="align-middle sticky-header">
             <thead style={{ backgroundColor: "#f8f9fa", position: "sticky", top: 0, zIndex: 1 }}>
@@ -1052,9 +981,8 @@
                           setShowAddPOModal(true);   // Open Modal
                         }}
                       >
-                        PO Add
+                       Add PO
                       </button>
-
                       <span className={`badge ${getStatusClass(
                         po.receivablePurchases?.[0]?.POStatus?.toLowerCase() || "pending"
                       )} px-2 py-1`}>
@@ -1072,7 +1000,6 @@
                       >
                         <FaDownload />
                       </button>
-
                     </div>
                   </td>
                 </tr>
@@ -1080,7 +1007,6 @@
             </tbody>
           </Table>
         </div>
-
         {/* Modal for converting to invoice */}
         <Modal
           show={showInvoiceModal}
@@ -1168,7 +1094,6 @@
             <Button variant="primary">Create Invoice</Button>
           </Modal.Footer>
         </Modal>
-
         {renderAddPOModal()}
         {/* Modal for converting to invoice */}
         {!loading && !error && (
@@ -1180,7 +1105,6 @@
               <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                 <button className="page-link" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}>
                   <span aria-hidden="true">&laquo;</span>
-
                 </button>
               </li>
               {Array.from({ length: totalPages }, (_, i) => (
@@ -1192,7 +1116,6 @@
               ))}
               <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                 <button className="page-link" onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}>
-
                   <span aria-hidden="true">&raquo;</span>
                 </button>
               </li>
@@ -1202,7 +1125,6 @@
       </div>
     );
   }
-
   export default CostEstimates;
 
 
