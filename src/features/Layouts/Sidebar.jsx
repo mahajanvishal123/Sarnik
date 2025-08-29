@@ -70,10 +70,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <div className={`sidebar ${isOpen ? "expanded" : "collapsed"}`}>
-      <div className="sidebar-header">
-        {/* <div className="logo">
+      {/* <div className="sidebar-header">
+        <div className="logo">
           <span className="logo-text">Saaranik</span>
-        </div> */}
+        </div>
 
         <div className="logo" style={{
           display: 'flex',
@@ -92,7 +92,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           />
         </div>
 
-      </div>
+      </div> */}
 
       <ul className="menu" style={{ whiteSpace: "nowrap" }}>
         {menuItems.map((item, index) => (

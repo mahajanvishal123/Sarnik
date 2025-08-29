@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { decryptToken } from '../../Protecuted/decode';
 import "./Navbar.css";
+import logo from "../../assets/logo.png"
 import { SingleUser } from "../../redux/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -17,14 +18,12 @@ const Navbar = ({ toggleSidebar }) => {
     }
   }, [])
 
-
   const handleLogout = () => {
     // Clear entire localStorage
     localStorage.clear();
     // Optionally redirect to login page
     window.location.href = "/"; // ya "/login"
   };
-
   // Get profile link based on role
   const getProfileLink = () => {
     if (roledata === "admin") return "/admin/profile";
@@ -33,7 +32,6 @@ const Navbar = ({ toggleSidebar }) => {
     return "/";
   };
 
-
   //   ChangePassword url 
   const ChangePassword = () => {
     if (roledata === "admin") return "/admin/ChangePassword";
@@ -41,7 +39,6 @@ const Navbar = ({ toggleSidebar }) => {
     if (roledata === "client") return "/client/ChangePassword";
     return "/";
   };
-
   // UpdateProfile
   const UpdateProfile = () => {
     if (roledata === "admin") return "/admin/UpdateProfile";
@@ -49,7 +46,6 @@ const Navbar = ({ toggleSidebar }) => {
     if (roledata === "client") return "/client/UpdateProfile";
     return "/";
   };
-
 
   // decodeTokenAndLog.js SingleUser
   const { UserSingle, loading, error } = useSelector((state) => state.user);
@@ -59,59 +55,97 @@ const Navbar = ({ toggleSidebar }) => {
 
   return (
     <>
-      <nav className="navbar me-5 d-flex justify-content-end">
-        <div className="navbar-left">
-          <p className="navbar-logo">logo</p>
-          <button onClick={toggleSidebar} className="toggle-button d-block d-md-none">
-            <i className="fas fa-bars"></i>
+      <nav className="navbar navbar-expand-lg navbar-light bg-white">
+        <div className="container-fluid">
+          {/* Logo - Always visible */}
+          <Link className="navbar-brand d-flex align-items-center" to="/">
+           
+                   <div className="logo" style={{
+                     display: 'flex',
+                     alignItems: 'center',
+                     height: '30px',
+                     paddingLeft: '10px'
+                   }}>
+                     <img
+                       src={logo}
+                       alt="Logo"
+                       style={{
+                         height: '50px',
+                         display: 'block',
+                         objectFit: 'contain'
+                       }}
+                     />
+                   </div>
+          </Link>
+          
+          {/* Mobile menu button */}
+          <button 
+            className="navbar-toggler" 
+            type="button" 
+            onClick={toggleSidebar}
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
           </button>
-        </div>
-
-        <div className="navbar-right">
-          <div className="dropdown profile-dropdown d-none d-md-block">
-            <div className="profile-trigger" data-bs-toggle="dropdown" aria-expanded="false">
-              <div className="profile-info" >
-                <span className="profile-name">{UserSingle?.firstName} {UserSingle?.lastName}</span>
-                <span className="profile-role">{UserSingle?.email}</span>
+          
+          {/* Profile dropdown - aligned to the right */}
+          <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <div className="dropdown profile-dropdown">
+              <div 
+                className="profile-trigger d-flex align-items-center" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+              >
+                <div className="profile-info me-2 d-none d-md-block">
+                  <span className="profile-name d-block">
+                    {UserSingle?.firstName} {UserSingle?.lastName}
+                  </span>
+                  <span className="profile-role d-block text-muted small">
+                    {UserSingle?.email}
+                  </span>
+                </div>
+                <div className="profile-avatar">
+                  <img
+                    src={UserSingle?.profileImage && UserSingle?.profileImage.length > 0 
+                      ? UserSingle?.profileImage[0] 
+                      : '/default-profile.png'}
+                    alt="Profile"
+                    className="rounded-circle"
+                    style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+                  />
+                </div>
               </div>
-              <div className="profile-avatar">
-                {/* <img src="https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=2654" alt="profile" /> */}
-                <img
-                  src={UserSingle?.profileImage && UserSingle?.profileImage.length > 0 ? UserSingle?.profileImage[0] : '/default-profile.png'}
-                  style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: "25px" }}
-                />
-              </div>
+              
+              <ul className="dropdown-menu dropdown-menu-end profile-menu">
+                <li>
+                  <Link to={getProfileLink()} className="dropdown-item">
+                    <i className="fas fa-user me-2"></i>
+                    <span>My Profile</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to={UpdateProfile()} className="dropdown-item">
+                    <i className="fas fa-edit me-2"></i>
+                    <span>Update Profile</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to={ChangePassword()} className="dropdown-item">
+                    <i className="fas fa-lock me-2"></i>
+                    <span>Change Password</span>
+                  </Link>
+                </li>
+                <li><hr className="dropdown-divider" /></li>
+                <li onClick={handleLogout}>
+                  <Link to="/" className="dropdown-item text-danger">
+                    <i className="fas fa-sign-out-alt me-2"></i>
+                    <span>Logout</span>
+                  </Link>
+                </li>
+              </ul>
             </div>
-
-            <ul className="dropdown-menu dropdown-menu-end profile-menu">
-              <li>
-                <Link to={getProfileLink()} className="dropdown-item" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <i className="fas fa-user" style={{ marginRight: '8px' }}></i>
-                  <span>My Profile</span>
-                </Link>
-              </li>
-
-              <li>
-                <Link to={UpdateProfile()} className="dropdown-item" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <i className="fas fa-edit"></i>
-                  <span>Update Profile</span>
-                </Link>
-              </li>
-
-              <li>
-                <Link to={ChangePassword()} className="dropdown-item" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <i className="fas fa-lock"></i>
-                  <span>Change Password</span>
-                </Link>
-              </li>
-              <li><hr className="dropdown-divider" /></li>
-              <li onClick={handleLogout}>
-                <Link to="/" className="dropdown-item text-danger">
-                  <i className="fas fa-sign-out-alt"></i>
-                  <span>Logout</span>
-                </Link>
-              </li>
-            </ul>
           </div>
         </div>
       </nav>

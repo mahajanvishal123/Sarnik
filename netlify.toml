@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist" # If you are using Vite, use "dist". For CRA, use "build"
+
+[dev]
+  command = "npm run dev"
+  port = 8888
+
+# Redirects for SPA (React Router)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -456,72 +456,20 @@ import {
   FaUser,
   FaBell,
 } from "react-icons/fa";
-
-// Notifiction code
 import { initMessaging, getFcmToken, onForegroundMessage } from "../../../firebase";
 import { saveToken, sendTestNotification } from "./api";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllNotifications } from "../../../redux/slices/Notifiction";
 import dayjs from "dayjs";
 
-
-const VAPID_KEY = "BBrmFxSoxxTJSvX7C4cMqpeNg437_GvbxC9pPQ6rjbtii8lR8iqHy8CfWo-BLVIu7TN53LobGEi6clH6rXSG-nw"; // Firebase Console → Cloud Messaging → Web configuration
-
+const VAPID_KEY =
+  "BBrmFxSoxxTJSvX7C4cMqpeNg437_GvbxC9pPQ6rjbtii8lR8iqHy8CfWo-BLVIu7TN53LobGEi6clH6rXSG-nw"; // Firebase Console → Cloud Messaging → Web configuration
 
 function Notiifcations() {
-  const dispatch = useDispatch()
-
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: "purchase",
-      title: "New Purchase Order #PO-2024-089 requires your approval",
-      from: "Client: ABC Corporation",
-      time: "2 hours ago",
-      read: false,
-      category: "Today",
-    },
-    {
-      id: 2,
-      type: "timesheet",
-      title: "Timesheet submission reminder",
-      description: "Please submit your timesheet for the week ending Jan 14",
-      time: "3 hours ago",
-      read: false,
-      category: "Today",
-    },
-    {
-      id: 3,
-      type: "project",
-      title: 'Project "Holiday Package Design" completed',
-      description: "All deliverables have been approved",
-      time: "Yesterday at 4:24 PM",
-      read: true,
-      category: "Yesterday",
-    },
-    {
-      id: 4,
-      type: "invoice",
-      title: "Invoice #INV-2024-045 is overdue",
-      description: "Payment was due on Jan 10, 2024",
-      time: "Yesterday at 2:15 PM",
-      read: false,
-      category: "Yesterday",
-    },
-    {
-      id: 5,
-      type: "team",
-      title: 'New team member added to Project "Brand Guidelines"',
-      description: "Sarah Johnson has joined as Junior Designer",
-      time: "Jan 11, 2024",
-      read: false,
-      category: "Earlier",
-    },
-  ]);
-
+  const dispatch = useDispatch();
+  const [notifications, setNotifications] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [showModal, setShowModal] = useState(false);
-
   const [formData, setFormData] = useState({
     title: "",
     text: "",
@@ -532,100 +480,64 @@ function Notiifcations() {
     time: "",
   });
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map((notif) => ({ ...notif, read: true })));
-  };
+  const { Notifiction, loading, error } = useSelector((state) => state.notifiction);
 
-  const removeNotification = (id) => {
-    setNotifications(notifications.filter((notif) => notif.id !== id));
-  };
+  // Fetch notifications from Redux
+  useEffect(() => {
+    dispatch(getAllNotifications());
+  }, [dispatch]);
 
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case "purchase":
-        return <FaFileAlt />;
-      case "timesheet":
-        return <FaClock />;
-      case "project":
-        return <FaCheckCircle />;
-      case "invoice":
-        return <FaExclamationCircle />;
-      case "team":
-        return <FaUser />;
-      default:
-        return <FaBell />;
+  // Group notifications by date
+  const groupedNotifications = useMemo(() => {
+    if (!Notifiction?.notifications) return {};
+    const today = dayjs().startOf("day");
+    const yesterday = dayjs().subtract(1, "day").startOf("day");
+    return Notifiction.notifications.reduce((acc, n) => {
+      const notifDate = dayjs(n.date);
+      let category = "Earlier";
+      if (notifDate.isAfter(today)) {
+        category = "Today";
+      } else if (notifDate.isAfter(yesterday)) {
+        category = "Yesterday";
+      }
+      if (!acc[category]) acc[category] = [];
+      acc[category].push({
+        id: n.id,
+        title: n.title,
+        description: n.body,
+        time: n.ago,
+        category,
+      });
+      return acc;
+    }, {});
+  }, [Notifiction]);
+
+  // Delete Notification API
+  const deleteNotification = async (id) => {
+    try {
+      const response = await fetch(
+        `https://sarnic-backend-production-690c.up.railway.app/api/notifiction/deleteNotification/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const result = await response.json();
+      if (response.ok) {
+        alert("Notification deleted successfully!");
+        dispatch(getAllNotifications()); // Refresh notifications after delete
+      } else {
+        alert(`Error deleting notification: ${result.message}`);
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Something went wrong while deleting.");
     }
   };
 
-  const getNotificationClass = (type) => {
-    switch (type) {
-      case "purchase":
-        return "bg-primary bg-opacity-10";
-      case "timesheet":
-        return "bg-warning bg-opacity-10";
-      case "project":
-        return "bg-success bg-opacity-10";
-      case "invoice":
-        return "bg-danger bg-opacity-10";
-      case "team":
-        return "bg-info bg-opacity-10";
-      default:
-        return "";
-    }
-  };
-
-  const filteredNotifications = notifications.filter(
-    (notif) =>
-      selectedCategory === "All Categories" ||
-      notif.type === selectedCategory.toLowerCase()
-  );
-
-  const categories = [
-    "All Categories",
-    "Purchase",
-    "Timesheet",
-    "Project",
-    "Invoice",
-    "Team",
-  ];
-
-  const handleFormChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    const newNotification = {
-      id: notifications.length + 1,
-      type: "custom",
-      title: formData.title,
-      description: formData.text,
-      time:
-        formData.scheduleOption === "now"
-          ? "Just now"
-          : `${formData.date} at ${formData.time}`,
-      read: false,
-      category: "Today",
-    };
-    setNotifications([newNotification, ...notifications]);
-    setShowModal(false);
-    setFormData({
-      title: "",
-      text: "",
-      image: "",
-      name: "",
-      scheduleOption: "now",
-      date: "",
-      time: "",
-    });
-  };
-
-
-  // Notifiction code 
+  // Firebase notification code
   const [token, setToken] = useState("");
   const [title, setTitle] = useState("Hello Farhan 👋");
   const [body, setBody] = useState("This is a test notification Saaranik Project");
-
   useEffect(() => {
     (async () => {
       const messaging = await initMessaging();
@@ -638,14 +550,10 @@ function Notiifcations() {
         console.warn("Notification permission not granted");
         return;
       }
-
-      // Get + Save token initially
       const t = await getFcmToken(VAPID_KEY);
       if (t) {
         setToken(t);
         await saveToken(t);
-
-        // Client → SW fallback postMessage (optional; if you use clients.matchAll in SW)
         if (navigator.serviceWorker?.controller) {
           navigator.serviceWorker.controller.postMessage({
             type: "NEW_FCM_TOKEN",
@@ -653,24 +561,16 @@ function Notiifcations() {
           });
         }
       }
-
-      // Foreground message listener
       onForegroundMessage((payload) => {
         console.log("Foreground message:", payload);
         const { title, body, icon } = payload.notification || {};
-
-        // Show browser native notification
         if (Notification.permission === "granted") {
           new Notification(title, {
             body,
-            icon: icon || "/favicon.ico", // icon optional
+            icon: icon || "/favicon.ico",
           });
         }
       });
-
-
-      // Simple token refresh strategy:
-      // Re-check token on every load (and daily/interval if you want)
       const recheck = async () => {
         const newTok = await getFcmToken(VAPID_KEY);
         if (newTok && newTok !== token) {
@@ -684,46 +584,10 @@ function Notiifcations() {
           }
         }
       };
-      const interval = setInterval(recheck, 24 * 60 * 60 * 1000); // daily
+      const interval = setInterval(recheck, 24 * 60 * 60 * 1000);
       return () => clearInterval(interval);
     })();
   }, []);
-
-
-  const { Notifiction, loading, error } = useSelector((state) => state.notifiction);
-  console.log("jjjjjj", Notifiction);
-
-  useEffect(() => {
-    dispatch(getAllNotifications())
-  }, [dispatch])
-  const groupedNotifications = useMemo(() => {
-    if (!Notifiction?.notifications) return {};
-
-    const today = dayjs().startOf("day");
-    const yesterday = dayjs().subtract(1, "day").startOf("day");
-
-    return Notifiction.notifications.reduce((acc, n) => {
-      const notifDate = dayjs(n.date);
-
-      let category = "Earlier";
-      if (notifDate.isAfter(today)) {
-        category = "Today";
-      } else if (notifDate.isAfter(yesterday)) {
-        category = "Yesterday";
-      }
-
-      if (!acc[category]) acc[category] = [];
-      acc[category].push({
-        id: n.id,
-        title: n.title,
-        description: n.body,
-        time: n.ago,
-        category,
-      });
-
-      return acc;
-    }, {});
-  }, [Notifiction]);
 
   return (
     <div className="container-fluid py-4">
@@ -731,38 +595,19 @@ function Notiifcations() {
         <div className="notification-header d-flex justify-content-between align-items-center mb-4">
           <h3>Notifications</h3>
           <div className="d-flex align-items-center">
-            {/* <select
-              className="form-select me-3"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-            >
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select> */}
             <button
               className="btn btn-primary me-3"
               onClick={() => setShowModal(true)}
-              style={{ whiteSpace: 'nowrap' }}
+              style={{ whiteSpace: "nowrap" }}
             >
               Send Notification
             </button>
-            {/* <button
-              className="btn btn-link text-decoration-none text-muted"
-              onClick={markAllAsRead}
-            >
-              Mark all as read
-            </button> */}
           </div>
         </div>
-
         <div>
           {["Today", "Yesterday", "Earlier"].map((category) => {
             const categoryNotifications = groupedNotifications[category] || [];
             if (categoryNotifications.length === 0) return null;
-
             return (
               <div key={category} className="mb-4">
                 <h6 className="text-muted mb-3">{category}</h6>
@@ -772,9 +617,7 @@ function Notiifcations() {
                     className={`notification-card mb-3 p-3 bg-light rounded-3 position-relative`}
                   >
                     <div className="d-flex align-items-start">
-                      <div
-                        className={`notification-icon rounded-circle p-2 me-3`}
-                      >
+                      <div className={`notification-icon rounded-circle p-2 me-3`}>
                         <span className="fs-5">🔔</span>
                       </div>
                       <div className="flex-grow-1">
@@ -789,15 +632,13 @@ function Notiifcations() {
                         <span className="text-muted smaller d-block">
                           {notification.time}
                         </span>
-                        <span className="text-muted smaller d-block">
-                          {notification.date}
-                        </span>
                       </div>
                       <button
-                        className="btn-close position-absolute top-0 end-0 mt-2 me-2"
-                        onClick={() => console.log("Remove", notification.id)}
-                        aria-label="Close"
-                      ></button>
+                        className="btn btn-danger btn-sm position-absolute top-0 end-0 mt-2 me-2"
+                        onClick={() => deleteNotification(notification.id)}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -807,14 +648,14 @@ function Notiifcations() {
         </div>
       </div>
 
-      {/* Bootstrap Modal */}
+      {/* Modal for Sending Notification */}
       {showModal && (
         <div
           className="modal fade show"
           style={{ display: "block", background: "rgba(0,0,0,0.5)" }}
         >
           <div className="modal-dialog">
-            <div className="modal-content  text-dark">
+            <div className="modal-content text-dark">
               <div className="modal-header">
                 <h5 className="modal-title">Send Notification</h5>
                 <button
@@ -824,73 +665,31 @@ function Notiifcations() {
                 ></button>
               </div>
               <div className="modal-body">
-                <form onSubmit={handleFormSubmit}>
+                <form>
                   <label>Notification title</label>
-                  <input className="form-control mb-2" value={title} onChange={(e) => setTitle(e.target.value)} />
-
+                  <input
+                    className="form-control mb-2"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
                   <label>Notification text</label>
-                  <textarea className="form-control mb-2" value={body} onChange={(e) => setBody(e.target.value)} />
-
-                  <label>Notification image (optional)</label>
-                  <input
-                    type="text"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleFormChange}
+                  <textarea
                     className="form-control mb-2"
+                    value={body}
+                    onChange={(e) => setBody(e.target.value)}
                   />
-
-                  <label>Notification name (optional)</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleFormChange}
-                    className="form-control mb-2"
-                  />
-
-                  <label>Scheduling</label>
-                  <select
-                    name="scheduleOption"
-                    value={formData.scheduleOption}
-                    onChange={handleFormChange}
-                    className="form-select mb-2"
-                  >
-                    <option value="now">Now</option>
-                    <option value="scheduled">Scheduled</option>
-                  </select>
-
-                  {formData.scheduleOption === "scheduled" && (
-                    <div className="d-flex gap-2">
-                      <input
-                        type="date"
-                        name="date"
-                        value={formData.date}
-                        onChange={handleFormChange}
-                        className="form-control mb-2"
-                      />
-                      <input
-                        type="time"
-                        name="time"
-                        value={formData.time}
-                        onChange={handleFormChange}
-                        className="form-control mb-2"
-                      />
-                    </div>
-                  )}
                   <button
                     style={{ marginTop: 16 }}
                     onClick={async (e) => {
                       e.preventDefault();
-
                       setTimeout(() => {
                         dispatch(getAllNotifications());
                       }, 3000);
-
-                      // null bhejne ka matlab hai -> sabhi tokens par send hoga
                       const res = await sendTestNotification(null, title, body);
                       console.log("Notification response:", res);
-                      alert(`Sent to all tokens: ${res.successCount} success, ${res.failureCount} failed`);
+                      alert(
+                        `Sent to all tokens: ${res.successCount} success, ${res.failureCount} failed`
+                      );
                     }}
                     id="All_btn"
                     type="button"
@@ -898,7 +697,6 @@ function Notiifcations() {
                   >
                     Send
                   </button>
-
                 </form>
               </div>
             </div>
@@ -908,6 +706,4 @@ function Notiifcations() {
     </div>
   );
 }
-
 export default Notiifcations;
-
