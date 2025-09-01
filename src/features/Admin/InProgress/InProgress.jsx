@@ -449,7 +449,7 @@ function InProgress() {
   };
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const filteredProjects = (job?.jobs || []).filter((j) => {
     const terms = searchQuery.trim().split(/\s+/).filter(Boolean);

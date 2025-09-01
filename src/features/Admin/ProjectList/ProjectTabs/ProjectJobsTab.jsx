@@ -737,7 +737,7 @@ function ProjectJobsTab() {
   };
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const filteredProjects = ProjectJob?.jobs || [];
   const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);

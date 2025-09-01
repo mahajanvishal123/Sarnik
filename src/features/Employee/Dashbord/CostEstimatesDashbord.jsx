@@ -208,7 +208,7 @@ function CostEstimatesDashbord() {
 
     // PAGINATION SETUP FOR ESTIMATES
  const [currentPage, setCurrentPage] = useState(1);
-const itemsPerPage = 7;
+const itemsPerPage = 15;
 
 // Filter only pending estimates
 const filteredEstimates = estimates?.costEstimates?.filter(

@@ -113,7 +113,7 @@ function Job_History() {
     return matchesSearch && matchesProject && matchesPriority && matchesStatus;
   });
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
 
   const paginatedProjects = filteredJobs.slice(

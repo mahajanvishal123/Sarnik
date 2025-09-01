@@ -38,7 +38,7 @@ function ProductionManager() {
   ]);
 
   const [filteredManagers, setFilteredManagers] = useState([]);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All Status');

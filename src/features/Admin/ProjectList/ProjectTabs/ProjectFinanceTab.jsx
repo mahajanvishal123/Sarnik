@@ -4,23 +4,23 @@ import ReceivablePurchaseOrders from './ReceivablePurchaseOrders';
 import Invoicing_Billing from '../../Invoicing_Billing/Invoicing_Billing';
 import ProjectInvoiceBilling from './ProjectInvoiceBilling';
 
-function ProjectFinanceTab({ budget, purchaseOrders }) {
+function ProjectFinanceTab({ projectNO, budget, purchaseOrders }) {
   return (
     <div className="row g-4">
    
       {/* Purchase Orders */}
       <div className="col-12">
-      <PurchaseOrder/>
+      <PurchaseOrder projectNO={projectNO}/>
       </div>
 
       {/* Received POs Section */}
       <div className="col-12">
-        <ReceivablePurchaseOrders/>
+        <ReceivablePurchaseOrders projectNO={projectNO}/>
       </div>
 
       {/* Financial Summary Charts */}
       <div className="col-12">
-       <ProjectInvoiceBilling/>
+       <ProjectInvoiceBilling projectNO={projectNO}/>
       </div>
 
     </div>

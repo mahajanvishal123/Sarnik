@@ -448,7 +448,7 @@ function Invoicing_Billing() {
   }, [dispatch]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7;
+  const itemsPerPage = 15;
 
   const filteredEstimates = invocing?.InvoicingBilling
     ?.slice()

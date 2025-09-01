@@ -101,7 +101,7 @@ function MyJobs() {
   }, [dispatch]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const filteredProjects = (assigns?.assignments || []).filter((assignment) => {
     const terms = searchQuery.trim().split(/\s+/).filter(Boolean);

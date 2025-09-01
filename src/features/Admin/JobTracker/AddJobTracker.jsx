@@ -604,7 +604,7 @@ function AddJobTracker() {
     priority: '',
     Status: 'Active',
     totalTime: '',
-    assign: 'Not Assing',
+    assign: 'Not Assign',
     barcode: "",
   });
 

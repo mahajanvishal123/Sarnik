@@ -24,7 +24,7 @@ function TimesheetWorklog() {
     dispatch(fetchTimesheetWorklogs());
   }, [dispatch]);
 
-  const itemsPerPage = 7;
+  const itemsPerPage = 15;
   const totalPages = Math.ceil((timesheetWorklog.TimesheetWorklogss?.length || 0) / itemsPerPage);
   const paginatedTimeLogss = timesheetWorklog.TimesheetWorklogss?.slice(
     (currentPage - 1) * itemsPerPage,

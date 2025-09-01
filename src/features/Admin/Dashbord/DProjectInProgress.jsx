@@ -21,7 +21,7 @@ function  DProjectInProgress() {
   const { project, loading, error } = useSelector((state) => state.projects);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const projectsPerPage = 10;
+  const projectsPerPage = 15;
 
   const [showDesignerModal, setShowDesignerModal] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);

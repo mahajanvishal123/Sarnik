@@ -416,7 +416,7 @@ function DCostEstimates() {
 
   // PAGINATION SETUP FOR ESTIMATES
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7;
+  const itemsPerPage = 15;
 
   // Add filtering logic before pagination
 const filteredEstimates = estimates?.costEstimates

@@ -2,22 +2,23 @@ import React, { useEffect, useState, useRef } from "react";
 import { Modal, Form, Table, Badge, Dropdown, Button } from "react-bootstrap";
 import { BsPlusLg, BsPencil, BsTrash, BsUpload, BsClipboard } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
-import { deleteCostEstimate, fetchCostEstimates, updateCostEstimate } from "../../../redux/slices/costEstimatesSlice";
+import { deleteCostEstimate, fetchCostEstimates, updateCostEstimate } from "../../../../../../redux/slices/costEstimatesSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { FaDownload, FaTrash } from "react-icons/fa";
 import Swal from 'sweetalert2';
-import { fetchProject } from "../../../redux/slices/ProjectsSlice";
-import { fetchClient } from "../../../redux/slices/ClientSlice";
-import { createReceivablePurchase, fetchReceivablePurchases, imagelogoreceivablePurchase } from "../../../redux/slices/receivablePurchaseSlice";
+import { fetchProject } from "../../../../../../redux/slices/ProjectsSlice";
+import { fetchClient } from "../../../../../../redux/slices/ClientSlice";
+import { createReceivablePurchase, fetchReceivablePurchases, imagelogoreceivablePurchase } from "../../../../../../redux/slices/receivablePurchaseSlice";
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
 import { FaRegCopy } from "react-icons/fa";
 import axios from "axios";
-import axiosInstance from "../../../redux/utils/axiosInstance";
+import axiosInstance from "../../../../../../redux/utils/axiosInstance";
 
-function CostEstimates() {
+function CostEstimates({projectNO}) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  console.log("projectNO",projectNO)
   // State declarations
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPOStatus, setSelectedPOStatus] = useState("All PO Status");
@@ -456,7 +457,7 @@ function CostEstimates() {
     //   }
     // PAGINATION SETUP FOR ESTIMATES
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 15;
+    const itemsPerPage = 7;
 
     // Add filtering logic before pagination
     const filteredEstimates = estimates?.costEstimates
@@ -937,7 +938,11 @@ function CostEstimates() {
               </tr>
             </thead>
             <tbody>
-              {paginatedEstimates?.map((po, index) => (
+              {paginatedEstimates?.filter((item)=> {
+              return(
+                item.projects[0].projectId == projectNO
+              )
+              }).map((po, index) => (
                 <tr style={{ whiteSpace: "nowrap" }} key={po.poNumber}>
                   {/* <td><input type="checkbox" /></td> */}
                   <td onClick={() => CostEstimatesDetails(po)}>

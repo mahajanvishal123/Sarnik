@@ -3,9 +3,9 @@ import { Form, Table, Badge, InputGroup, Button, Collapse, Dropdown } from "reac
 import { FaSearch, FaFilter, FaSort } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { fetchReceivablePurchases } from "../../../redux/slices/receivablePurchaseSlice";
+import { fetchReceivablePurchases } from "../../../../../../redux/slices/receivablePurchaseSlice";
 
-function ReciveablePurchase() {
+function ReciveablePurchase({projectNO}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All Status");
   const [sortField, setSortField] = useState(null);
@@ -297,7 +297,11 @@ const handleToBeInvoiced = (po) => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((po, index) => (
+            {paginatedData.filter((Item)=>{
+              return(
+                Item.projects[0]?.projectId == projectNO
+              )
+            }).map((po, index) => (
               <tr key={index}>
                 <td>
                   {po.PONumber}

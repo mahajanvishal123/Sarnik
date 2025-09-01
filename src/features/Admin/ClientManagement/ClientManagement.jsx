@@ -20,7 +20,7 @@ function ClientManagement() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [clientsPerPage] = useState(10);
+  const [clientsPerPage] = useState(15);
 
   const { Clients } = useSelector((state) => state.client);
 

@@ -104,7 +104,7 @@ function ProjectList() {
     }
   };
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
   const totalPages = Math.ceil((filteredProjects?.length || 0) / itemsPerPage);
   const paginatedProjects = filteredProjects?.slice(
     (currentPage - 1) * itemsPerPage,
@@ -216,13 +216,15 @@ function ProjectList() {
                   </Link>
                 </td> */}
                 <td>
-                  <Link to={"/employee/myJobs"}>
-                    {String((currentPage - 1) * itemsPerPage + index + 1).padStart(4, '0')}</Link>
+              <Link to={"/employee/myJobs"}>
+                    {/* {String((currentPage - 1) * itemsPerPage + index + 1).padStart(4, '0')} */}
+                    {project.projectNo}
+                  </Link>
                 </td>
                 <td style={{ whiteSpace: 'nowrap' }}>{project.projectName}</td>
                 <td>{new Date(project.startDate).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
                 <td>{new Date(project.endDate).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
-                <td>{project.client}Client</td>
+                <td>{project.clientId.clientName || 'Client'}</td>
                 <th>
                   {project.projectRequirements && project.projectRequirements.length > 0
                     ? Object.entries(project.projectRequirements[0])

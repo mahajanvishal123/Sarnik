@@ -78,6 +78,7 @@ function ProjectOverview() {
       totalValue: '$35,000'
     }
   };
+
   
   const renderTabContent = () => {
     switch (activeTab) {
@@ -86,7 +87,7 @@ function ProjectOverview() {
       case 'jobs':
         return <ProjectJobsTab jobList={projectData.jobList} />;
       case 'finance':
-        return <ProjectFinanceTab budget={projectData.budget} purchaseOrders={projectData.purchaseOrders} />;
+        return <ProjectFinanceTab projectNO={projectDatah?._id} budget={projectData.budget} purchaseOrders={projectData.purchaseOrders} />;
       case 'documents':
         return <ProjectDocumentsTab />;
       case 'team':

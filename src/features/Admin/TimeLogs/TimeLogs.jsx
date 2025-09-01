@@ -91,7 +91,7 @@ function TimeLogs() {
     dispatch(fetchTimesheetWorklogs());
   }, [dispatch]);
 
-  const itemsPerPage = 7;
+  const itemsPerPage = 15;
 
   const filteredTimeLogs = (timesheetWorklog.TimesheetWorklogss || []).filter((log) => {
     // Split searchQuery by spaces, ignore empty terms
