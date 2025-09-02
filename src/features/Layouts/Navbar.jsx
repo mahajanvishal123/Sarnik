@@ -43,6 +43,7 @@ const Navbar = ({ toggleSidebar }) => {
   const UpdateProfile = () => {
     if (roledata === "admin") return "/admin/UpdateProfile";
     if (roledata === "employee") return "/employee/UpdateProfile";
+    if (roledata === "production") return "/production/UpdateProfile";
     if (roledata === "client") return "/client/UpdateProfile";
     return "/";
   };
