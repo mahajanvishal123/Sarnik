@@ -77,7 +77,8 @@ const ProtectedRoute = ({ children }) => {
           if (
             (userRole === "admin" && pathname.startsWith("/admin")) ||
             (userRole === "employee" && pathname.startsWith("/employee"))||
-            (userRole === "client" && pathname.startsWith("/client"))
+            (userRole === "client" && pathname.startsWith("/client"))||
+            (userRole === "production" && pathname.startsWith("/production"))
           ) {
             setIsAuthorized(true);
           } else {

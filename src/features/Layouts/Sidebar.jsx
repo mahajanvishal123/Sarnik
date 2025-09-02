@@ -1,7 +1,7 @@
 // src/components/Sidebar.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { adminMenuItems, employeeMenuItems, clientMenuItems } from "../Layouts/menuConfig";
+import { adminMenuItems, employeeMenuItems, clientMenuItems, ProductionMenuItems } from "../Layouts/menuConfig";
 import "./Sidebar.css";
 import logo from "../../assets/logo.png"
 const Sidebar = ({ isOpen, toggleSidebar }) => {
@@ -20,7 +20,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         ? employeeMenuItems
         : roleData === "client"
           ? clientMenuItems
-          : [];
+          :roleData === "production"
+          ? ProductionMenuItems :[];
+          
 
 
   useEffect(() => {

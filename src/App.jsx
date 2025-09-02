@@ -5,10 +5,12 @@ import Login from "./features/Auth/Login";
 import Register from "./features/Auth/Register";
 import Employee from './Routes/Employee';
 import Client from './Routes/Client';
+
 import ProtectedRoute from './Protecuted/Protecuted';
 import PageNotfound from './Routes/PageNotfound';
 import ForgotPassword from './features/Auth/ForgotPassword';
 import ResetPassword from './features/Auth/ResetPassword';
+import Production from './Routes/Production';
 
 function App() {
   return (
@@ -29,6 +31,9 @@ function App() {
           </ProtectedRoute>} />
           <Route path='/client/*' element={<ProtectedRoute>
             <Client />
+          </ProtectedRoute>} />
+            <Route path='/production/*' element={<ProtectedRoute>
+            <Production />
           </ProtectedRoute>} />
           <Route path='/*' element={
             <PageNotfound/>

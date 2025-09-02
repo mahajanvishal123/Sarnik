@@ -203,3 +203,56 @@ export const clientMenuItems = [
     path: "/admin/Settings",
   },
 ];
+
+
+
+// Production Menu
+export const ProductionMenuItems = [
+  {
+    title: "Dashboard",
+    icon: <FaHome className="menu-icon" />,
+    path: "/production/dashboard",
+  },
+  {
+    title: "My Jobs",
+    icon: <FaTasks className="menu-icon" />,
+    path: "/production/myJobs",
+  },
+    {
+    title: "Projects & Jobs",
+    icon: <FaProjectDiagram className="menu-icon" />,
+    submenu: [
+      { title: "Projects", path: "/production/projectList" },
+      { title: "Job Trackers", path: "/production/JobsTracker" },
+    ],
+  },
+  {
+    title: "Time Tracking",
+    icon: <FaClock className="menu-icon" />,
+    path: "/production/TimeTracking",
+  },
+
+
+  {
+    title: "Job History",
+    icon: <FaHistory className="menu-icon" />,
+    path: "/production/jobhistory",
+  },
+
+  {
+    title: "Notifications",
+    icon: <FaBell className="menu-icon" />,
+    path: "/production/Notification",
+  },
+  {
+    title: "Profile",
+    icon: <FaUserCircle className="menu-icon" />,
+    path: "/production/Profile",
+  },
+
+  {
+    title: "Settings",
+    icon: <FaCog className="menu-icon" />,
+    path: "/production/Settings",
+  },
+];
