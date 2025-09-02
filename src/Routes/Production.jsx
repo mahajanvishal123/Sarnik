@@ -65,6 +65,7 @@ function Production() {
             <Route path="/TimeTracking" element={<ProtectedRoute><TimeLogs/></ProtectedRoute>} />
             <Route path="/AddTimeLog" element={<ProtectedRoute><AddTimeLog/></ProtectedRoute>} />
             <Route path="/TimesheetWorklog" element={<ProtectedRoute><TimesheetWorklog/></ProtectedRoute>} />
+            <Route path="/myJobs" element={<ProtectedRoute><MyJobs/></ProtectedRoute>} />
             
           </Routes>
         </div>

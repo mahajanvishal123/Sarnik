@@ -441,11 +441,11 @@ function InProgress() {
   };
 
   const handleUpdate = (job) => {
-    navigate('/admin/AddJobTracker', { state: { job } });
+    navigate('/production/AddJobTracker', { state: { job } });
   };
 
   const JobDetails = (job) => {
-    navigate('/admin/OvervieJobsTracker', { state: { job } });
+    navigate('/production/OvervieJobsTracker', { state: { job } });
   };
 
   const [currentPage, setCurrentPage] = useState(1);

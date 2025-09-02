@@ -272,11 +272,11 @@ function NewJobsList() {
     });
 
   const handleUpdate = (job) => {
-    navigate(`/admin/AddJobTracker/${job._id}`, { state: { job } });
+    navigate(`/production/AddJobTracker/${job._id}`, { state: { job } });
   };
 
   const JobDetails = (job) => {
-    navigate(`/admin/OvervieJobsTracker`, { state: { job } });
+    navigate(`/production/OvervieJobsTracker`, { state: { job } });
   };
 
   const handleCheckboxChange = (jobId) => {
@@ -328,7 +328,7 @@ function NewJobsList() {
           toast.success(response.message || "Project Assigned Successfully!");
           setShowAssignModal(false);
           setSelectedJobs(false);
-          navigate("/admin/MyJobs");
+          navigate("/production/MyJobs");
         } else {
           setShowAssignModal(false);
           toast.error(response.message || "Assignment failed!");
