@@ -67,11 +67,11 @@ function ProjectOverview() {
       { action: 'New purchase order created', time: 'Yesterday' },
       { action: 'New team member added', time: '2 days ago' }
     ],
-    teamMembers: [
-      { name: 'Sarah Johnson', role: 'Project Manager' },
-      { name: 'Michael Chen', role: 'Lead Developer' },
-      { name: 'Emily Wilson', role: 'UI/UX Designer' }
-    ],
+    // teamMembers: [
+    //   { name: 'Sarah Johnson', role: 'Project Manager' },
+    //   { name: 'Michael Chen', role: 'Lead Developer' },
+    //   { name: 'Emily Wilson', role: 'UI/UX Designer' }
+    // ],
     purchaseOrders: {
       received: 3,
       issued: 5,
@@ -88,10 +88,10 @@ function ProjectOverview() {
         return <ProjectJobsTab jobList={projectData.jobList} />;
       case 'finance':
         return <ProjectFinanceTab projectNO={projectDatah?._id} budget={projectData.budget} purchaseOrders={projectData.purchaseOrders} />;
-      case 'documents':
-        return <ProjectDocumentsTab />;
-      case 'team':
-        return <ProjectTeamTab teamMembers={projectData.teamMembers} />;
+      // case 'documents':
+      //   return <ProjectDocumentsTab />;
+      // case 'team':
+      //   return <ProjectTeamTab teamMembers={projectData.teamMembers} />;
       default:
         return <ProjectOverviewTab projectData={projectData} />;
     }
@@ -116,7 +116,7 @@ function ProjectOverview() {
 
       {/* Tabs for Desktop */}
       <ul className="nav nav-tabs mb-4 d-none d-md-flex">
-        {['overview', 'jobs', 'finance', 'documents', 'team'].map((tab) => (
+        {['overview', 'jobs', 'finance'].map((tab) => (
           <li className="nav-item" key={tab}>
             <button
               className={`nav-link ${activeTab === tab ? 'active' : ''}`}
@@ -151,12 +151,12 @@ function ProjectOverview() {
             <li>
               <button className="dropdown-item" onClick={() => setActiveTab('finance')}>Finance</button>
             </li>
-            <li>
+            {/* <li>
               <button className="dropdown-item" onClick={() => setActiveTab('documents')}>Documents</button>
             </li>
             <li>
               <button className="dropdown-item" onClick={() => setActiveTab('team')}>Team</button>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>
