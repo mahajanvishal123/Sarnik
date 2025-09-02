@@ -456,7 +456,7 @@ function CostEstimates() {
     //   }
     // PAGINATION SETUP FOR ESTIMATES
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 7;
+    const itemsPerPage = 15;
 
     // Add filtering logic before pagination
     const filteredEstimates = estimates?.costEstimates
@@ -981,7 +981,7 @@ function CostEstimates() {
                           setShowAddPOModal(true);   // Open Modal
                         }}
                       >
-                       Add PO
+                      Add PO
                       </button>
                       <span className={`badge ${getStatusClass(
                         po.receivablePurchases?.[0]?.POStatus?.toLowerCase() || "pending"

@@ -23,7 +23,7 @@ function ReciveablePurchase() {
     dispatch(fetchReceivablePurchases());
   }, [dispatch]);
 
-  const itemsPerPage = 7;
+  const itemsPerPage = 15;
   const allOrders = purchases?.receivablePurchases || [];
 
   // 🔍 Filtering based on search and status

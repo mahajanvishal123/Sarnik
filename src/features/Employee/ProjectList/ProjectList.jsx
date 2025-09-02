@@ -217,12 +217,14 @@ function ProjectList() {
                 </td> */}
                 <td>
                   <Link to={"/employee/myJobs"}>
-                    {String((currentPage - 1) * itemsPerPage + index + 1).padStart(4, '0')}</Link>
+                    {/* {String((currentPage - 1) * itemsPerPage + index + 1).padStart(4, '0')} */}
+                    {project.projectNo}
+                  </Link>
                 </td>
                 <td style={{ whiteSpace: 'nowrap' }}>{project.projectName}</td>
                 <td>{new Date(project.startDate).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
                 <td>{new Date(project.endDate).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
-                <td>{project.client}Client</td>
+                <td>{project.clientId.clientName || 'Client'}</td>
                 <th>
                   {project.projectRequirements && project.projectRequirements.length > 0
                     ? Object.entries(project.projectRequirements[0])
