@@ -15,13 +15,13 @@ function ProjectOverview() {
   const { id, openTab, projectDatah, projectNo, projectName, clientName } = location.state || {};
   const [activeTab, setActiveTab] = useState('overview');
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     if (location.state?.openTab) {
       setActiveTab(location.state.openTab);
     }
   }, [location.state]);
-  
+
   // 定义状态样式函数
   const getStatusClass = (status) => {
     switch (status) {
@@ -37,7 +37,7 @@ function ProjectOverview() {
         return 'bg-secondary';
     }
   };
-  
+
   // 修改处理编辑的函数，确保传递projectDatah
   const handleUpdate = (project) => {
     navigate(`/admin/AddProjectList`, { state: { project: project || projectDatah } });
@@ -79,7 +79,7 @@ function ProjectOverview() {
     }
   };
 
-  
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
@@ -96,7 +96,7 @@ function ProjectOverview() {
         return <ProjectOverviewTab projectData={projectData} />;
     }
   };
-  
+
   return (
     <div className="container-fluid py-4">
       {/* Project Header */}
@@ -128,7 +128,7 @@ function ProjectOverview() {
           </li>
         ))}
       </ul>
-      
+
       {/* Dropdown for Mobile */}
       <div className="d-block d-md-none mb-4">
         <div className="dropdown">
@@ -160,10 +160,10 @@ function ProjectOverview() {
           </ul>
         </div>
       </div>
-      
+
       {/* Tab Content */}
       {renderTabContent()}
-      
+
       {/* Project Details Table */}
       <div className="mb-4">
         <h5 className="mb-3">Project Details</h5>
@@ -187,13 +187,13 @@ function ProjectOverview() {
                 <td>{projectDatah.projectNo}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>{projectDatah.projectName}</td>
                 <td>
-                  {projectDatah.startDate 
-                    ? new Date(projectDatah.startDate).toLocaleDateString('en-GB').replace(/\/20/, '/') 
+                  {projectDatah.startDate
+                    ? new Date(projectDatah.startDate).toLocaleDateString('en-GB').replace(/\/20/, '/')
                     : 'N/A'}
                 </td>
                 <td>
-                  {projectDatah.endDate 
-                    ? new Date(projectDatah.endDate).toLocaleDateString('en-GB').replace(/\/20/, '/') 
+                  {projectDatah.endDate
+                    ? new Date(projectDatah.endDate).toLocaleDateString('en-GB').replace(/\/20/, '/')
                     : 'N/A'}
                 </td>
                 <td style={{ whiteSpace: 'nowrap' }}>{projectDatah?.clientId?.clientName || 'N/A'}</td>
@@ -205,7 +205,7 @@ function ProjectOverview() {
                       .join(', ')
                     : 'N/A'}
                 </td>
-                <td>{projectDatah.projectPriority || 'N/A'}</td>    
+                <td>{projectDatah.projectPriority || 'N/A'}</td>
                 <td>
                   <span className={`badge ${getStatusClass(projectDatah.status)} px-2 py-1`}>
                     {projectDatah.status || 'N/A'}
@@ -214,10 +214,10 @@ function ProjectOverview() {
                 <td>
                   <div className="action-buttons d-flex">
                     {/* 修改这里：传递projectDatah参数 */}
-                    <Button 
-                      style={{ color: "#0d6efd" }} 
-                      variant="link" 
-                      className="p-0 me-2" 
+                    <Button
+                      style={{ color: "#0d6efd" }}
+                      variant="link"
+                      className="p-0 me-2"
                       onClick={() => handleUpdate(projectDatah)}
                     >
                       <FaEdit />

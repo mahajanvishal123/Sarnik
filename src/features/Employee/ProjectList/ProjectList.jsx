@@ -216,10 +216,10 @@ function ProjectList() {
                   </Link>
                 </td> */}
                 <td>
-              <Link to={"/employee/myJobs"}>
+                  <Link to={"/employee/myJobs"}>
                     {/* {String((currentPage - 1) * itemsPerPage + index + 1).padStart(4, '0')} */}
                     {project.projectNo}
-                  </Link>
+                  </Link>
                 </td>
                 <td style={{ whiteSpace: 'nowrap' }}>{project.projectName}</td>
                 <td>{new Date(project.startDate).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>

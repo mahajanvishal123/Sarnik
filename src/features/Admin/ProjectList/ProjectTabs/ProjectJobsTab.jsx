@@ -843,7 +843,8 @@ function ProjectJobsTab() {
                     <td>{job.packCode}</td>
                     <td><span className={getPriorityClass(job.priority)}>{job.priority}</span></td>
                     <td>{new Date(job?.createdAt).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
-                    <td>{job.assign}</td>
+                    {/* <td>{job.assign}</td> */}
+                    <td>{job.assignedTo}</td>
                     <td>{getEmployeeTotalTime(job.assign)}</td>
                     <td><span className={`badge ${getStatusClass(job.Status)} px-2 py-1`}>{job.Status}</span></td>
                     <td className="d-flex">
@@ -876,7 +877,7 @@ function ProjectJobsTab() {
               >
                 <option value="">-- Select --</option>
                 <option value="Designer">Designer</option>
-                <option value="Production">Production</option>
+                <option value="production">Production</option>
               </Form.Select>
             </Form.Group>
 
@@ -889,7 +890,18 @@ function ProjectJobsTab() {
               >
                 <option value="">-- Select Employee --</option>
                 {(userAll?.data?.users || [])
-                  .filter((emp) => emp.role === 'employee' && emp.assign === selectedDesigner)
+                  // .filter((emp) => emp.role === 'employee' && emp.assign === selectedDesigner)
+                  .filter((emp) => {
+                    if (selectedDesigner == "production") {
+                      return (
+                        emp.role == "production"
+                      )
+                    } else {
+                      return (
+                        emp.role === 'employee' && emp.assign === selectedDesigner
+                      )
+                    }
+                  })
                   .map((emp) => (
                     <option key={emp._id} value={emp._id}>
                       {emp.firstName} {emp.lastName}

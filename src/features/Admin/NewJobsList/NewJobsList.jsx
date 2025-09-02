@@ -72,7 +72,7 @@ function NewJobsList() {
   ];
 
   const { job, loading, error } = useSelector((state) => state.jobs);
-  console.log("jjjjjjjjjff",job.data)
+  console.log("jjjjjjjjjff", job.data)
   useEffect(() => {
     dispatch(ProductionJobsGet());
   }, [dispatch]);
@@ -355,7 +355,7 @@ function NewJobsList() {
       });
   };
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
 
@@ -490,7 +490,7 @@ function NewJobsList() {
                   <td style={{ whiteSpace: "nowrap" }}>
                     {job.projectId?.[0]?.projectName || "N/A"}
                   </td>
-                     <td style={{ whiteSpace: "nowrap" }}>
+                  <td style={{ whiteSpace: "nowrap" }}>
                     {job.projectId?.[0]?.projectNo || "N/A"}
                   </td>
                   <td style={{ whiteSpace: "nowrap" }}>{job.brandName}</td>
@@ -499,13 +499,13 @@ function NewJobsList() {
                   <td style={{ whiteSpace: "nowrap" }}>{job.packType}</td>
                   <td style={{ whiteSpace: "nowrap" }}>{job.packSize}</td>
                   <td style={{ whiteSpace: "nowrap" }}>{job?.packCode}</td>
-             <td>
-                      {new Date(job.updatedAt).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false
-                      })}
-                    </td>
+                  <td>
+                    {new Date(job.updatedAt).toLocaleTimeString('en-US', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false
+                    })}
+                  </td>
                   <td style={{ whiteSpace: "nowrap" }}>
                     {new Date(job.createdAt).toLocaleDateString("en-GB")}
                   </td>

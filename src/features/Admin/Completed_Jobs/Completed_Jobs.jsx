@@ -48,7 +48,7 @@ function Completed_Jobs() {
   const id = location.state?.id || params.id;
 
   const { assigns, loading, error } = useSelector((state) => state.Assign);
-  const { job} = useSelector((state) => state.jobs);
+  const { job } = useSelector((state) => state.jobs);
   const [Status, setStatus] = useState("Completed");
 
   useEffect(() => {
@@ -119,26 +119,26 @@ function Completed_Jobs() {
       setTimeout(() => setErrorMessage(""), 3000);
       return;
     }
-    
+
     // Get the selected job objects
     const jobsToReturn = filteredJobs.filter(job => selectedJobIds.includes(job._id));
-    
+
     // Store returned jobs in localStorage to access on the returned jobs page
     const existingReturnedJobs = JSON.parse(localStorage.getItem('returnedJobs') || '[]');
     const updatedReturnedJobs = [...existingReturnedJobs, ...jobsToReturn];
     localStorage.setItem('returnedJobs', JSON.stringify(updatedReturnedJobs));
-    
+
     // Update job status to "Returned"
     selectedJobIds.forEach(jobId => {
       dispatch(updatejob({ id: jobId, data: { Status: "Returned" } }));
     });
-    
+
     // Clear selection
     setSelectedJobs({});
-    
+
     setSuccessMessage("Jobs returned successfully. They will appear on the Returned Jobs page.");
     setTimeout(() => setSuccessMessage(""), 3000);
-    
+
     // Refresh the jobs list
     dispatch(fetchjobs());
   };
@@ -349,9 +349,9 @@ function Completed_Jobs() {
           <h2 className="job-title mb-0">Completed Jobs</h2>
         </div>
         <div className="d-flex gap-2 ">
-          <Button 
-            id="All_btn" 
-            className="m-2" 
+          <Button
+            id="All_btn"
+            className="m-2"
             variant="primary"
             onClick={handleReturnJobs}
           >
@@ -492,13 +492,13 @@ function Completed_Jobs() {
                   <td style={{ whiteSpace: "nowrap" }}>{job.packType}</td>
                   <td style={{ whiteSpace: "nowrap" }}>{job.packSize}</td>
                   <td style={{ whiteSpace: "nowrap" }}>{job?.packCode}</td>
-                 <td>
-                      {new Date(job.updatedAt).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false
-                      })}
-                    </td>
+                  <td>
+                    {new Date(job.updatedAt).toLocaleTimeString('en-US', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false
+                    })}
+                  </td>
                   <td style={{ whiteSpace: "nowrap" }}>
                     {new Date(job.createdAt).toLocaleDateString("en-GB")}
                   </td>
