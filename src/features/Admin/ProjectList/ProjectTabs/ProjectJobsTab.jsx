@@ -597,6 +597,7 @@ import { fetchusers } from '../../../../redux/slices/userSlice';
 import { createAssigns } from '../../../../redux/slices/AssignSlice';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { apiUrl } from '../../../../redux/utils/config';
 
 function ProjectJobsTab() {
   const location = useLocation();
@@ -626,7 +627,7 @@ function ProjectJobsTab() {
   useEffect(() => {
     const fetchWorklogs = async () => {
       try {
-        const res = await fetch(`https://sarnic-backend-production-690c.up.railway.app/api/jobs/worklog-project/${id}`);
+        const res = await fetch(`${apiUrl}/jobs/worklog-project/${id}`);
         const data = await res.json();
         console.log("📊 Worklog API Response:", data);
 

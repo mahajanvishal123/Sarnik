@@ -161,7 +161,7 @@ function AddTimeLog() {
       .unwrap()
       .then((res) => {
         toast.success(res?.message || "Timesheet created successfully!");
-        navigate("/employee/TimeTracking");
+        navigate("/production/TimeTracking");
       })
       .catch((err) => {
         toast.error(err?.message || "Error creating timesheet!");
@@ -277,7 +277,7 @@ function AddTimeLog() {
                   </div>
                 </div>
                 <div className="d-flex justify-content-end gap-2 mt-4">
-                  <Link to="/admin/TimesheetWorklog" className="btn btn-light">Cancel</Link>
+                  <Link to="/production/TimesheetWorklog" className="btn btn-light">Cancel</Link>
                   <button type="submit" className="btn btn-dark">
                     {id ? "Update Time Entry" : "Submit Time Entry"}
                   </button>

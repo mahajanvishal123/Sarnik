@@ -525,7 +525,7 @@ function Completed_Jobs() {
       </div>
 
       {/* Assign Modal */}
-    <Modal show={showAssignModal} onHide={() => setShowAssignModal(false)}>
+     <Modal show={showAssignModal} onHide={() => setShowAssignModal(false)}>
   <Modal.Header closeButton>
     <Modal.Title>Assign Job</Modal.Title>
   </Modal.Header>
@@ -595,7 +595,6 @@ function Completed_Jobs() {
     </Button>
   </Modal.Footer>
 </Modal>
-
 
       {/* Reject Modal */}
       <Modal show={showRejectModal} onHide={() => setShowRejectModal(false)}>
