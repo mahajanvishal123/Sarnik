@@ -216,7 +216,7 @@ function ProjectList() {
                   </Link>
                 </td> */}
                 <td>
-              <Link to={"/employee/myJobs"}>
+              <Link to={"/production/myJobs"}>
                     {/* {String((currentPage - 1) * itemsPerPage + index + 1).padStart(4, '0')} */}
                     {project.projectNo}
                   </Link>

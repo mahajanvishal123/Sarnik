@@ -61,6 +61,7 @@ function Production() {
             <Route path="/newJobsList" element={<ProtectedRoute><NewJobsList/></ProtectedRoute>} />
             <Route path="/inProgress" element={<ProtectedRoute><InProgress/></ProtectedRoute>} />
             <Route path="/completedJobs" element={<ProtectedRoute><Completed_Jobs/></ProtectedRoute>} />
+            <Route path="/myJobs" element={<ProtectedRoute><MyJobs/></ProtectedRoute>} />
             
           </Routes>
         </div>
