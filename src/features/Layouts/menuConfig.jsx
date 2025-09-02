@@ -223,13 +223,18 @@ export const ProductionMenuItems = [
     icon: <FaProjectDiagram className="menu-icon" />,
     submenu: [
       { title: "Projects", path: "/production/projectList" },
-      { title: "Job Trackers", path: "/production/JobsTracker" },
+      { title: "Job Trackers", path: "/production/ProductionJobTrackers" },
     ],
   },
   {
-    title: "Time Tracking",
+    title: "My Production",
     icon: <FaClock className="menu-icon" />,
-    path: "/production/TimeTracking",
+     submenu: [
+      { title: "Assign", path: "/production/newJobsList" },
+      { title: "In Progress", path: "/production/inProgress" },
+      { title: "Completed", path: "/production/completedJobs" },
+    ],
+    
   },
 
 

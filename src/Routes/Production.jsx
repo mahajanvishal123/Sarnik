@@ -18,6 +18,9 @@ import UpdateProfile from '../features/Production/ProductionProfile/UpdateProfil
 import OvervieJobsTracker from '../features/Production/ProductionJobTracker/OvervieJobsTracker.jsx';
 import Pluginss from '../assets/css/Pluginss/Pluginss.jsx';
 import ProductionJobTrackers from '../features/Production/ProductionJobTrackers/ProductionJobTrackers.jsx';
+import NewJobsList from '../features/Production/NewJobsList/NewJobsList.jsx';
+import InProgress from '../features/Production/InProgress/InProgress.jsx';
+import Completed_Jobs from '../features/Production/Completed_Jobs/Completed_Jobs.jsx';
 
 
 
@@ -55,6 +58,10 @@ function Production() {
             <Route path="/UpdateProfile" element={<ProtectedRoute><UpdateProfile/></ProtectedRoute>} />
             <Route path="/OvervieJobsTracker" element={<ProtectedRoute><OvervieJobsTracker/></ProtectedRoute>} />
             <Route path="/ProductionJobTrackers" element={<ProtectedRoute><ProductionJobTrackers/></ProtectedRoute>} />
+            <Route path="/newJobsList" element={<ProtectedRoute><NewJobsList/></ProtectedRoute>} />
+            <Route path="/inProgress" element={<ProtectedRoute><InProgress/></ProtectedRoute>} />
+            <Route path="/completedJobs" element={<ProtectedRoute><Completed_Jobs/></ProtectedRoute>} />
+            
           </Routes>
         </div>
       </div>
