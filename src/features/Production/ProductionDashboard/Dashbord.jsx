@@ -26,6 +26,7 @@ const EmployeeDashboard = () => {
 
   useEffect(() => {
     dispatch(EmployeeDashboardData());
+    
   }, [dispatch]);  
 
   const summary = DasbordAll[0]?.data?.summary || {};

@@ -535,7 +535,7 @@ function TimeLogs() {
         <h3 className="mb-0">Time Logs</h3>
         <div className="d-flex gap-3 mt-4 flex-wrap align-items-center">
           {/* Reverted: Add Time Log opens existing working page */}
-          <Link to={"/employee/AddTimelog"} className="text-decoration-none">
+          <Link to={"/production/AddTimelog"} className="text-decoration-none">
             <button id='All_btn' className="btn btn-dark d-flex align-items-center gap-2">
               <FaPlus /> Add Time Log
             </button>

@@ -672,7 +672,7 @@ function MyJobs() {
   };
 
   const JobDetails = (job) => {
-    navigate(`/employee/OvervieJobsTracker`, { state: { job } });
+    navigate(`/production/OvervieJobsTracker`, { state: { job } });
   };
 
   const getPriorityClass = (priority) => {

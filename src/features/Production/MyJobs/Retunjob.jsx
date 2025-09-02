@@ -5,7 +5,7 @@ import { Button, Form, Table, Pagination, Modal } from "react-bootstrap";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchjobs, filterStatus, ProductionJobsGet, Project_job_Id, updatejob, UpdateJobAssign } from "../../../redux/slices/JobsSlice";
+import { fetchjobs, ProductionJobsGet, Project_job_Id, updatejob, UpdateJobAssign } from "../../../redux/slices/JobsSlice";
 import {
   FaFilePdf,
   FaUpload,
@@ -21,7 +21,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BiCopy } from "react-icons/bi";
 
-function Completed_Jobs() {
+function Retunjob() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -47,15 +47,42 @@ function Completed_Jobs() {
   const params = useParams();
   const id = location.state?.id || params.id;
 
+  const jobs = [
+    {
+      id: "00001",
+      project: "PackageRedesign",
+      client: "AcmeCorp",
+      brief: "Redesign...",
+      date: "2024-02-20",
+    },
+    {
+      id: "00002",
+      project: "BrandGuidelines",
+      client: "TechSolutions",
+      brief: "Create...",
+      date: "2024-02-19",
+    },
+    {
+      id: "00003",
+      project: "MarketingMaterials",
+      client: "GlobalInc",
+      brief: "Design...",
+      date: "2024-02-18",
+    },
+  ];
+
+  const { job, } = useSelector((state) => state.jobs);
   const { assigns, loading, error } = useSelector((state) => state.Assign);
-  const { job} = useSelector((state) => state.jobs);
-  const [Status, setStatus] = useState("Completed");
+  console.log("Job Data:", assigns.data);
 
   useEffect(() => {
-    dispatch(filterStatus(Status));
-  }, [dispatch, Status]);
+    dispatch(RetunjobGet());
+  }, [dispatch]);
 
+  // ✅ Step 1: Flatten all jobId objects from the nested structure
   const flattenedJobs = assigns.data?.flatMap((item) => item.jobdata) || [];
+  console.log("Flattened Jobs:", flattenedJobs);
+
 
   const handleShowDescription = (job) => {
     setSelectedJob(job);
@@ -99,6 +126,7 @@ function Completed_Jobs() {
       setTimeout(() => setErrorMessage(""), 3000);
       return;
     }
+    // dispatch(updatejob({ id: selectedJobIds, data: { Status: "Reject" } }))
     dispatch(updatejob({ id: selectedJobIds, data: { Status: "Cancelled" } }))
     setSuccessMessage("Jobs rejected successfully.");
     dispatch(fetchjobs());
@@ -111,37 +139,35 @@ function Completed_Jobs() {
     setShowRejectModal(false);
   };
 
-  // Function to handle returning jobs
-  const handleReturnJobs = () => {
-    const selectedJobIds = Object.keys(selectedJobs).filter((id) => selectedJobs[id]);
-    if (selectedJobIds.length === 0) {
-      setErrorMessage("Please select at least 1 job to return.");
-      setTimeout(() => setErrorMessage(""), 3000);
-      return;
-    }
-    
-    // Get the selected job objects
-    const jobsToReturn = filteredJobs.filter(job => selectedJobIds.includes(job._id));
-    
-    // Store returned jobs in localStorage to access on the returned jobs page
-    const existingReturnedJobs = JSON.parse(localStorage.getItem('returnedJobs') || '[]');
-    const updatedReturnedJobs = [...existingReturnedJobs, ...jobsToReturn];
-    localStorage.setItem('returnedJobs', JSON.stringify(updatedReturnedJobs));
-    
-    // Update job status to "Returned"
-    selectedJobIds.forEach(jobId => {
-      dispatch(updatejob({ id: jobId, data: { Status: "Returned" } }));
-    });
-    
-    // Clear selection
-    setSelectedJobs({});
-    
-    setSuccessMessage("Jobs returned successfully. They will appear on the Returned Jobs page.");
-    setTimeout(() => setSuccessMessage(""), 3000);
-    
-    // Refresh the jobs list
-    dispatch(fetchjobs());
-  };
+  // const handleDelete = (_id) => {
+  //     console.log(_id);
+  //     Swal.fire({
+  //       title: "Are you sure?",
+  //       text: "You want to mark this job as Cancelled?",
+  //       icon: "warning",
+  //       showCancelButton: true,
+  //       confirmButtonColor: "#3085d6",
+  //       cancelButtonColor: "#d33",
+  //       confirmButtonText: "Yes, mark as Cancelled!",
+  //     }).then((result) => {
+  //       if (result.isConfirmed) {
+  //         // dispatch(deletejob({ id: _id, data: { status: "Cancelled" } }))
+  //         console.log(id);
+
+  //         dispatch(updatejob({ id: _id, data: { Status: "Cancelled" } }))
+  //           .unwrap()
+  //           .then(() => {
+  //             Swal.fire("Updated!", "The job has been marked as Cancelled.", "success");
+  //             dispatch(Project_job_Id(id));
+  //           })
+  //           .catch(() => {
+  //             Swal.fire("Error!", "Something went wrong while updating.", "error");
+  //           });
+  //       }
+  //     });
+  //   };
+
+
 
   const getPriorityClass = (priority) => {
     switch ((priority || "").toLowerCase()) {
@@ -175,16 +201,15 @@ function Completed_Jobs() {
         return "bg-secondary text-white";
       case "open":
         return "bg-primary text-white";
-      case "returned":
-        return "bg-warning text-dark";     // Yellow for returned jobs
       default:
         return "bg-light text-dark";
     }
   };
 
-  const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
+  const filteredJobs = assigns?.data?.flatMap((item) => item.jobdata) || []
     .filter((j) => j.assignedTo === "Not Assigned")
     .filter((j) => {
+      // Split searchQuery by spaces, ignore empty terms
       const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
       if (terms.length === 0) {
         const matchesProject =
@@ -206,6 +231,7 @@ function Completed_Jobs() {
           matchesStage
         );
       }
+      // Prepare searchable fields as strings
       const fields = [
         j.JobNo,
         j.projectId?.[0]?.projectName,
@@ -221,6 +247,7 @@ function Completed_Jobs() {
         j.priority,
         j.Status
       ].map(f => (f || '').toString().toLowerCase());
+      // Every term must be found in at least one field
       const matchesSearch = terms.every(term =>
         fields.some(field => field.includes(term.toLowerCase()))
       );
@@ -246,11 +273,11 @@ function Completed_Jobs() {
     });
 
   const handleUpdate = (job) => {
-    navigate(`/production/AddJobTracker/${job._id}`, { state: { job } });
+    navigate(`/admin/AddJobTracker/${job._id}`, { state: { job } });
   };
 
   const JobDetails = (job) => {
-    navigate(`/production/OvervieJobsTracker`, { state: { job } });
+    navigate(`/admin/OvervieJobsTracker`, { state: { job } });
   };
 
   const handleCheckboxChange = (jobId) => {
@@ -258,10 +285,6 @@ function Completed_Jobs() {
       ...prev,
       [jobId]: !prev[jobId],
     }));
-  };
-
-  const navigateToReturnedJobs = () => {
-    navigate("/production/ReturnedJobs");
   };
 
   const [selectedEmployee, setSelectedEmployee] = useState("");
@@ -296,6 +319,7 @@ function Completed_Jobs() {
       Status: "In Progress",
     };
     console.log("Assignment Payload:", payload);
+    // then update the job itself
     dispatch(Project_job_Id(id))
     dispatch(createAssigns(payload))
       .unwrap()
@@ -305,7 +329,7 @@ function Completed_Jobs() {
           toast.success(response.message || "Project Assigned Successfully!");
           setShowAssignModal(false);
           setSelectedJobs(false);
-          navigate("/production/MyJobs");
+          navigate("/admin/MyJobs");
         } else {
           setShowAssignModal(false);
           toast.error(response.message || "Assignment failed!");
@@ -340,31 +364,18 @@ function Completed_Jobs() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+  console.log("gggggggggggggggg", paginatedProjects);
+  console.log("gggggggggggggggg", paginatedProjects?.projectName);
 
   return (
-    <div className="container-fluid bg-white p-3 mt-4 rounded shadow-sm">
+    <div className="container bg-white p-3 mt-4 rounded shadow-sm">
       {/* Title */}
       <div className="d-flex justify-content-between align-items-center">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="job-title mb-0">Completed Jobs</h2>
-        </div>
+        <h5 className="fw-bold m-0">Retun Job</h5>
         <div className="d-flex gap-2 ">
-          <Button 
-            id="All_btn" 
-            className="m-2" 
-            variant="primary"
-            onClick={handleReturnJobs}
-          >
-            Return
+          <Button onClick={handleRejectJobs} id="All_btn" className="m-2" variant="primary">
+            Cancelled Job
           </Button>
-          {/* <Button 
-            id="All_btn" 
-            className="m-2" 
-            variant="info"
-            onClick={navigateToReturnedJobs}
-          >
-            View Returned Jobs
-          </Button> */}
           <Button
             id="All_btn"
             className="m-2"
@@ -442,6 +453,7 @@ function Completed_Jobs() {
                     setSelectedJobs(newSelectedJobs);
                   }}
                   checked={flattenedJobs.length > 0 && flattenedJobs.every((j) => selectedJobs[j._id])}
+
                 />
               </th>
               <th>JobNo</th>
@@ -462,10 +474,12 @@ function Completed_Jobs() {
             </tr>
           </thead>
           <tbody>
+
             {paginatedProjects
               .slice()
               .reverse()
               .map((job, index) => (
+
                 <tr key={job._id}>
                   <td>
                     <input
@@ -492,13 +506,12 @@ function Completed_Jobs() {
                   <td style={{ whiteSpace: "nowrap" }}>{job.packType}</td>
                   <td style={{ whiteSpace: "nowrap" }}>{job.packSize}</td>
                   <td style={{ whiteSpace: "nowrap" }}>{job?.packCode}</td>
-                 <td>
-                      {new Date(job.updatedAt).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false
-                      })}
-                    </td>
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    {new Date(job.updatedAt).toLocaleTimeString("en-US", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </td>
                   <td style={{ whiteSpace: "nowrap" }}>
                     {new Date(job.createdAt).toLocaleDateString("en-GB")}
                   </td>
@@ -542,6 +555,7 @@ function Completed_Jobs() {
               >
                 <option value="">-- Select --</option>
                 <option value="Designer">Designer</option>
+                {/* <option value="Production">Production</option> */}
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
@@ -645,4 +659,4 @@ function Completed_Jobs() {
   );
 }
 
-export default Completed_Jobs;
+export default Retunjob; 

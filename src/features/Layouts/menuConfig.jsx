@@ -237,6 +237,12 @@ export const ProductionMenuItems = [
     
   },
 
+  {
+title:"Time Tracking",
+icon:<FaClock className="menu-icon" />,
+path:"/production/TimeTracking",
+  },
+
 
   {
     title: "Job History",
