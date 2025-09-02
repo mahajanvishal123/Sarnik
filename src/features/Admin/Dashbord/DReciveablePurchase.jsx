@@ -14,7 +14,7 @@ function DReciveablePurchase() {
     const [sortField, setSortField] = useState(null);
     const [sortDirection, setSortDirection] = useState("asc");
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10; // Changed to 10 items per page
+    const itemsPerPage = 15; // Changed to 10 items per page
 
     const dispatch = useDispatch()
     const navigate = useNavigate()

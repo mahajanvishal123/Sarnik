@@ -26,7 +26,7 @@ function WaitingApproval() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedProject, setSelectedProject] = useState("All Projects");
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 15;
 
     const { job, loading } = useSelector((state) => state.jobs);
     console.log("Job data hai ", job.jobs);

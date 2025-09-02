@@ -972,8 +972,8 @@ function CostEstimates() {
                     <div className="d-flex gap-2">
                       <button className="btn btn-sm btn-success"
                         disabled={
-                          po.receivablePurchases?.length > 0 &&
-                          po.receivablePurchases[0]?.Status?.toLowerCase() !== "pending"
+                          po.CostPOStatus?.length > 0 &&
+                          po.CostPOStatus.toLowerCase() !== "pending"
                         }
                         onClick={() => {
                           setCostEstimatesId(po._id); // Store the ID

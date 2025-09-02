@@ -597,6 +597,7 @@ import { fetchusers } from '../../../../redux/slices/userSlice';
 import { createAssigns } from '../../../../redux/slices/AssignSlice';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { apiUrl } from '../../../../redux/utils/config';
 
 function ProjectJobsTab() {
   const location = useLocation();
@@ -626,7 +627,7 @@ function ProjectJobsTab() {
   useEffect(() => {
     const fetchWorklogs = async () => {
       try {
-        const res = await fetch(`https://sarnic-backend-production-690c.up.railway.app/api/jobs/worklog-project/${id}`);
+        const res = await fetch(`${apiUrl}/jobs/worklog-project/${id}`);
         const data = await res.json();
         console.log("📊 Worklog API Response:", data);
 
@@ -737,7 +738,7 @@ function ProjectJobsTab() {
   };
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const filteredProjects = ProjectJob?.jobs || [];
   const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
@@ -875,7 +876,7 @@ function ProjectJobsTab() {
               >
                 <option value="">-- Select --</option>
                 <option value="Designer">Designer</option>
-                <option value="Production">Production</option>
+                <option value="production">Production</option>
               </Form.Select>
             </Form.Group>
 
@@ -888,7 +889,18 @@ function ProjectJobsTab() {
               >
                 <option value="">-- Select Employee --</option>
                 {(userAll?.data?.users || [])
-                  .filter((emp) => emp.role === 'employee' && emp.assign === selectedDesigner)
+                  // .filter((emp) => emp.role === 'employee' && emp.assign === selectedDesigner)
+                  .filter((emp) => {
+                    if (selectedDesigner == "production") {
+                      return (
+                        emp.role == "production"
+                      )
+                    } else {
+                      return (
+                        emp.role === 'employee' && emp.assign === selectedDesigner
+                      )
+                    }
+                  })
                   .map((emp) => (
                     <option key={emp._id} value={emp._id}>
                       {emp.firstName} {emp.lastName}

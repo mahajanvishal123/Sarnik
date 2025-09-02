@@ -130,7 +130,7 @@ function JobTracker() {
   };
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
 
@@ -236,7 +236,7 @@ function JobTracker() {
               <th>PackSize</th>
               <th>PackCode</th>
               <th>Priority</th>
-              <th>Assign</th>
+              <th style={{ whiteSpace: "nowrap" }}>Assigned To</th>
               <th style={{ whiteSpace: "nowrap" }}>Created Date</th>
               <th>Status</th>
               <th>Actions</th>

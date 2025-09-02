@@ -272,7 +272,7 @@ function Completed_Jobs() {
   }, [dispatch]);
 
   const [currentAssignment, setCurrentAssignment] = useState(1);
-  const itemsAssignment = 10;
+  const itemsAssignment = 15;
 
   const filteredAssignment = (userAll?.data?.users || []).filter(
     (j) =>

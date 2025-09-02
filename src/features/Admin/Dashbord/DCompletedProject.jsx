@@ -142,7 +142,7 @@ function DCompletedProject() {
   // Function to generate page numbers
   const getPageNumbers = () => {
     const pageNumbers = [];
-    const maxPagesToShow = 5;
+    const maxPagesToShow = 15;
     
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {

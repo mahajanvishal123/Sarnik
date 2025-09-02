@@ -636,10 +636,7 @@ const OvervieJobsTracker = ({ onClose }) => {
       <Card className="border-0 shadow-sm rounded-4 mb-4 p-4">
         <div
           className="d-flex justify-content-between align-items-center mb-4 p-3 rounded-4 shadow-sm"
-          style={{
-            background:
-              "linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%)",
-          }}
+          style={{backgroundColor:"#0052CC"}}
         >
           <div className="d-flex align-items-center gap-2">
             <FaInfoCircle className="text-white" size={28} />
@@ -663,7 +660,7 @@ const OvervieJobsTracker = ({ onClose }) => {
         <Row className="g-4">
           {jobDetails.map((item, idx) => (
             <Col xs={12} md={6} key={idx}>
-              <div className="d-flex align-items-center bg-light rounded-3 p-3 mb-2 shadow-sm h-100">
+              <div className="d-flex align-items-center bg-light rounded-3 p-3 mb-2 shadow-sm h-100" style={{color:"#0052CC"}}>
                 {item.icon}
                 <span
                   className="fw-semibold text-secondary"

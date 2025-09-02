@@ -104,7 +104,7 @@ function ProjectList() {
     }
   };
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
   const totalPages = Math.ceil((filteredProjects?.length || 0) / itemsPerPage);
   const paginatedProjects = filteredProjects?.slice(
     (currentPage - 1) * itemsPerPage,

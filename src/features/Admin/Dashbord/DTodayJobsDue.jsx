@@ -17,7 +17,7 @@ function DTodayJobsDue() {
   const fileInputRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const [showDesignerModal, setShowDesignerModal] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);

@@ -37,7 +37,7 @@ export const adminMenuItems = [
     submenu: [
       { title: "Projects", path: "/admin/projectList" },
       { title: "Job Tracker", path: "/admin/JobTracker" },
-      { title: "Completed Producation jobs", path: "/admin/Completed" },
+      { title: "Completed Production jobs", path: "/admin/Completed" },
     ],
   },
   {
@@ -201,5 +201,63 @@ export const clientMenuItems = [
     title: "Settings",
     icon: <FaCog className="menu-icon" />,
     path: "/admin/Settings",
+  },
+];
+
+
+
+// Production Menu
+export const ProductionMenuItems = [
+  {
+    title: "Dashboard",
+    icon: <FaHome className="menu-icon" />,
+    path: "/production/dashboard",
+  },
+  {
+    title: "My Jobs",
+    icon: <FaTasks className="menu-icon" />,
+    path: "/production/myJobs",
+  },
+    {
+    title: "Projects & Jobs",
+    icon: <FaProjectDiagram className="menu-icon" />,
+    submenu: [
+      { title: "Projects", path: "/production/projectList" },
+      { title: "Job Trackers", path: "/production/ProductionJobTrackers" },
+    ],
+  },
+  {
+    title: "My Production",
+    icon: <FaClock className="menu-icon" />,
+     submenu: [
+      { title: "Assign", path: "/production/newJobsList" },
+      { title: "In Progress", path: "/production/inProgress" },
+      { title: "Completed", path: "/production/completedJobs" },
+    ],
+    
+  },
+
+
+  {
+    title: "Job History",
+    icon: <FaHistory className="menu-icon" />,
+    path: "/production/jobhistory",
+  },
+
+  {
+    title: "Notifications",
+    icon: <FaBell className="menu-icon" />,
+    path: "/production/Notification",
+  },
+  {
+    title: "Profile",
+    icon: <FaUserCircle className="menu-icon" />,
+    path: "/production/Profile",
+  },
+
+  {
+    title: "Settings",
+    icon: <FaCog className="menu-icon" />,
+    path: "/production/Settings",
   },
 ];
