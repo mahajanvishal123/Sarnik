@@ -31,44 +31,44 @@ const Login = () => {
     });
   };
 
-  
+
   const handleLogin = async (e) => {
-  e.preventDefault();
-  const { email, password } = formData;
+    e.preventDefault();
+    const { email, password } = formData;
 
-  try {
-    setLoading(true);
-    const res = await axios.post(`${apiUrl}/user/login`, { email, password });
-    console.log("API Response:", res.data);
+    try {
+      setLoading(true);
+      const res = await axios.post(`${apiUrl}/user/login`, { email, password });
+      console.log("API Response:", res.data);
 
-    // localStorage.setItem("authResponse", JSON.stringify(res.data));
+      // localStorage.setItem("authResponse", JSON.stringify(res.data));
 
-    const { role, token } = res.data.user;
-    localStorage.setItem("encode", res.data.token.token);
-    localStorage.setItem("iv", res.data.token.iv);
-    localStorage.setItem("userRole", role);
-    localStorage.setItem("_id", res.data.user._id);
+      const { role, token } = res.data.user;
+      localStorage.setItem("encode", res.data.token.token);
+      localStorage.setItem("iv", res.data.token.iv);
+      localStorage.setItem("userRole", role);
+      localStorage.setItem("_id", res.data.user._id);
 
-    toast.success("Logged in successfully!");
-    
-    // Redirect based on role
-    if (role === "admin") {
-      navigate("/admin/dashboard");
-    } else if (role === "production") {
-      navigate("/production/dashboard");
-    } else if (role === "employee") {
-      navigate("/employee/dashboard");
-    } else if (role === "client") {
-      navigate("/client/dashboard");
-    } else {
-      navigate("/dashboard");
+      toast.success("Logged in successfully!");
+
+      // Redirect based on role
+      if (role === "admin") {
+        navigate("/admin/dashboard");
+      } else if (role === "production") {
+        navigate("/production/dashboard");
+      } else if (role === "employee") {
+        navigate("/employee/dashboard");
+      } else if (role === "client") {
+        navigate("/client/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      toast.error("Error logging in. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    toast.error("Error logging in. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div id="login-bg" className="auth-container d-flex justify-content-center align-items-center min-vh-100 bg-light">
@@ -112,7 +112,7 @@ const Login = () => {
                   Remember me
                 </label>
               </div>
-              <Link to={"/forgotPassword"}  className="text-decoration-none text-secondary">
+              <Link to={"/forgotPassword"} className="text-decoration-none text-secondary">
                 Forgot password?
               </Link>
             </div>

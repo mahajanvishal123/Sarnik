@@ -843,7 +843,8 @@ function ProjectJobsTab() {
                     <td>{job.packCode}</td>
                     <td><span className={getPriorityClass(job.priority)}>{job.priority}</span></td>
                     <td>{new Date(job?.createdAt).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
-                    <td>{job.assign}</td>
+                    {/* <td>{job.assign}</td> */}
+                    <td>{job.assignedTo}</td>
                     <td>{getEmployeeTotalTime(job.assign)}</td>
                     <td><span className={`badge ${getStatusClass(job.Status)} px-2 py-1`}>{job.Status}</span></td>
                     <td className="d-flex">
