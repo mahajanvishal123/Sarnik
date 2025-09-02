@@ -108,7 +108,9 @@ export const EmployeeDashboardData = createAsyncThunk(
       const response = await axiosInstance.get(
         `${apiUrl}/employee/dashboard/${userId}`
       );
+      
       return response.data;
+      
     } catch (error) {
       console.error("Error occurred while fetching jobs:", error);
       return rejectWithValue(error.response?.data || error.message);
