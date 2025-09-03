@@ -183,7 +183,7 @@ function Completed_Jobs() {
   };
 
   const filteredJobs = (job?.jobs || []).filter(j => j.Status === "Completed")
-    .filter((j) => j.assignedTo === "Not Assigned")
+    // .filter((j) => j.assignedTo === "Not Assigned")
     .filter((j) => {
       const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
       if (terms.length === 0) {
@@ -525,76 +525,76 @@ function Completed_Jobs() {
       </div>
 
       {/* Assign Modal */}
-     <Modal show={showAssignModal} onHide={() => setShowAssignModal(false)}>
-  <Modal.Header closeButton>
-    <Modal.Title>Assign Job</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <Form>
-      {/* Select Designer */}
-      <Form.Group className="mb-3">
-        <Form.Label>Select Designer</Form.Label>
-        <Form.Select
-          value={selectedDesigner}
-          onChange={(e) => {
-            setSelectedDesigner(e.target.value);
-            setSelectedEmployee(""); // Reset employee when designer changes
-          }}
-        >
-          <option value="">-- Select --</option>
-          <option value="Designer">Designer</option>
-          <option value="Production">Production</option>
-        </Form.Select>
-      </Form.Group>
+      <Modal show={showAssignModal} onHide={() => setShowAssignModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Assign Job</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            {/* Select Designer */}
+            <Form.Group className="mb-3">
+              <Form.Label>Select Designer</Form.Label>
+              <Form.Select
+                value={selectedDesigner}
+                onChange={(e) => {
+                  setSelectedDesigner(e.target.value);
+                  setSelectedEmployee(""); // Reset employee when designer changes
+                }}
+              >
+                <option value="">-- Select --</option>
+                <option value="Designer">Designer</option>
+                <option value="Production">Production</option>
+              </Form.Select>
+            </Form.Group>
 
-      {/* Select Employee */}
-      <Form.Group className="mb-3">
-        <Form.Label>Select Employee</Form.Label>
-        <Form.Select
-          value={selectedEmployee}
-          onChange={(e) => setSelectedEmployee(e.target.value)}
-          disabled={!selectedDesigner}
-        >
-          <option value="">-- Select Employee --</option>
-          {paginatedAssignment
-            .filter((emp) => {
-              if (selectedDesigner === "Designer") {
-                return emp.role === "employee";
-              } else if (selectedDesigner === "Production") {
-                return emp.role === "production";
-              }
-              return false;
-            })
-            .map((emp) => (
-              <option key={emp._id} value={emp._id}>
-                {emp.firstName || "Unnamed"} {emp.lastName || ""}
-              </option>
-            ))}
-        </Form.Select>
-      </Form.Group>
+            {/* Select Employee */}
+            <Form.Group className="mb-3">
+              <Form.Label>Select Employee</Form.Label>
+              <Form.Select
+                value={selectedEmployee}
+                onChange={(e) => setSelectedEmployee(e.target.value)}
+                disabled={!selectedDesigner}
+              >
+                <option value="">-- Select Employee --</option>
+                {paginatedAssignment
+                  .filter((emp) => {
+                    if (selectedDesigner === "Designer") {
+                      return emp.role === "employee";
+                    } else if (selectedDesigner === "Production") {
+                      return emp.role === "production";
+                    }
+                    return false;
+                  })
+                  .map((emp) => (
+                    <option key={emp._id} value={emp._id}>
+                      {emp.firstName || "Unnamed"} {emp.lastName || ""}
+                    </option>
+                  ))}
+              </Form.Select>
+            </Form.Group>
 
-      {/* Description */}
-      <Form.Group className="mb-3">
-        <Form.Label>Description</Form.Label>
-        <Form.Control
-          as="textarea"
-          rows={3}
-          value={assignmentDescription}
-          onChange={(e) => setAssignmentDescription(e.target.value)}
-          placeholder="Enter assignment details or instructions..."
-        />
-      </Form.Group>
-    </Form>
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant="secondary" onClick={() => setShowAssignModal(false)}>
-      Cancel
-    </Button>
-    <Button variant="primary" onClick={handleSubmitAssignment}>
-      Assign
-    </Button>
-  </Modal.Footer>
-</Modal>
+            {/* Description */}
+            <Form.Group className="mb-3">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={assignmentDescription}
+                onChange={(e) => setAssignmentDescription(e.target.value)}
+                placeholder="Enter assignment details or instructions..."
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowAssignModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleSubmitAssignment}>
+            Assign
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       {/* Reject Modal */}
       <Modal show={showRejectModal} onHide={() => setShowRejectModal(false)}>
