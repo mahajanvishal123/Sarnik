@@ -473,7 +473,7 @@ function MyJobs() {
   const navigate = useNavigate();
 
   const handleLogTime = (job) => {
-    navigate(`/employee/AddTimeLog`, {
+    navigate(`/production/AddTimeLog`, {
       state: {
         id: job._id,
         openTab: 'jobs',
@@ -823,6 +823,7 @@ function MyJobs() {
                     {job.Status || "N/A"}
                   </span>
                 </td>
+                
                 <td style={{ display: "flex", gap: "5px" }}>
                   <Button
                     id="All_btn"
