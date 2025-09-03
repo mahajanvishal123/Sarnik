@@ -234,7 +234,7 @@ function UserRoleModal() {
     <div className="container py-4">
       <div className="card shadow-sm">
         <div className="card-body">
-          <h5 className="card-title mb-4">Add New User</h5>
+          <h5 className="card-title mb-4"> {!_id ? "Add New User" : "Update User"} </h5>
           <form onSubmit={handleSubmit}>
 
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -244,7 +244,7 @@ function UserRoleModal() {
             </div>
             <div className="col-md-6">
               <label className="form-label">Profile Image</label>
-              <input type="file" className="form-control" name="image" accept="image/*" onChange={handleInputChange} required />
+              <input type="file" className="form-control" name="image" accept="image/*" onChange={handleInputChange} />
             </div>
             <div className="row g-3 mb-3">
               <div className="col-md-6">
@@ -362,7 +362,7 @@ function UserRoleModal() {
 
             <div className="d-flex justify-content-end gap-2">
               <button type="button" className="btn btn-outline-secondary" onClick={handleCancel}>Cancel</button>
-              <button type="submit" className="btn btn-dark">Create User</button>
+              <button type="submit" className="btn btn-dark"> {!_id ? "Create User" : "Update User"}</button>
             </div>
           </form>
         </div>
