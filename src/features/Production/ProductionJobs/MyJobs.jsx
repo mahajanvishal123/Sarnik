@@ -823,6 +823,7 @@ function MyJobs() {
                     {job.Status || "N/A"}
                   </span>
                 </td>
+                
                 <td style={{ display: "flex", gap: "5px" }}>
                   <Button
                     id="All_btn"
