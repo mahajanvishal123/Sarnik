@@ -367,20 +367,6 @@ function Job_History() {
   // Extract jobs only for current user (Admin sees all, Employee sees own)
   const allJobs = assigns?.assignments
     ? assigns.assignments
-<<<<<<< HEAD
-        .filter((assignment) => {
-          return ( 
-            user?.role === "Admin" || assignment.employeeId?._id === user
-          );
-        })
-        .flatMap((assignment) =>
-          assignment.jobs.map((jobItem) => ({
-            ...jobItem.jobId,
-            assignmentId: assignment._id,
-            employeeInfo: assignment.employeeId,
-          }))
-        )
-=======
       .filter((assignment) => {
         return (
           user?.role === "Admin" || assignment.employeeId?._id === user
@@ -398,7 +384,6 @@ function Job_History() {
           }
         }))
       )
->>>>>>> e55e31a2a8394992f33c2fd7709cf102d13e82d2
     : [];
 
   const handleCheckboxChange = (jobId) => {
