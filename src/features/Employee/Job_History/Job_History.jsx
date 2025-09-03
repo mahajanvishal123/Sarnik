@@ -27,7 +27,7 @@ function Job_History() {
   const allJobs = assigns?.assignments
     ? assigns.assignments
         .filter((assignment) => {
-          return (
+          return ( 
             user?.role === "Admin" || assignment.employeeId?._id === user
           );
         })
