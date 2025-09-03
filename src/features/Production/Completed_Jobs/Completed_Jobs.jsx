@@ -455,7 +455,7 @@ function Completed_Jobs() {
               <th>PackCode</th>
               <th>TimeLogged</th>
               <th>Due Date</th>
-              <th>assign</th>
+              <th>Assign To</th>
               <th>Priority</th>
               <th>Status</th>
               <th>Actions</th>
@@ -502,7 +502,10 @@ function Completed_Jobs() {
                   <td style={{ whiteSpace: "nowrap" }}>
                     {new Date(job.createdAt).toLocaleDateString("en-GB")}
                   </td>
-                  <td style={{ whiteSpace: 'nowrap' }}>{job?.assign}</td>
+                  <td style={{ whiteSpace: 'nowrap' }}>
+                    {/* {job?.assign} */}
+                    {job?.assignedTo ? `${job?.assignedTo?.firstName || ''} ${job?.assignedTo?.lastName || ''}` : 'Not Assigned'}
+                  </td>
                   <td>
                     <span className={getPriorityClass(job.priority)}>{job.priority}</span>
                   </td>
