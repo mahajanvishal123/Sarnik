@@ -497,7 +497,7 @@ function EmployeeJobTracker() {
   });
 
   const handleUpdate = (job) => {
-    navigate(`/admin/AddJobTracker/${job._id}`, { state: { job } });
+    navigate(`/employee/AddJobTracker/${job._id}`, { state: { job } });
   };
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -510,7 +510,7 @@ function EmployeeJobTracker() {
   );
 
   const JobDetails = (job) => {
-    navigate(`/admin/OvervieJobsTracker`, { state: { job } });
+    navigate(`/employee/OvervieJobsTracker`, { state: { job } });
   };
 
   return (

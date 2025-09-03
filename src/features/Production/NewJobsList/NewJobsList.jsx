@@ -1,3 +1,4 @@
+// NewJobsList Component - Modified to properly show production-assigned jobs based on API response
 import React, { useEffect, useState } from "react";
 import { MdEditSquare } from "react-icons/md";
 import { FaRegTrashCan } from "react-icons/fa6";
@@ -5,7 +6,7 @@ import { Button, Form, Table, Pagination, Modal } from "react-bootstrap";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchjobs, ProductionJobsGet, Project_job_Id, updatejob, UpdateJobAssign } from "../../../redux/slices/JobsSlice";
+import { fetchjobs, Project_job_Id, updatejob, UpdateJobAssign } from "../../../redux/slices/JobsSlice";
 import {
   FaFilePdf,
   FaUpload,
@@ -16,7 +17,7 @@ import {
 import { Dropdown } from "react-bootstrap";
 import Swal from "sweetalert2";
 import { fetchusers } from "../../../redux/slices/userSlice";
-import { createAssigns } from "../../../redux/slices/AssignSlice";
+import { createAssigns, fetchAssign } from "../../../redux/slices/AssignSlice";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BiCopy } from "react-icons/bi";
@@ -40,58 +41,37 @@ function NewJobsList() {
   const [selectedStatus, setSelectedStatus] = useState("All Status");
   const [selectedStage, setSelectedStage] = useState("All Stages");
   const [showModal, setShowModal] = useState(false);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const params = useParams();
   const id = location.state?.id || params.id;
-
-  const jobs = [
-    {
-      id: "00001",
-      project: "PackageRedesign",
-      client: "AcmeCorp",
-      brief: "Redesign...",
-      date: "2024-02-20",
-    },
-    {
-      id: "00002",
-      project: "BrandGuidelines",
-      client: "TechSolutions",
-      brief: "Create...",
-      date: "2024-02-19",
-    },
-    {
-      id: "00003",
-      project: "MarketingMaterials",
-      client: "GlobalInc",
-      brief: "Design...",
-      date: "2024-02-18",
-    },
-  ];
-
+  
   const { job, loading, error } = useSelector((state) => state.jobs);
-  console.log("jjjjjjjjjff", job.data)
+  console.log("Jobs data:", job);
+  
   useEffect(() => {
-    dispatch(ProductionJobsGet());
+    dispatch(fetchjobs());
   }, [dispatch]);
-
-  // ✅ Step 1: Flatten all jobId objects from the nested structure
-  const flattenedJobs = job?.data?.flatMap((item) => item.jobs) || [];
-  console.log("Flattened Jobs:", flattenedJobs);
-
-
+  
+  // Get assignments data to filter for production jobs
+  const { assigns } = useSelector((state) => state.Assign);
+  console.log("Assignments data:", assigns);
+  
+  useEffect(() => {
+    dispatch(fetchAssign());
+  }, [dispatch]);
+  
   const handleShowDescription = (job) => {
     setSelectedJob(job);
     setShowModal(true);
   };
-
+  
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedJob(null);
   };
-
+  
   const handleAssignJob = (job) => {
     if (job === null) {
       const selectedJobIds = Object.keys(selectedJobs).filter((id) => selectedJobs[id]);
@@ -104,7 +84,7 @@ function NewJobsList() {
     setSelectedJob(job);
     setShowAssignModal(true);
   };
-
+  
   const handleRejectJobs = () => {
     const selectedJobIds = Object.keys(selectedJobs).filter((id) => selectedJobs[id]);
     if (selectedJobIds.length === 0) {
@@ -114,17 +94,15 @@ function NewJobsList() {
     }
     setShowRejectModal(true);
   };
-
+  
   const handleSubmitRejection = () => {
     const selectedJobIds = Object.keys(selectedJobs).filter((id) => selectedJobs[id]);
     console.log(selectedJobIds);
-
     if (!rejectionReason.trim()) {
       setErrorMessage("Please enter a reason for rejection.");
       setTimeout(() => setErrorMessage(""), 3000);
       return;
     }
-    // dispatch(updatejob({ id: selectedJobIds, data: { Status: "Reject" } }))
     dispatch(updatejob({ id: selectedJobIds, data: { Status: "Cancelled" } }))
     setSuccessMessage("Jobs rejected successfully.");
     dispatch(fetchjobs());
@@ -136,37 +114,7 @@ function NewJobsList() {
     dispatch(fetchjobs());
     setShowRejectModal(false);
   };
-
-  // const handleDelete = (_id) => {
-  //     console.log(_id);
-  //     Swal.fire({
-  //       title: "Are you sure?",
-  //       text: "You want to mark this job as Cancelled?",
-  //       icon: "warning",
-  //       showCancelButton: true,
-  //       confirmButtonColor: "#3085d6",
-  //       cancelButtonColor: "#d33",
-  //       confirmButtonText: "Yes, mark as Cancelled!",
-  //     }).then((result) => {
-  //       if (result.isConfirmed) {
-  //         // dispatch(deletejob({ id: _id, data: { status: "Cancelled" } }))
-  //         console.log(id);
-
-  //         dispatch(updatejob({ id: _id, data: { Status: "Cancelled" } }))
-  //           .unwrap()
-  //           .then(() => {
-  //             Swal.fire("Updated!", "The job has been marked as Cancelled.", "success");
-  //             dispatch(Project_job_Id(id));
-  //           })
-  //           .catch(() => {
-  //             Swal.fire("Error!", "Something went wrong while updating.", "error");
-  //           });
-  //       }
-  //     });
-  //   };
-
-
-
+  
   const getPriorityClass = (priority) => {
     switch ((priority || "").toLowerCase()) {
       case "high":
@@ -179,7 +127,7 @@ function NewJobsList() {
         return "";
     }
   };
-
+  
   const getStatusClass = (status) => {
     switch (status.toLowerCase().trim()) {
       case "in progress":
@@ -203,53 +151,42 @@ function NewJobsList() {
         return "bg-light text-dark";
     }
   };
-
-  const filteredJobs = job?.data?.flatMap((item) => item.jobId) || []
-
-    .filter((j) => j.assignedTo === "Not Assigned")
-    .filter((j) => {
-      // Split searchQuery by spaces, ignore empty terms
-      const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
-      if (terms.length === 0) {
-        const matchesProject =
-          selectedProject === "All Projects" ||
-          (j.projectId?.[0]?.projectName?.toLowerCase() === selectedProject.toLowerCase());
-        const matchesPriority =
-          selectedPriority === "All Priorities" ||
-          (j.priority?.toLowerCase() === selectedPriority.toLowerCase());
-        const matchesStatus =
-          selectedStatus === "All Status" ||
-          (j.Status?.toLowerCase() === selectedStatus.toLowerCase());
-        const matchesStage =
-          selectedStage === "All Stages" ||
-          (j.stage?.toLowerCase() === selectedStage.toLowerCase());
-        return (
-          matchesProject &&
-          matchesPriority &&
-          matchesStatus &&
-          matchesStage
-        );
-      }
-      // Prepare searchable fields as strings
-      const fields = [
-        j.JobNo,
-        j.projectId?.[0]?.projectName,
-        j.brandName,
-        j.subBrand,
-        j.flavour,
-        j.packType,
-        j.packSize,
-        j.packCode,
-        j.updatedAt ? new Date(j.updatedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : '',
-        j.createdAt ? new Date(j.createdAt).toLocaleDateString("en-GB") : '',
-        j.assignedTo,
-        j.priority,
-        j.Status
-      ].map(f => (f || '').toString().toLowerCase());
-      // Every term must be found in at least one field
-      const matchesSearch = terms.every(term =>
-        fields.some(field => field.includes(term.toLowerCase()))
-      );
+  
+  // Filter for production-assigned jobs only using the assignments data
+  // Based on the API response, we need to check employeeId.role === "production"
+  const productionAssignments = (assigns?.assignments || []).filter(assignment => {
+    // Filter for assignments where the employee role is "production"
+    return assignment.employeeId && assignment.employeeId.role === "production";
+  });
+  
+  console.log("Production assignments:", productionAssignments);
+  
+  // Extract job IDs from production assignments
+  const productionJobIds = new Set();
+  productionAssignments.forEach(assignment => {
+    if (assignment.jobs && Array.isArray(assignment.jobs)) {
+      assignment.jobs.forEach(jobItem => {
+        if (jobItem.jobId && jobItem.jobId._id) {
+          productionJobIds.add(jobItem.jobId._id);
+        }
+      });
+    }
+  });
+  
+  console.log("Production job IDs:", productionJobIds);
+  
+  // Also get the actual job objects from the assignments for display
+  const productionJobs = productionAssignments.flatMap(assignment => 
+    assignment.jobs?.map(jobItem => jobItem.jobId) || []
+  );
+  
+  console.log("Production jobs:", productionJobs);
+  
+  // Filter jobs to only show those assigned to production
+  const filteredJobs = productionJobs.filter((j) => {
+    // Split searchQuery by spaces, ignore empty terms
+    const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
+    if (terms.length === 0) {
       const matchesProject =
         selectedProject === "All Projects" ||
         (j.projectId?.[0]?.projectName?.toLowerCase() === selectedProject.toLowerCase());
@@ -263,51 +200,92 @@ function NewJobsList() {
         selectedStage === "All Stages" ||
         (j.stage?.toLowerCase() === selectedStage.toLowerCase());
       return (
-        matchesSearch &&
         matchesProject &&
         matchesPriority &&
         matchesStatus &&
         matchesStage
       );
-    });
-
+    }
+    // Prepare searchable fields as strings
+    const fields = [
+      j.JobNo,
+      j.projectId?.[0]?.projectName,
+      j.brandName,
+      j.subBrand,
+      j.flavour,
+      j.packType,
+      j.packSize,
+      j.packCode,
+      j.updatedAt ? new Date(j.updatedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : '',
+      j.createdAt ? new Date(j.createdAt).toLocaleDateString("en-GB") : '',
+      j.assign,
+      j.priority,
+      j.Status
+    ].map(f => (f || '').toString().toLowerCase());
+    // Every term must be found in at least one field
+    const matchesSearch = terms.every(term =>
+      fields.some(field => field.includes(term.toLowerCase()))
+    );
+    const matchesProject =
+      selectedProject === "All Projects" ||
+      (j.projectId?.[0]?.projectName?.toLowerCase() === selectedProject.toLowerCase());
+    const matchesPriority =
+      selectedPriority === "All Priorities" ||
+      (j.priority?.toLowerCase() === selectedPriority.toLowerCase());
+    const matchesStatus =
+      selectedStatus === "All Status" ||
+      (j.Status?.toLowerCase() === selectedStatus.toLowerCase());
+    const matchesStage =
+      selectedStage === "All Stages" ||
+      (j.stage?.toLowerCase() === selectedStage.toLowerCase());
+    return (
+      matchesSearch &&
+      matchesProject &&
+      matchesPriority &&
+      matchesStatus &&
+      matchesStage
+    );
+  });
+  
+  console.log("Filtered jobs:", filteredJobs);
+  
   const handleUpdate = (job) => {
     navigate(`/production/AddJobTracker/${job._id}`, { state: { job } });
   };
-
+  
   const JobDetails = (job) => {
     navigate(`/production/OvervieJobsTracker`, { state: { job } });
   };
-
+  
   const handleCheckboxChange = (jobId) => {
     setSelectedJobs((prev) => ({
       ...prev,
       [jobId]: !prev[jobId],
     }));
   };
-
+  
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const { userAll } = useSelector((state) => state.user);
-
+  
   useEffect(() => {
     dispatch(fetchusers());
   }, [dispatch]);
-
+  
   const [currentAssignment, setCurrentAssignment] = useState(1);
   const itemsAssignment = 15;
-
+  
   const filteredAssignment = (userAll?.data?.users || []).filter(
     (j) =>
       ((j?.assign || "").toString().toLowerCase() ===
         selectedDesigner.toLowerCase()) &&
       selectedDesigner !== ""
   );
-
+  
   const paginatedAssignment = filteredAssignment.slice(
     (currentAssignment - 1) * itemsAssignment,
     currentAssignment * itemsAssignment
   );
-
+  
   const handleSubmitAssignment = async () => {
     const selectedJobIds = Object.keys(selectedJobs).filter((id) => selectedJobs[id]);
     const payload = {
@@ -318,7 +296,6 @@ function NewJobsList() {
       Status: "In Progress",
     };
     console.log("Assignment Payload:", payload);
-    // then update the job itself
     dispatch(Project_job_Id(id))
     dispatch(createAssigns(payload))
       .unwrap()
@@ -339,7 +316,7 @@ function NewJobsList() {
         toast.error(error.message || "Failed to update project!");
       });
   };
-
+  
   const handleJobAssign = (selectedIds, assignTo) => {
     const payload = {
       id: selectedIds,
@@ -354,21 +331,20 @@ function NewJobsList() {
         Swal.fire("Error!", "Something went wrong", "error");
       });
   };
+  
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
+  const itemsPerPage = 15;
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
-
   const paginatedProjects = filteredJobs.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
+  
   return (
     <div className="container-fluid bg-white p-3 mt-4 rounded shadow-sm">
       {/* Title */}
       <div className="d-flex justify-content-between align-items-center">
-        <h5 className="fw-bold m-0">Job Assign</h5>
+        <h5 className="fw-bold m-0">Production Assigned Jobs</h5>
         <div className="d-flex gap-2 ">
           <Button onClick={handleRejectJobs} id="All_btn" className="m-2" variant="primary">
             Reject Job
@@ -392,7 +368,6 @@ function NewJobsList() {
           </Button>
         </div>
       </div>
-
       {/* Show Messages */}
       {errorMessage && (
         <div className="alert alert-danger py-2" role="alert">
@@ -404,7 +379,12 @@ function NewJobsList() {
           {successMessage}
         </div>
       )}
-
+      {/* Debug Info - Remove in production */}
+      <div className="mb-2">
+        <small className="text-muted">
+          Debug: Found {productionAssignments.length} production assignments, {productionJobIds.size} unique job IDs, showing {filteredJobs.length} filtered jobs
+        </small>
+      </div>
       {/* Filters */}
       <div className="d-flex flex-wrap gap-2 mb-3 align-items-center">
         <Form.Control
@@ -422,7 +402,7 @@ function NewJobsList() {
             <Dropdown.Item onClick={() => setSelectedProject("All Projects")}>
               All Projects
             </Dropdown.Item>
-            {[...new Set((job?.jobs || []).map((j) => j.projectId?.[0]?.projectName || "N/A"))].map(
+            {[...new Set(productionJobs.map((j) => j.projectId?.[0]?.projectName || "N/A"))].map(
               (projectName, index) => (
                 <Dropdown.Item key={index} onClick={() => setSelectedProject(projectName)}>
                   {projectName}
@@ -431,106 +411,149 @@ function NewJobsList() {
             )}
           </Dropdown.Menu>
         </Dropdown>
+        <Dropdown>
+          <Dropdown.Toggle variant="light" id="status-dropdown">
+            {selectedStatus}
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item onClick={() => setSelectedStatus("All Status")}>
+              All Status
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setSelectedStatus("In Progress")}>
+              In Progress
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setSelectedStatus("Completed")}>
+              Completed
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setSelectedStatus("Cancelled")}>
+              Cancelled
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
       </div>
-
       {/* Table */}
       <div className="table-responsive">
-        <Table hover className="align-middle sticky-header">
-          <thead className="bg-light">
-            <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    const newSelectedJobs = {};
-                    flattenedJobs.forEach((job) => {
-                      newSelectedJobs[job._id] = checked;
-                    });
-                    setSelectedJobs(newSelectedJobs);
-                  }}
-                  checked={flattenedJobs.length > 0 && flattenedJobs.every((j) => selectedJobs[j._id])}
-
-                />
-              </th>
-              <th>JobNo</th>
-              <th style={{ whiteSpace: "nowrap" }}>Project Name</th>
-              <th style={{ whiteSpace: "nowrap" }}>Project No</th>
-              <th>Brand</th>
-              <th style={{ whiteSpace: "nowrap" }}>Sub Brand</th>
-              <th>Flavour</th>
-              <th>PackType</th>
-              <th>PackSize</th>
-              <th>PackCode</th>
-              <th>TimeLogged</th>
-              <th>Due Date</th>
-              <th>assign</th>
-              <th>Priority</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedProjects
-              .slice()
-              .reverse()
-              .filter((job) => job.Status === "Active") // 👈 Only show Active jobs
-              .map((job, index) => (
-                <tr key={job._id}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedJobs[job._id] || false}
-                      onChange={() => handleCheckboxChange(job._id)}
-                    />
-                  </td>
-                  <td onClick={() => JobDetails(job)}>
-                    <Link style={{ textDecoration: "none" }}>{job.JobNo}</Link>
-                  </td>
-                  <td style={{ whiteSpace: "nowrap" }}>
-                    {job.projectId?.[0]?.projectName || "N/A"}
-                  </td>
-                  <td style={{ whiteSpace: "nowrap" }}>
-                    {job.projectId?.[0]?.projectNo || "N/A"}
-                  </td>
-                  <td style={{ whiteSpace: "nowrap" }}>{job.brandName}</td>
-                  <td style={{ whiteSpace: "nowrap" }}>{job.subBrand}</td>
-                  <td style={{ whiteSpace: "nowrap" }}>{job.flavour}</td>
-                  <td style={{ whiteSpace: "nowrap" }}>{job.packType}</td>
-                  <td style={{ whiteSpace: "nowrap" }}>{job.packSize}</td>
-                  <td style={{ whiteSpace: "nowrap" }}>{job?.packCode}</td>
-                  <td>
-                    {new Date(job.updatedAt).toLocaleTimeString('en-US', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: false
-                    })}
-                  </td>
-                  <td style={{ whiteSpace: "nowrap" }}>
-                    {new Date(job.createdAt).toLocaleDateString("en-GB")}
-                  </td>
-                  <td style={{ whiteSpace: 'nowrap' }}>{job?.assign}</td>
-                  <td>
-                    <span className={getPriorityClass(job.priority)}>{job.priority}</span>
-                  </td>
-                  <td>
-                    <span className={`badge ${getStatusClass(job.Status)} px-2 py-1`}>
-                      {job.Status}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="d-flex gap-2">
-                      <Button id="icone_btn" size="sm" onClick={() => handleUpdate(job)}>
-                        <FaEdit />
-                      </Button>
-                    </div>
+        {loading ? (
+          <div className="text-center py-4">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-2">Loading jobs data...</p>
+          </div>
+        ) : error ? (
+          <div className="alert alert-danger">
+            Error loading jobs: {error.message || "Unknown error"}
+          </div>
+        ) : (
+          <Table hover className="align-middle sticky-header">
+            <thead className="bg-light">
+              <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      const newSelectedJobs = {};
+                      filteredJobs.forEach((job) => {
+                        newSelectedJobs[job._id] = checked;
+                      });
+                      setSelectedJobs(newSelectedJobs);
+                    }}
+                    checked={filteredJobs.length > 0 && filteredJobs.every((j) => selectedJobs[j._id])}
+                  />
+                </th>
+                <th>JobNo</th>
+                <th style={{ whiteSpace: "nowrap" }}>Project Name</th>
+                <th style={{ whiteSpace: "nowrap" }}>Project No</th>
+                <th>Brand</th>
+                <th style={{ whiteSpace: "nowrap" }}>Sub Brand</th>
+                <th>Flavour</th>
+                <th>PackType</th>
+                <th>PackSize</th>
+                <th>PackCode</th>
+                <th>TimeLogged</th>
+                <th>Due Date</th>
+                <th>assign</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedProjects.length > 0 ? (
+                paginatedProjects
+                  .slice()
+                  .reverse()
+                  .map((job, index) => (
+                    <tr key={job._id}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedJobs[job._id] || false}
+                          onChange={() => handleCheckboxChange(job._id)}
+                        />
+                      </td>
+                      <td onClick={() => JobDetails(job)}>
+                        <Link style={{ textDecoration: "none" }}>{job.JobNo}</Link>
+                      </td>
+                      <td style={{ whiteSpace: "nowrap" }}>
+                        {job.projectId?.[0]?.projectName || "N/A"}
+                      </td>
+                      <td style={{ whiteSpace: "nowrap" }}>
+                        {job.projectId?.[0]?.projectNo || "N/A"}
+                      </td>
+                      <td style={{ whiteSpace: "nowrap" }}>{job.brandName}</td>
+                      <td style={{ whiteSpace: "nowrap" }}>{job.subBrand}</td>
+                      <td style={{ whiteSpace: "nowrap" }}>{job.flavour}</td>
+                      <td style={{ whiteSpace: "nowrap" }}>{job.packType}</td>
+                      <td style={{ whiteSpace: "nowrap" }}>{job.packSize}</td>
+                      <td style={{ whiteSpace: "nowrap" }}>{job?.packCode}</td>
+                      <td>
+                        {job.updatedAt ? new Date(job.updatedAt).toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false
+                        }) : 'N/A'}
+                      </td>
+                      <td style={{ whiteSpace: "nowrap" }}>
+                        {job.createdAt ? new Date(job.createdAt).toLocaleDateString("en-GB") : 'N/A'}
+                      </td>
+                      <td style={{ whiteSpace: 'nowrap' }}>
+                        {productionAssignments.find(assignment => 
+                          assignment.jobs?.some(jobItem => jobItem.jobId._id === job._id)
+                        )?.employeeId?.firstName || 'N/A'} {' '}
+                        {productionAssignments.find(assignment => 
+                          assignment.jobs?.some(jobItem => jobItem.jobId._id === job._id)
+                        )?.employeeId?.lastName || ''}
+                      </td>
+                      <td>
+                        <span className={getPriorityClass(job.priority)}>{job.priority || 'N/A'}</span>
+                      </td>
+                      <td>
+                        <span className={`badge ${getStatusClass(job.Status)} px-2 py-1`}>
+                          {job.Status || 'N/A'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="d-flex gap-2">
+                          <Button id="icone_btn" size="sm" onClick={() => handleUpdate(job)}>
+                            <FaEdit />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td colSpan="16" className="text-center py-4">
+                    No production-assigned jobs found
                   </td>
                 </tr>
-              ))}
-          </tbody>
-        </Table>
+              )}
+            </tbody>
+          </Table>
+        )}
       </div>
-
       {/* Assign Modal */}
       <Modal show={showAssignModal} onHide={() => setShowAssignModal(false)}>
         <Modal.Header closeButton>
@@ -539,7 +562,7 @@ function NewJobsList() {
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Select Designer</Form.Label>
+              <Form.Label>Select Role</Form.Label>
               <Form.Select
                 value={selectedDesigner}
                 onChange={(e) => {
@@ -548,8 +571,7 @@ function NewJobsList() {
                 }}
               >
                 <option value="">-- Select --</option>
-                <option value="Designer">Designer</option>
-                {/* <option value="Production">Production</option> */}
+                <option value="Production">Production</option>
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
@@ -561,7 +583,7 @@ function NewJobsList() {
               >
                 <option value="">-- Select Employee --</option>
                 {paginatedAssignment
-                  .filter((emp) => emp.role === 'employee')
+                  .filter((emp) => emp.role === 'production')
                   .map((emp) => (
                     <option key={emp._id} value={emp._id}>
                       {emp.firstName || "Unnamed Employee"} {emp.lastName || "Unnamed Employee"}
@@ -569,7 +591,6 @@ function NewJobsList() {
                   ))}
               </Form.Select>
             </Form.Group>
-
             <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>
               <Form.Control
@@ -591,7 +612,6 @@ function NewJobsList() {
           </Button>
         </Modal.Footer>
       </Modal>
-
       {/* Reject Modal */}
       <Modal show={showRejectModal} onHide={() => setShowRejectModal(false)}>
         <Modal.Header closeButton>
@@ -621,9 +641,8 @@ function NewJobsList() {
           </Button>
         </Modal.Footer>
       </Modal>
-
       {/* Pagination */}
-      {!loading && !error && (
+      {!loading && !error && filteredJobs.length > 0 && (
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div className="text-muted small">
             Showing {(currentPage - 1) * itemsPerPage + 1} to {(currentPage - 1) * itemsPerPage + paginatedProjects.length} of {filteredJobs.length}
