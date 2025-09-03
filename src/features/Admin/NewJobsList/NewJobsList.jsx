@@ -959,7 +959,7 @@ function NewJobsList() {
       Status: "In Progress",
     };
     console.log("Assignment Payload:", payload);
-    dispatch(Project_job_Id(id))
+    // dispatch(Project_job_Id(id))
     dispatch(createAssigns(payload))
       .unwrap()
       .then((response) => {
