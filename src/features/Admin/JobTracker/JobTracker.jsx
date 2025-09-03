@@ -78,13 +78,13 @@ function JobTracker() {
       return (
         (selectedProject === "All Projects" ||
           (j.projectId?.[0]?.projectName || "").toLowerCase() ===
-            selectedProject.toLowerCase()) &&
+          selectedProject.toLowerCase()) &&
         (selectedPriority === "All Priorities" ||
           (j.priority || "").toLowerCase() ===
-            selectedPriority.toLowerCase()) &&
+          selectedPriority.toLowerCase()) &&
         (selectedStatus === "All Status" ||
           (j.Status || "").toLowerCase().trim() ===
-            selectedStatus.toLowerCase().trim())
+          selectedStatus.toLowerCase().trim())
       );
     // Prepare searchable fields as strings
     const fields = [
@@ -101,9 +101,9 @@ function JobTracker() {
       j.assignedTo,
       j.updatedAt
         ? new Date(j.updatedAt).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })
+          hour: "2-digit",
+          minute: "2-digit",
+        })
         : "",
       j.Status,
     ].map((f) => (f || "").toString().toLowerCase());
@@ -114,14 +114,14 @@ function JobTracker() {
     const matchesProject =
       selectedProject === "All Projects" ||
       (j.projectId?.[0]?.projectName || "").toLowerCase() ===
-        selectedProject.toLowerCase();
+      selectedProject.toLowerCase();
     const matchesPriority =
       selectedPriority === "All Priorities" ||
       (j.priority || "").toLowerCase() === selectedPriority.toLowerCase();
     const matchesStatus =
       selectedStatus === "All Status" ||
       (j.Status || "").toLowerCase().trim() ===
-        selectedStatus.toLowerCase().trim();
+      selectedStatus.toLowerCase().trim();
     return matchesSearch && matchesProject && matchesPriority && matchesStatus;
   });
 
@@ -269,10 +269,9 @@ function JobTracker() {
                     </span>
                   </td>
                   <td style={{ whiteSpace: "nowrap" }}>
-                    {job?.assign &&
-                    job.assign.trim().toLowerCase() !== "not assign"
-                      ? job.assign
-                      : "Unassigned"}
+                    {job.assignedTo
+                      ? `${job.assignedTo.firstName} ${job.assignedTo.lastName}`
+                      : job.assign || "Unassigned"}
                   </td>
 
                   <td>{new Date(job.createdAt).toLocaleDateString("en-GB")}</td>
@@ -343,9 +342,8 @@ function JobTracker() {
               </li>
             ))}
             <li
-              className={`page-item ${
-                currentPage === totalPages ? "disabled" : ""
-              }`}
+              className={`page-item ${currentPage === totalPages ? "disabled" : ""
+                }`}
             >
               <button
                 className="page-link"
