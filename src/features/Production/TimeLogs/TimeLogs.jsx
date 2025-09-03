@@ -285,7 +285,7 @@
 //           </Dropdown>
 //         </div>
 //       </div>
-      
+
 //       <div className="card shadow-sm">
 //         <div className="card-body p-0">
 //           <div className="table-responsive">
@@ -473,6 +473,8 @@ function TimeLogs() {
   const dispatch = useDispatch();
   const { timesheetWorklog } = useSelector((state) => state.TimesheetWorklogs);
 
+  const employeeId = localStorage.getItem("_id");
+
   useEffect(() => {
     dispatch(fetchTimesheetWorklogs());
   }, [dispatch]);
@@ -481,7 +483,7 @@ function TimeLogs() {
 
   const filteredTimeLogs = (timesheetWorklog.TimesheetWorklogss || []).filter((log) => {
     const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
-    const employeeName = log.employeeId?.[0] 
+    const employeeName = log.employeeId?.[0]
       ? `${log.employeeId[0].firstName} ${log.employeeId[0].lastName}`.toLowerCase()
       : '';
     const projectName = (log.projectId?.[0]?.projectName || '').toLowerCase();
@@ -583,7 +585,7 @@ function TimeLogs() {
             onChange={(e) => setFromDate(e.target.value)}
           />
         </div>
-        
+
         <div className="col-md-3">
           <input
             type="date"
@@ -592,7 +594,7 @@ function TimeLogs() {
             onChange={(e) => setToDate(e.target.value)}
           />
         </div>
-        
+
         <div className="col-md-3">
           <Dropdown>
             <Dropdown.Toggle variant="light" id="project-dropdown" className="w-100">
@@ -602,7 +604,7 @@ function TimeLogs() {
               <Dropdown.Item onClick={() => setSelectedProject("All Projects")}>
                 All Projects
               </Dropdown.Item>
-              {[...new Set((timesheetWorklog.TimesheetWorklogss || []).map((log) => 
+              {[...new Set((timesheetWorklog.TimesheetWorklogss || []).map((log) =>
                 log.projectId?.[0]?.projectName || "N/A"
               ))].filter(name => name !== "N/A").map((projectName, index) => (
                 <Dropdown.Item key={index} onClick={() => setSelectedProject(projectName)}>
@@ -631,7 +633,12 @@ function TimeLogs() {
                 </tr>
               </thead>
               <tbody>
-                {paginatedTimeLogss.map((log, index) => (
+                {paginatedTimeLogss.filter((item) => {
+                  return item?.employeeId &&
+                    Array.isArray(item.employeeId) &&
+                    item.employeeId.length > 0 &&
+                    item.employeeId[0]?._id === employeeId;
+                }).map((log, index) => (
                   <tr key={index}>
                     <td>
                       <input
