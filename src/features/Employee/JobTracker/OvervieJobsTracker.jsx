@@ -78,7 +78,7 @@ const OvervieJobsTracker = ({ onClose }) => {
     { label: "Pack Type", value: job?.packType, icon: <FaBox className="me-2 text-primary" /> },
     { label: "Pack Size", value: job?.packSize, icon: <FaBox className="me-2 text-primary" /> },
     { label: "Priority", value: job?.priority, icon: <FaInfoCircle className="me-2 text-primary" /> },
-    { label: "Assign", value: job?.assign, icon: <FaUser className="me-2 text-primary" /> },
+    { label: "Assign", value: job?.assignedTo.firstName, icon: <FaUser className="me-2 text-primary" /> },
     { label: "Project Barcode", value: job?.barcode, icon: <FaBarcode className="me-2 text-primary" /> },
   ];
 

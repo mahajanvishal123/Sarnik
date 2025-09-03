@@ -1,10 +1,10 @@
+// MyJobs Component - Modified to show only employee-assigned jobs
 import React, { useEffect, useState, useRef } from "react";
 import { Container, Row, Col, Button, Form, Table, Dropdown } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import * as XLSX from 'xlsx';
 import { useDispatch, useSelector } from "react-redux";
-import { fetchjobs } from "../../../redux/slices/JobsSlice";
-
+import { fetchjobs, ProductionJobsGet } from "../../../redux/slices/JobsSlice";
 import { FaUpload, FaFilter } from "react-icons/fa";
 import { fetchAssign } from "../../../redux/slices/AssignSlice";
 
@@ -16,14 +16,14 @@ function MyJobs() {
   const [selectedStatus, setSelectedStatus] = useState("All Status");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState("All Employees");
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
   // Get user role from Redux store or authentication context
   const { user } = useSelector((state) => state.auth || {});
   const isDesigner = user?.role === "designer";
-
+  const isProduction = user?.role === "production";
+  
   const handleReturnJob = () => {
     const hasTimesheet = false;
     if (!hasTimesheet) {
@@ -31,26 +31,26 @@ function MyJobs() {
       return;
     }
   };
-
+  
   const fileInputRef = useRef(null);
-
+  
   const handleUploadClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
-
+  
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       console.log("Selected file:", file);
     }
   };
-
+  
   const handleSelectAll = (e) => {
     // Implement your select all logic here if needed
   };
-
+  
   const getPriorityClass = (priority) => {
     switch ((priority || "").toLowerCase()) {
       case "high":
@@ -63,7 +63,7 @@ function MyJobs() {
         return "";
     }
   };
-
+  
   const getStatusClass = (status) => {
     switch ((status || "").toLowerCase().trim()) {
       case "in progress":
@@ -86,28 +86,32 @@ function MyJobs() {
         return "bg-light text-dark";
     }
   };
-
+  
   const { job, loading, error } = useSelector((state) => state.jobs);
-
   useEffect(() => {
-    dispatch(fetchjobs());
+    // Using ProductionJobsGet to get all jobs, then we'll filter for employee assignments
+    dispatch(ProductionJobsGet());
   }, [dispatch]);
-
+  
   const { assigns } = useSelector((state) => state.Assign);
-  console.log("Assignments:", assigns.assignments);
-
+  console.log("Assignments:", assigns?.assignments);
+  
   useEffect(() => {
     dispatch(fetchAssign());
   }, [dispatch]);
-
+  
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
-
+  
+  // Filter for employee-assigned jobs only
   const filteredProjects = (assigns?.assignments || []).filter((assignment) => {
+    // Only show assignments for employees (not production)
+    if (!assignment.employeeId || assignment.employeeId.role !== "employee") {
+      return false;
+    }
+    
     const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
-
     const firstValidJob = (assignment.jobs || []).find(j => j.jobId);
-
     const employeeName = assignment.employeeId
       ? `${assignment.employeeId.firstName} ${assignment.employeeId.lastName}`.toLowerCase()
       : '';
@@ -130,7 +134,7 @@ function MyJobs() {
       : '';
     const status = (firstValidJob?.jobId?.Status || '').toLowerCase();
     const designer = (assignment.selectDesigner || '').toLowerCase();
-
+    
     const fields = [
       employeeName,
       employeeEmail,
@@ -149,10 +153,11 @@ function MyJobs() {
       jobNo,
       designer
     ];
-
+    
     const matchesSearch = terms.length === 0 || terms.every(term =>
       fields.some(field => field.includes(term.toLowerCase()))
     );
+    
     const matchesEmployee =
       selectedEmployee === "All Employees" ||
       employeeName === selectedEmployee.toLowerCase();
@@ -166,35 +171,32 @@ function MyJobs() {
       (selectedStatus.toLowerCase() === "active" && assignmentStatus === "active") ||
       (selectedStatus.toLowerCase() === "completed" && assignmentStatus === "completed") ||
       (selectedStatus.toLowerCase() === assignmentStatus);
-
+    
     return matchesSearch && matchesEmployee && matchesStatus;
   });
-
+  
   const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
-
   const paginatedProjects = filteredProjects.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
+  
   const handleCopyFileName = (assignment, index, currentPage, itemsPerPage) => {
     const firstValidJob = (assignment.jobs || []).find(j => j.jobId);
     const displayId = String((currentPage - 1) * itemsPerPage + index + 1).padStart(4, '0');
     const fileName = `${displayId}_${firstValidJob?.jobId?.JobNo || ''}_${firstValidJob?.jobId?.brandName || ''}_${firstValidJob?.jobId?.subBrand || ''}_${firstValidJob?.jobId?.flavour || ''}_${firstValidJob?.jobId?.packType || ''}_${firstValidJob?.jobId?.packSize || ''}_${firstValidJob?.jobId?.packCode || ''}`;
-
     navigator.clipboard.writeText(fileName)
       .then(() => alert("Copied to clipboard: " + fileName))
       .catch((err) => console.error("Failed to copy!", err));
   };
-
+  
   const handleRowClick = (id) => {
     setExpandedJob(expandedJob === id ? null : id);
   };
-
+  
   return (
     <div className="p-4 m-2" style={{ backgroundColor: "white", borderRadius: "10px" }}>
-      <h5 className="fw-bold mb-3 text-start">Assigned Jobs</h5>
-
+      <h5 className="fw-bold mb-3 text-start">Employee Assigned Jobs</h5>
       <div className="d-lg-none mb-2 text-end">
         <Button
           variant="primary"
@@ -206,7 +208,6 @@ function MyJobs() {
           Filter
         </Button>
       </div>
-
       <Row className={`mb-3 align-items-center ${showFilters ? "" : "d-none d-lg-flex"}`}>
         <Col xs={12} lg={9} className="d-flex flex-wrap gap-2 mb-2 mb-lg-0">
           <Form.Control
@@ -225,10 +226,12 @@ function MyJobs() {
               <Dropdown.Item onClick={() => setSelectedEmployee("All Employees")}>
                 All Employees
               </Dropdown.Item>
-              {[...new Set((assigns?.assignments || []).map(job =>
-                job.employeeId
-                  ? `${job.employeeId.firstName} ${job.employeeId.lastName}`
-                  : 'No Employee'
+              {[...new Set((assigns?.assignments || [])
+                .filter(assignment => assignment.employeeId && assignment.employeeId.role === "employee")
+                .map(job =>
+                  job.employeeId
+                    ? `${job.employeeId.firstName} ${job.employeeId.lastName}`
+                    : 'No Employee'
               ))].map((employeeName, index) => (
                 <Dropdown.Item
                   key={index}
@@ -253,7 +256,6 @@ function MyJobs() {
           </Dropdown>
         </Col>
       </Row>
-
       <div className="table-responsive">
         <Table hover className="align-middle sticky-header">
           <thead className="bg-light">
@@ -330,7 +332,6 @@ function MyJobs() {
                       </td>
                     )}
                   </tr>
-
                   {expandedJob === assignment._id && (
                     <tr>
                       <td colSpan={isDesigner ? "13" : "12"}>
@@ -377,7 +378,6 @@ function MyJobs() {
           </tbody>
         </Table>
       </div>
-
       {!loading && !error && (
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div className="text-muted small">
