@@ -354,75 +354,74 @@ function AddCostEstimates() {
                   required
                 />
               </div> */}
-        <div className="col-md-4 mb-3 ">
-  <label className="form-label">Upload PDF Logo</label>
-  <div className="input-group">
-    <input
-      type="file"
-      className="form-control"
-      accept="image/*"
-      onChange={handleImageChange}
-    />
-    {/* Fake input to show gallery-selected image name */}
-    {image && (
-      <input
-        type="text"
-        className="form-control"
-        value={image.name}
-        readOnly
-      />
-    )}
-  </div>
+              <div className="col-md-4 mb-3 ">
+                <label className="form-label">Upload PDF Logo</label>
+                <div className="input-group">
+                  <input
+                    type="file"
+                    className="form-control"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                  {/* Fake input to show gallery-selected image name */}
+                  {image && (
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={image.name}
+                      readOnly
+                    />
+                  )}
+                </div>
 
-  {/* Image Selector from API (logoCostEstimate.image) */}
-  <div className="mt-3">
-    <label className="form-label fw-bold">Or Select From Gallery</label>
-    
-    <div className="d-flex align-items-center">
-      {/* Scrollable Images */}
-      <div className="d-flex flex-row overflow-auto" style={{ gap: "10px", flex: 1 }}>
-        {Array.isArray(logoCostEstimate?.image) &&
-          logoCostEstimate.image.map((imgUrl, index) => (
-            <div
-              className={`card border ${
-                image?.name === `logo_${index}.jpg`
-                  ? "border-primary"
-                  : "border-light"
-              }`}
-              key={index}
-              style={{
-                width: "90px",
-                minWidth: "90px",
-                cursor: "pointer",
-              }}
-              onClick={() => {
-                fetch(imgUrl)
-                  .then((res) => res.blob())
-                  .then((blob) => {
-                    const file = new File([blob], `logo_${index}.jpg`, {
-                      type: blob.type,
-                    });
-                    setImage(file);
-                  });
-              }}
-            >
-              <img
-                src={imgUrl}
-                alt="logo"
-                className="card-img-top"
-                style={{
-                  height: "80px",
-                  objectFit: "cover",
-                  borderRadius: "6px",
-                }}
-              />
+                {/* Image Selector from API (logoCostEstimate.image) */}
+                <div className="mt-3">
+                  <label className="form-label fw-bold">Or Select From Gallery</label>
+
+                  <div className="d-flex align-items-center">
+                    {/* Scrollable Images */}
+                    <div className="d-flex flex-row overflow-auto" style={{ gap: "10px", flex: 1 }}>
+                      {Array.isArray(logoCostEstimate?.image) &&
+                        logoCostEstimate.image.map((imgUrl, index) => (
+                          <div
+                            className={`card border ${image?.name === `logo_${index}.jpg`
+                                ? "border-primary"
+                                : "border-light"
+                              }`}
+                            key={index}
+                            style={{
+                              width: "90px",
+                              minWidth: "90px",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              fetch(imgUrl)
+                                .then((res) => res.blob())
+                                .then((blob) => {
+                                  const file = new File([blob], `logo_${index}.jpg`, {
+                                    type: blob.type,
+                                  });
+                                  setImage(file);
+                                });
+                            }}
+                          >
+                            <img
+                              src={imgUrl}
+                              alt="logo"
+                              className="card-img-top"
+                              style={{
+                                height: "80px",
+                                objectFit: "cover",
+                                borderRadius: "6px",
+                              }}
+                            />
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          ))}
-      </div>
-    </div>
-  </div>
-</div>
-</div>
 
             <h6 className="fw-semibold mb-3">Line Items</h6>
             <div className="row fw-semibold text-muted mb-2 px-2">
