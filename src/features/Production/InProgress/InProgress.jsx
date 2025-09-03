@@ -332,6 +332,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchjobs, filterStatus } from "../../../redux/slices/JobsSlice";
 import { Dropdown } from "react-bootstrap";
 import axios from "axios"; // Import axios for API calls
+import { apiUrl } from "../../../redux/utils/config";
 
 function InProgress() {
   const navigate = useNavigate();
@@ -361,8 +362,9 @@ function InProgress() {
       setLoadingDesigners(true);
       try {
         // Replace with your actual API endpoint
-        const response = await axios.get("https://api.example.com/employees");
-        setDesigners(response.data); // Assuming response.data is an array of designer objects
+        // const response = await axios.get("https://api.example.com/employees");
+        const response = await axios.get(`${apiUrl}/user/getAllUsers`);
+        setDesigners(response?.data?.data?.users); // Assuming response.data is an array of designer objects
       } catch (error) {
         console.error("Error fetching designers:", error);
       } finally {
@@ -381,13 +383,14 @@ function InProgress() {
     if (selectedJob) {
       try {
         // API call to update the assigned employee
-        await axios.put(`https://api.example.com/jobs/${selectedJob._id}`, {
+        // await axios.put(`https://api.example.com/jobs/${selectedJob._id}`, {
+        await axios.put(`${apiUrl}/jobs/${selectedJob._id}`, {
           assign: newDesignerId
         });
-        
+
         // Update local state if needed
         // You might want to refetch jobs or update the specific job in your Redux store
-        
+
         setShowDesignerModal(false);
       } catch (error) {
         console.error("Error updating designer:", error);
@@ -459,7 +462,7 @@ function InProgress() {
         (j.projectId?.[0]?.projectName?.toLowerCase() === selectedProject.toLowerCase());
       return matchesProject;
     }
-    
+
     const fields = [
       j.JobNo,
       j.projectId?.[0]?.projectName,
@@ -475,7 +478,7 @@ function InProgress() {
       j.updatedAt ? new Date(j.updatedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '',
       j.Status
     ].map(f => (f || '').toString().toLowerCase());
-    
+
     const matchesSearch = terms.every(term =>
       fields.some(field => field.includes(term.toLowerCase()))
     );
@@ -497,7 +500,7 @@ function InProgress() {
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="fw-bold m-0">Jobs In Progress</h5>
       </div>
-      
+
       {/* Filters */}
       <div className="d-flex flex-wrap gap-2 mb-3 align-items-center">
         <Form.Control
@@ -525,7 +528,7 @@ function InProgress() {
           </Dropdown.Menu>
         </Dropdown>
       </div>
-      
+
       {/* Table */}
       <div className="table-responsive">
         <Table hover className="align-middle sticky-header">
@@ -582,11 +585,12 @@ function InProgress() {
                     </td>
                     <td>{new Date(job.createdAt).toLocaleDateString("en-GB")}</td>
                     <td style={{ whiteSpace: 'nowrap' }}>
-                      <span 
+                      <span
                         className="text-primary cursor-pointer"
                         onClick={() => handleDesignerClick(job)}
                       >
-                        {job.assign || "Assign"}
+                        {/* {job.assign || "Assign"} */}
+                        {job.assignedTo}
                       </span>
                     </td>
                     <td>
@@ -621,7 +625,7 @@ function InProgress() {
           </tbody>
         </Table>
       </div>
-      
+
       {/* Change Designer Modal */}
       <Modal show={showDesignerModal} onHide={() => setShowDesignerModal(false)}>
         <Modal.Header closeButton>
@@ -629,15 +633,15 @@ function InProgress() {
         </Modal.Header>
         <Modal.Body>
           {loadingDesigners ? (
-            <p>Loading designers...</p>
+            <p>Loading Assign...</p>
           ) : (
             <Form.Group>
-              <Form.Label>Choose Designer</Form.Label>
+              <Form.Label>Choose Assign</Form.Label>
               <Form.Select onChange={(e) => handleDesignerChange(e.target.value)}>
-                <option value="">Select designer...</option>
-                {designers.map((designer) => (
+                <option value="">Select Assign...</option>
+                {designers.filter((item) => item.role == "employee").map((designer) => (
                   <option key={designer.id} value={designer.id}>
-                    {designer.name}
+                    {designer.firstName}{designer.lastName}
                   </option>
                 ))}
               </Form.Select>
@@ -648,7 +652,7 @@ function InProgress() {
           </button>
         </Modal.Body>
       </Modal>
-      
+
       {/* Pagination */}
       {!loading && !error && (
         <div className="d-flex justify-content-between align-items-center mb-4">

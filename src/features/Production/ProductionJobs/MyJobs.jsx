@@ -473,7 +473,7 @@ function MyJobs() {
   const navigate = useNavigate();
 
   const handleLogTime = (job) => {
-    navigate(`/employee/AddTimeLog`, {
+    navigate(`/production/AddTimeLog`, {
       state: {
         id: job._id,
         openTab: 'jobs',

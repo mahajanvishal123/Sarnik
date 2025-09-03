@@ -22,6 +22,7 @@ import NewJobsList from '../features/Production/NewJobsList/NewJobsList.jsx';
 import InProgress from '../features/Production/InProgress/InProgress.jsx';
 import Completed_Jobs from '../features/Production/Completed_Jobs/Completed_Jobs.jsx';
 import TimesheetWorklog from '../features/Production/TimesheetWorklog/TimesheetWorklog.jsx';
+import AddJobTracker from '../features/Production/JobTracker/AddJobTracker.jsx';
 
 
 
@@ -66,6 +67,7 @@ function Production() {
             <Route path="/AddTimeLog" element={<ProtectedRoute><AddTimeLog/></ProtectedRoute>} />
             <Route path="/TimesheetWorklog" element={<ProtectedRoute><TimesheetWorklog/></ProtectedRoute>} />
             <Route path="/myJobs" element={<ProtectedRoute><MyJobs/></ProtectedRoute>} />
+            <Route path="/AddJobTracker/:id" element={<ProtectedRoute><AddJobTracker /></ProtectedRoute>} />
             
           </Routes>
         </div>
