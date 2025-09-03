@@ -675,6 +675,7 @@
 // export default NewJobsList;
 
 // NewJobsList Component - Modified to properly show production-assigned jobs based on API response
+
 import React, { useEffect, useState } from "react";
 import { MdEditSquare } from "react-icons/md";
 import { FaRegTrashCan } from "react-icons/fa6";
@@ -984,13 +985,13 @@ function NewJobsList() {
       assign: assignTo,
     };
     console.log("Assignment Payload:", payload);
-    dispatch(Project_job_Id(id))
-      .then(() => {
-        // Swal.fire("Success!", "Jobs assigned successfully", "success");
-      })
-      .catch(() => {
-        Swal.fire("Error!", "Something went wrong", "error");
-      });
+    // dispatch(Project_job_Id(id))
+    //   .then(() => {
+    //     // Swal.fire("Success!", "Jobs assigned successfully", "success");
+    //   })
+    //   .catch(() => {
+    //     Swal.fire("Error!", "Something went wrong", "error");
+    //   });
   };
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
@@ -1230,7 +1231,7 @@ function NewJobsList() {
                 }}
               >
                 <option value="">-- Select --</option>
-                <option value="Production">Production</option>
+                <option value="Designer">Designer</option>
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
@@ -1242,7 +1243,7 @@ function NewJobsList() {
               >
                 <option value="">-- Select Employee --</option>
                 {paginatedAssignment
-                  .filter((emp) => emp.role === 'production')
+                  .filter((emp) => emp.assign == selectedDesigner && emp.role == "employee")
                   .map((emp) => (
                     <option key={emp._id} value={emp._id}>
                       {emp.firstName || "Unnamed Employee"} {emp.lastName || "Unnamed Employee"}
