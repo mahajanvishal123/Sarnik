@@ -546,7 +546,7 @@ function InProgress() {
               <th>PackCode</th>
               <th>Priority</th>
               <th>Due Date</th>
-              <th>Assign</th>
+              <th>Assign To</th>
               <th>TimeLogged</th>
               <th>Status</th>
               {/* <th>Actions</th> */}
@@ -590,7 +590,7 @@ function InProgress() {
                         onClick={() => handleDesignerClick(job)}
                       >
                         {/* {job.assign || "Assign"} */}
-                        {job.assignedTo}
+                        {job.assignedTo.firstName ? `${job.assignedTo.firstName} ${job.assignedTo.lastName}` : job.assignedTo}
                       </span>
                     </td>
                     <td>
