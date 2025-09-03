@@ -469,10 +469,8 @@ function TimeLogs() {
   const [selectedProject, setSelectedProject] = useState('All Projects');
   const [selectedJobs, setSelectedJobs] = useState({});
   const [showFilters, setShowFilters] = useState(false);
-
   const dispatch = useDispatch();
   const { timesheetWorklog } = useSelector((state) => state.TimesheetWorklogs);
-
   const employeeId = localStorage.getItem("_id");
 
   useEffect(() => {
@@ -480,8 +478,17 @@ function TimeLogs() {
   }, [dispatch]);
 
   const itemsPerPage = 15;
-
-  const filteredTimeLogs = (timesheetWorklog.TimesheetWorklogss || []).filter((log) => {
+  
+  // First, filter by employee ID to ensure we only show logs for the current employee
+  const employeeFilteredLogs = (timesheetWorklog.TimesheetWorklogss || []).filter((log) => {
+    return log?.employeeId &&
+      Array.isArray(log.employeeId) &&
+      log.employeeId.length > 0 &&
+      log.employeeId[0]?._id === employeeId;
+  });
+  
+  // Then apply the other filters
+  const filteredTimeLogs = employeeFilteredLogs.filter((log) => {
     const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
     const employeeName = log.employeeId?.[0]
       ? `${log.employeeId[0].firstName} ${log.employeeId[0].lastName}`.toLowerCase()
@@ -490,20 +497,20 @@ function TimeLogs() {
     const jobNo = (log.jobId?.[0]?.JobNo || '').toString().toLowerCase();
     const taskDescription = (log.taskDescription || '').toLowerCase();
     const status = (log.status || '').toLowerCase();
-
     const fields = [employeeName, projectName, jobNo, taskDescription, status];
+    
     const matchesSearch = terms.length === 0 || terms.every(term =>
       fields.some(field => field.includes(term.toLowerCase()))
     );
-
+    
     const matchesDate =
       (!fromDate || new Date(log.date) >= new Date(fromDate)) &&
       (!toDate || new Date(log.date) <= new Date(toDate));
-
+    
     const matchesProject =
       selectedProject === "All Projects" ||
       projectName === selectedProject.toLowerCase();
-
+    
     return matchesSearch && matchesDate && matchesProject;
   });
 
@@ -527,7 +534,7 @@ function TimeLogs() {
     return `${hours}:${minutes.toString().padStart(2, '0')}`;
   };
 
-  // Calculate totals (after filters)
+  // Calculate totals based on filtered data
   const totalTimeSum = sumTime(filteredTimeLogs.map(log => log.time));
   const overtimeSum = sumTime(filteredTimeLogs.map(log => log.overtime));
 
@@ -542,7 +549,6 @@ function TimeLogs() {
               <FaPlus /> Add Time Log
             </button>
           </Link>
-
           <Button
             className="d-md-none d-flex align-items-center gap-2 mb-2"
             size="sm"
@@ -553,13 +559,13 @@ function TimeLogs() {
           </Button>
         </div>
       </div>
-
+      
       {/* Total Time Row (Summary) */}
       <div className="d-flex justify-content-end mb-2 fw-bold">
         <span className="me-4">Total Time: {totalTimeSum}</span>
         <span>Overtime: {overtimeSum}</span>
       </div>
-
+      
       {/* Filters Section */}
       <div className={`row g-3 mb-4 ${showFilters ? 'd-block' : 'd-none d-md-flex'}`}>
         <div className="col-md-3">
@@ -576,7 +582,6 @@ function TimeLogs() {
             />
           </div>
         </div>
-
         <div className="col-md-3">
           <input
             type="date"
@@ -585,7 +590,6 @@ function TimeLogs() {
             onChange={(e) => setFromDate(e.target.value)}
           />
         </div>
-
         <div className="col-md-3">
           <input
             type="date"
@@ -594,7 +598,6 @@ function TimeLogs() {
             onChange={(e) => setToDate(e.target.value)}
           />
         </div>
-
         <div className="col-md-3">
           <Dropdown>
             <Dropdown.Toggle variant="light" id="project-dropdown" className="w-100">
@@ -615,7 +618,7 @@ function TimeLogs() {
           </Dropdown>
         </div>
       </div>
-
+      
       {/* Table */}
       <div className="card shadow-sm">
         <div className="card-body p-0">
@@ -633,12 +636,7 @@ function TimeLogs() {
                 </tr>
               </thead>
               <tbody>
-                {paginatedTimeLogss.filter((item) => {
-                  return item?.employeeId &&
-                    Array.isArray(item.employeeId) &&
-                    item.employeeId.length > 0 &&
-                    item.employeeId[0]?._id === employeeId;
-                }).map((log, index) => (
+                {paginatedTimeLogss.map((log, index) => (
                   <tr key={index}>
                     <td>
                       <input
@@ -660,7 +658,6 @@ function TimeLogs() {
                     <td>{log.totalTime}</td>
                   </tr>
                 ))}
-
                 {/* Summary Row at bottom */}
                 <tr className="fw-bold bg-light">
                   <td colSpan="4" className="text-end">Grand Total:</td>

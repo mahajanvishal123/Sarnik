@@ -553,6 +553,14 @@ const OvervieJobsTracker = ({ onClose }) => {
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
   };
 
+  const calculateEmployeeTotalTime = (worklogs) => {
+  let totalTime = "00:00";
+  worklogs.forEach(log => {
+    totalTime = addTimes(totalTime, addTimes(log.time, log.overtime));
+  });
+  return totalTime;
+};
+
   // Responsive two-column grid for job details
   const jobDetails = [
     {
@@ -730,64 +738,83 @@ const OvervieJobsTracker = ({ onClose }) => {
             <>
               {workLogData.employees.map((employeeData, empIndex) => (
                 <div key={empIndex} className="mb-4">
-                  <div className="d-flex justify-content-between align-items-center mb-2 bg-light p-2 rounded">
-                    <h6 className="mb-0">
+                  <div className="d-flex justify-content-end align-items-center mb-2 bg-light p-2 rounded">
+                    {/* <h6 className="mb-0">
                       {employeeData.employee.firstName} {employeeData.employee.lastName}
                       <small className="text-muted ms-2">({employeeData.employee.assign})</small>
-                    </h6>
-                    <Badge bg="primary" className="fs-6">
-                      Total Time: {employeeData.totalTimeSpent}
-                    </Badge>
+                    </h6> */}
+             <Badge bg="primary" className="fs-6">
+        Total Time: {calculateEmployeeTotalTime(employeeData.worklogs)}
+      </Badge>
                   </div>
 
                   <div className="table-responsive">
-                    <Table
-                      striped
-                      bordered
-                      hover
-                      size="sm"
-                      className="align-middle shadow-sm"
-                    >
-                      <thead className="bg-light">
-                        <tr>
-                          <th>Date</th>
-                          <th>Task Description</th>
-                          <th className="text-center">Time Spent</th>
-                          <th className="text-center">Overtime</th>
-                          <th className="text-center">Total Time</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {employeeData.worklogs.map((log, logIndex) => (
-                          <tr key={logIndex}>
-                            <td>{log.date ? new Date(log.date).toLocaleDateString() : "-"}</td>
-                            <td style={{ whiteSpace: "pre-line" }}>
-                              {log.taskDescription || "-"}
-                            </td>
-                            <td className="text-center fw-bold text-primary">
-                              {formatTime(log.time)}
-                            </td>
-                            <td className="text-center fw-bold text-danger">
-                              {formatTime(log.overtime)}
-                            </td>
-                            <td className="text-center fw-bold text-success">
-                              {addTimes(log.time, log.overtime)}
-                            </td>
-                            <td>
-                              <Badge
-                                bg={
-                                  log.status === 'Approved' ? 'success' :
-                                    log.status === 'Rejected' ? 'danger' : 'warning'
-                                }
-                              >
-                                {log.status || 'Pending'}
-                              </Badge>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
+             <Table
+  striped
+  bordered
+  hover
+  size="sm"
+  className="align-middle shadow-sm"
+>
+  <thead className="bg-light">
+    <tr>
+      <th>Date</th>
+      <th>Employee Name</th> {/* ✅ Added */}
+      <th>Assign</th> {/* ✅ Added */}
+      <th>Task Description</th>
+      <th className="text-center">Time Spent</th>
+      <th className="text-center">Overtime</th>
+      <th className="text-center">Total Time</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {employeeData.worklogs.map((log, logIndex) => (
+      <tr key={logIndex}>
+        <td>{log.date ? new Date(log.date).toLocaleDateString() : "-"}</td>
+
+        {/* ✅ Employee Name */}
+        <td>
+          {employeeData.employee.firstName} {employeeData.employee.lastName}
+        </td>
+
+        {/* ✅ Assign */}
+        <td>
+          {employeeData.employee.assign || "-"}
+        </td>
+
+        {/* Task Description */}
+        <td style={{ whiteSpace: "pre-line" }}>
+          {log.taskDescription || "-"}
+        </td>
+
+        <td className="text-center fw-bold text-primary">
+          {formatTime(log.time)}
+        </td>
+        <td className="text-center fw-bold text-danger">
+          {formatTime(log.overtime)}
+        </td>
+        <td className="text-center fw-bold text-success">
+          {addTimes(log.time, log.overtime)}
+        </td>
+        <td>
+          <Badge
+            bg={
+              log.status === "Approved"
+                ? "success"
+                : log.status === "Rejected"
+                ? "danger"
+                : "warning"
+            }
+          >
+            {log.status || "Pending"}
+          </Badge>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</Table>
+
                   </div>
                 </div>
               ))}
@@ -798,19 +825,19 @@ const OvervieJobsTracker = ({ onClose }) => {
                   <Row>
                     <Col md={4}>
                       <div className="text-center p-2">
-                        <h6 className="text-muted mb-1">Total Time Spent</h6>
+                        <h6 className="text-muted mb-1">Work Time</h6>
                         <h4 className="fw-bold text-primary mb-0">{calculateProjectTotalTime()}</h4>
                       </div>
                     </Col>
                     <Col md={4}>
                       <div className="text-center p-2">
-                        <h6 className="text-muted mb-1">Total Overtime</h6>
+                        <h6 className="text-muted mb-1">Over Time</h6>
                         <h4 className="fw-bold text-danger mb-0">{calculateProjectOvertime()}</h4>
                       </div>
                     </Col>
                     <Col md={4}>
                       <div className="text-center p-2">
-                        <h6 className="text-muted mb-1">Grand Total</h6>
+                        <h6 className="text-muted mb-1"> Total Time</h6>
                         <h4 className="fw-bold text-success mb-0">
                           {addTimes(calculateProjectTotalTime(), calculateProjectOvertime())}
                         </h4>
