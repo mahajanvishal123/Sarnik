@@ -230,6 +230,7 @@ function Job_History() {
             {paginatedProjects
               .slice()
               .reverse()
+            
               .map((job) => (
                 <tr key={job._id}>
                   <td>
