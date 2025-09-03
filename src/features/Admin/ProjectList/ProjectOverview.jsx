@@ -22,7 +22,7 @@ function ProjectOverview() {
     }
   }, [location.state]);
 
-  // 定义状态样式函数
+
   const getStatusClass = (status) => {
     switch (status) {
       case 'Active Project':
