@@ -78,7 +78,7 @@ const OvervieJobsTracker = ({ onClose }) => {
     { label: "Pack Type", value: job?.packType, icon: <FaBox className="me-2 text-primary" /> },
     { label: "Pack Size", value: job?.packSize, icon: <FaBox className="me-2 text-primary" /> },
     { label: "Priority", value: job?.priority, icon: <FaInfoCircle className="me-2 text-primary" /> },
-    { label: "Assign", value: job?.assignedTo.firstName, icon: <FaUser className="me-2 text-primary" /> },
+    { label: "Assign", value: job?.assignedTo ? `${job.assignedTo.firstName} ${job.assignedTo.lastName}` : 'Not assigned', icon: <FaUser className="me-2 text-primary" /> },
     { label: "Project Barcode", value: job?.barcode, icon: <FaBarcode className="me-2 text-primary" /> },
   ];
 
@@ -91,7 +91,7 @@ const OvervieJobsTracker = ({ onClose }) => {
 
       {/* Job Details Grid */}
       <Card className="border-0 shadow-sm rounded-4 mb-4 p-4">
-        <div className="d-flex justify-content-between align-items-center mb-4 p-3 rounded-4 shadow-sm" style={{ background: "linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%)" }}>
+        <div className="d-flex justify-content-between align-items-center mb-4 p-3 rounded-4 shadow-sm" style={{ backgroundColor: '#0052CC ' }}>
           <div className="d-flex align-items-center gap-2">
             <FaInfoCircle className="text-white" size={28} />
             <h2 className="mb-0 fw-bold text-white" style={{ letterSpacing: 1 }}>Job Details</h2>
