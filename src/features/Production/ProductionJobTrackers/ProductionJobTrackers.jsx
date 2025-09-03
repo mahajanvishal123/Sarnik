@@ -146,7 +146,7 @@ function EmployeeJobTracker() {
   );
 
   const JobDetails = (job) => {
-    navigate(`/admin/OvervieJobsTracker`, { state: { job } });
+    navigate(`/production/OvervieJobsTracker`, { state: { job } });
   };
 
   return (
