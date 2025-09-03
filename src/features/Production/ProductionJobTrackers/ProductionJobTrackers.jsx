@@ -20,7 +20,7 @@ function EmployeeJobTracker() {
 
   // 🔹 yaha se apna employeeId lo (auth state/localStorage se)
   // Example: agar aap redux me auth rakhe ho
-  const employeeId = useSelector((state) => state.auth?.user?._id); 
+  const employeeId = localStorage.getItem("_id");
   // Agar localStorage me h to use this:
   // const employeeId = localStorage.getItem("employeeId");
 
@@ -69,7 +69,7 @@ function EmployeeJobTracker() {
 
   // 🔹 Pehle employee ke jobs filter karo
   const employeeJobs = (job?.jobs || []).filter(
-    (j) => (j.assignedTo?._id || j.assign) === employeeId
+    (j) => (j.assignedTo?.userId || j.assign) === employeeId
   );
 
   // 🔹 Uske baad filters aur search lagao
@@ -80,13 +80,13 @@ function EmployeeJobTracker() {
       return (
         (selectedProject === "All Projects" ||
           (j.projectId?.[0]?.projectName || "").toLowerCase() ===
-            selectedProject.toLowerCase()) &&
+          selectedProject.toLowerCase()) &&
         (selectedPriority === "All Priorities" ||
           (j.priority || "").toLowerCase() ===
-            selectedPriority.toLowerCase()) &&
+          selectedPriority.toLowerCase()) &&
         (selectedStatus === "All Status" ||
           (j.Status || "").toLowerCase().trim() ===
-            selectedStatus.toLowerCase().trim())
+          selectedStatus.toLowerCase().trim())
       );
 
     const fields = [
@@ -105,9 +105,9 @@ function EmployeeJobTracker() {
       j.assignedTo,
       j.updatedAt
         ? new Date(j.updatedAt).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })
+          hour: "2-digit",
+          minute: "2-digit",
+        })
         : "",
       j.Status,
     ].map((f) => (f || "").toString().toLowerCase());
@@ -119,21 +119,21 @@ function EmployeeJobTracker() {
     const matchesProject =
       selectedProject === "All Projects" ||
       (j.projectId?.[0]?.projectName || "").toLowerCase() ===
-        selectedProject.toLowerCase();
+      selectedProject.toLowerCase();
     const matchesPriority =
       selectedPriority === "All Priorities" ||
       (j.priority || "").toLowerCase() ===
-        selectedPriority.toLowerCase();
+      selectedPriority.toLowerCase();
     const matchesStatus =
       selectedStatus === "All Status" ||
       (j.Status || "").toLowerCase().trim() ===
-        selectedStatus.toLowerCase().trim();
+      selectedStatus.toLowerCase().trim();
 
     return matchesSearch && matchesProject && matchesPriority && matchesStatus;
   });
 
   const handleUpdate = (job) => {
-    navigate(`/admin/AddJobTracker/${job._id}`, { state: { job } });
+    navigate(`/production/AddJobTracker/${job._id}`, { state: { job } });
   };
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -241,7 +241,7 @@ function EmployeeJobTracker() {
               <th>PackSize</th>
               <th>PackCode</th>
               <th>Priority</th>
-              <th>Assign</th>
+              <th>Assign To</th>
               <th style={{ whiteSpace: "nowrap" }}>Created Date</th>
               <th>Status</th>
               <th>Actions</th>
@@ -273,7 +273,12 @@ function EmployeeJobTracker() {
                       {job.priority}
                     </span>
                   </td>
-                  <td style={{ whiteSpace: "nowrap" }}>{job?.assign}</td>
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    {/* {job?.assign} */}
+                    {job?.assignedTo?.firstName
+                      ? `${job.assignedTo.firstName} ${job.assignedTo.lastName}`
+                      : job?.assignedTo}
+                  </td>
                   <td>
                     {new Date(job.createdAt).toLocaleDateString("en-GB")}
                   </td>
@@ -335,9 +340,8 @@ function EmployeeJobTracker() {
               </li>
             ))}
             <li
-              className={`page-item ${
-                currentPage === totalPages ? "disabled" : ""
-              }`}
+              className={`page-item ${currentPage === totalPages ? "disabled" : ""
+                }`}
             >
               <button
                 className="page-link"

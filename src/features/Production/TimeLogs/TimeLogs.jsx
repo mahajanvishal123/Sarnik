@@ -473,6 +473,8 @@ function TimeLogs() {
   const dispatch = useDispatch();
   const { timesheetWorklog } = useSelector((state) => state.TimesheetWorklogs);
 
+  const employeeId = localStorage.getItem("_id");
+
   useEffect(() => {
     dispatch(fetchTimesheetWorklogs());
   }, [dispatch]);
@@ -631,7 +633,12 @@ function TimeLogs() {
                 </tr>
               </thead>
               <tbody>
-                {paginatedTimeLogss.map((log, index) => (
+                {paginatedTimeLogss.filter((item) => {
+                  return item?.employeeId &&
+                    Array.isArray(item.employeeId) &&
+                    item.employeeId.length > 0 &&
+                    item.employeeId[0]?._id === employeeId;
+                }).map((log, index) => (
                   <tr key={index}>
                     <td>
                       <input
