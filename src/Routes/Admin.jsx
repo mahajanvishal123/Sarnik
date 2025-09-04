@@ -48,7 +48,7 @@ import OvervieMyJobs from "../features/Admin/MyJobs/OvervieMyJobs.jsx";
 import OvervieJobsProject from "../features/Admin/ProjectList/ProjectTabs/OvervieJobsProject.jsx";
 import Profile from "../features/Admin/Profile/Profile.jsx";
 import Extrahr from "../features/Admin/TimeLogs/Extrahr.jsx";
-import  DProjectInProgress from "../features/Admin/Dashbord/DProjectInProgress.jsx";
+import DProjectInProgress from "../features/Admin/Dashbord/DProjectInProgress.jsx";
 import DTodayJobsDue from "../features/Admin/Dashbord/DTodayJobsDue.jsx";
 import DCostEstimates from "../features/Admin/Dashbord/DCostEstimates.jsx";
 import Reports from "../features/Admin/Reports/Reports.jsx";
@@ -95,9 +95,9 @@ function Admin() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/DJobsInProgress" element={<ProtectedRoute><DJobsInProgress/></ProtectedRoute>} />
+            <Route path="/DJobsInProgress" element={<ProtectedRoute><DJobsInProgress /></ProtectedRoute>} />
             <Route path="/DProjectInProgress" element={<ProtectedRoute>< DProjectInProgress /></ProtectedRoute>} />
-             <Route path="/DCompletedProject" element={<ProtectedRoute><DCompletedProject/></ProtectedRoute>} />
+            <Route path="/DCompletedProject" element={<ProtectedRoute><DCompletedProject /></ProtectedRoute>} />
             <Route path="/DTodayJobsDue" element={<ProtectedRoute><DTodayJobsDue /></ProtectedRoute>} />
             <Route path="/DCostEstimates" element={<ProtectedRoute><DCostEstimates /></ProtectedRoute>} />
 
@@ -105,7 +105,7 @@ function Admin() {
             <Route path="/AddClientManagement" element={<ProtectedRoute><AddClientManagement /></ProtectedRoute>} />
             <Route path="/ViewdetailsClientManagement" element={<ProtectedRoute><ViewdetailsClientManagement /></ProtectedRoute>} />
             <Route path="/CostEstimates" element={<ProtectedRoute><CostEstimates /></ProtectedRoute>} />
-            <Route path="/OvervieCostEstimates" element={<ProtectedRoute><OvervieCostEstimates/></ProtectedRoute>} />
+            <Route path="/OvervieCostEstimates" element={<ProtectedRoute><OvervieCostEstimates /></ProtectedRoute>} />
             <Route path="/AddCostEstimates" element={<ProtectedRoute><AddCostEstimates /></ProtectedRoute>} />
             <Route path="/duplicate/AddCostEstimates/:id" element={<ProtectedRoute><AddCostEstimates /></ProtectedRoute>} />
             <Route path="/receivable" element={<ProtectedRoute><ReciveablePurchase /></ProtectedRoute>} />
@@ -117,7 +117,7 @@ function Admin() {
             <Route path="/ProjectOverview/:id" element={<ProtectedRoute><ProjectOverview /></ProtectedRoute>} />
             <Route path="/UpdateProjectLis" element={<ProtectedRoute><UpdateProjectLis /></ProtectedRoute>} />
             <Route path="/jobTracker" element={<ProtectedRoute><JobTracker /></ProtectedRoute>} />
-             <Route path="/farhan" element={<ProtectedRoute><Pluginss /></ProtectedRoute>} />
+            <Route path="/farhan" element={<ProtectedRoute><Pluginss /></ProtectedRoute>} />
             <Route path="/AddJobTracker/:id" element={<ProtectedRoute><AddJobTracker /></ProtectedRoute>} />
             <Route path="/OvervieJobsTracker" element={<ProtectedRoute><OvervieJobsTracker /></ProtectedRoute>} />
             <Route path="/updateJobTracker" element={<ProtectedRoute><UpdateJobTracker /></ProtectedRoute>} />
@@ -148,13 +148,13 @@ function Admin() {
             <Route path="/Settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/Extrahr" element={<ProtectedRoute><Extrahr /></ProtectedRoute>} />
-            <Route path="/ChangePassword" element={<ProtectedRoute><ChangePassword/></ProtectedRoute>} />
-            <Route path="/UpdateProfile" element={<ProtectedRoute><UpdateProfile/></ProtectedRoute>} />
-            <Route path="/Retunjob" element={<ProtectedRoute><Retunjob/></ProtectedRoute>} />
-            <Route path="/approval" element={<ProtectedRoute><WaitingApproval/></ProtectedRoute>} />
-            <Route path="/ProjectInvoiceBilling" element={<ProtectedRoute><ProjectInvoiceBilling/></ProtectedRoute>} />
-            <Route path="/DReciveablePurchase" element={<ProtectedRoute><DReciveablePurchase/></ProtectedRoute>} />
-            <Route path="/Completed" element={<ProtectedRoute><ReturnedJobs/></ProtectedRoute>} />
+            <Route path="/ChangePassword" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
+            <Route path="/UpdateProfile" element={<ProtectedRoute><UpdateProfile /></ProtectedRoute>} />
+            <Route path="/Retunjob" element={<ProtectedRoute><Retunjob /></ProtectedRoute>} />
+            <Route path="/approval" element={<ProtectedRoute><WaitingApproval /></ProtectedRoute>} />
+            <Route path="/ProjectInvoiceBilling" element={<ProtectedRoute><ProjectInvoiceBilling /></ProtectedRoute>} />
+            <Route path="/DReciveablePurchase" element={<ProtectedRoute><DReciveablePurchase /></ProtectedRoute>} />
+            <Route path="/Completed" element={<ProtectedRoute><ReturnedJobs /></ProtectedRoute>} />
           </Routes>
         </div>
       </div>
