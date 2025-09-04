@@ -671,8 +671,23 @@ function MyJobs() {
     });
   };
 
+  // const JobDetails = (job) => {
+  //   navigate(`/production/OvervieJobsTracker`, { state: { job } });
+  // };
   const JobDetails = (job) => {
-    navigate(`/production/OvervieJobsTracker`, { state: { job } });
+    // Find the full job data with assignedTo information
+    const fullJobData = myjobs.assignments
+      .flatMap(assign => assign.jobs)
+      .find(j => j.jobId._id === job._id);
+
+    navigate(`/production/OvervieJobsTracker`, {
+      state: {
+        job: {
+          ...job,
+          assignedTo: fullJobData?.assignedTo // Add the assignedTo information
+        }
+      }
+    });
   };
 
   const getPriorityClass = (priority) => {
@@ -823,7 +838,7 @@ function MyJobs() {
                     {job.Status || "N/A"}
                   </span>
                 </td>
-                
+
                 <td style={{ display: "flex", gap: "5px" }}>
                   <Button
                     id="All_btn"
