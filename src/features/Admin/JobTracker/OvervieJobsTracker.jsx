@@ -874,6 +874,7 @@ import {
   FaBox,
 } from "react-icons/fa";
 import { useDispatch } from "react-redux";
+import { apiUrl } from "../../../redux/utils/config";
 const OvervieJobsTracker = ({ onClose }) => {
   const fileInputRef = useRef(null);
   const [showModal, setShowModal] = useState(false);
@@ -904,7 +905,7 @@ const OvervieJobsTracker = ({ onClose }) => {
       setError(null);
       try {
         const response = await fetch(
-          `https://sarnic-backend-production-690c.up.railway.app/api/jobs/worklog-project/${job.projectId[0]._id}`
+          `${apiUrl}/jobs/worklog-project/${job.projectId[0]._id}`
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -985,6 +986,26 @@ const OvervieJobsTracker = ({ onClose }) => {
     });
     return totalTime;
   };
+
+  // Helper function to get assigned person name
+  const getAssignedPersonName = (assignedTo) => {
+    if (!assignedTo) return "-";
+
+    // If it's a string, return it directly
+    if (typeof assignedTo === 'string') return assignedTo;
+
+    // If it's an object with firstName and lastName
+    if (assignedTo.firstName && assignedTo.lastName) {
+      return `${assignedTo.firstName} ${assignedTo.lastName}`;
+    }
+
+    // If it's an object with userId (but no firstName/lastName)
+    if (assignedTo.userId) return `User ID: ${assignedTo.userId}`;
+
+    // Fallback
+    return "-";
+  };
+
   // Responsive two-column grid for job details
   const jobDetails = [
     {
@@ -1048,7 +1069,8 @@ const OvervieJobsTracker = ({ onClose }) => {
     },
     {
       label: "Assign",
-      value: job?.assignedTo,
+      // value: job?.assignedTo,
+      value: getAssignedPersonName(job?.assignedTo),
       // value: job?.assignedTo ? `${job.assignedTo.firstName} ${job.assignedTo.lastName}` : 'Not assigned',
       icon: <FaUser className="me-2 text-primary" />,
     },
