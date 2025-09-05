@@ -470,8 +470,15 @@ function Job_History() {
     currentPage * itemsPerPage
   );
 
+  // const JobDetails = (job) => {
+  //   navigate(`/employee/OvervieJobsTracker`, { state: { job } });
+  // };
   const JobDetails = (job) => {
-    navigate(`/employee/OvervieJobsTracker`, { state: { job } });
+    const completeJobData = {
+      ...job,
+      assignedTo: job.assignedEmployee,
+    };
+    navigate(`/employee/OvervieJobsTracker`, { state: { job: completeJobData } });
   };
 
   const projectNames = [

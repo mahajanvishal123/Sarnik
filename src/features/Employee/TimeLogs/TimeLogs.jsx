@@ -554,8 +554,8 @@ function TimeLogs() {
 
       {/* Total Time Row (Summary) */}
       <div className="d-flex justify-content-end mb-2 fw-bold">
-        <span className="me-4">Total Time: {totalTimeSum}</span>
-        <span>Overtime: {overtimeSum}</span>
+        <span className="me-4">Work Time: {totalTimeSum}</span>
+        <span>Over Time: {overtimeSum}</span>
       </div>
 
       {/* Filters Section */}
@@ -625,8 +625,8 @@ function TimeLogs() {
                   <th>JobID</th>
                   <th>Project Name</th>
                   <th>Date</th>
-                  <th>Time</th>
-                  <th>Overtime</th>
+                  <th>Work Time</th>
+                  <th>Over Time</th>
                   <th>Total Time</th>
                 </tr>
               </thead>
@@ -656,7 +656,7 @@ function TimeLogs() {
 
                 {/* Summary Row at bottom */}
                 <tr className="fw-bold bg-light">
-                  <td colSpan="4" className="text-end">Grand Total:</td>
+                  <td colSpan="4" className="text-end">Total Time:</td>
                   <td>{totalTimeSum}</td>
                   <td>{overtimeSum}</td>
                   <td>-</td>

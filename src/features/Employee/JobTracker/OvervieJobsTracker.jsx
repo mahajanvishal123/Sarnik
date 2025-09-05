@@ -777,11 +777,11 @@ const OvervieJobsTracker = ({ onClose }) => {
         </Row>
 
         {/* Debug Info - Remove in production */}
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <small className="text-muted">
             Debug: Job data: {JSON.stringify(job?.assignedTo, null, 2)}
           </small>
-        </div>
+        </div> */}
 
         {/* ✅ Work Log Section from API */}
         <div className="mt-4 border-top pt-4">
@@ -817,8 +817,8 @@ const OvervieJobsTracker = ({ onClose }) => {
                           <th>Employee Name</th>
                           <th>Assign</th>
                           <th>Task Description</th>
-                          <th className="text-center">Time Spent</th>
-                          <th className="text-center">Overtime</th>
+                          <th className="text-center">Work Time</th>
+                          <th className="text-center">Over Time</th>
                           <th className="text-center">Total Time</th>
                           <th>Status</th>
                         </tr>
