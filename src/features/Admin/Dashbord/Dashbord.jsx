@@ -274,7 +274,7 @@ const recentActivities = projects
                 <div>
                   <h3 className="mb-0">{projectCompleted}</h3>
                   <p className="text-muted mb-0">Completed Projects</p>
-                  <small className="text-danger">To be Invoiced</small>
+                  <small className="text-danger">Complete projects</small>
                 </div>
               </Card.Body>
             </Card>
