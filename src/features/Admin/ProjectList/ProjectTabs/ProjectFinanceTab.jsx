@@ -7,20 +7,20 @@ import ProjectInvoiceBilling from './ProjectInvoiceBilling';
 function ProjectFinanceTab({ projectNO, budget, purchaseOrders }) {
   return (
     <div className="row g-4">
-   
+
       {/* Purchase Orders */}
       <div className="col-12">
-      <PurchaseOrder projectNO={projectNO}/>
+        <PurchaseOrder projectNO={projectNO} />
       </div>
 
       {/* Received POs Section */}
       <div className="col-12">
-        <ReceivablePurchaseOrders projectNO={projectNO}/>
+        <ReceivablePurchaseOrders projectNO={projectNO} />
       </div>
 
       {/* Financial Summary Charts */}
       <div className="col-12">
-       <ProjectInvoiceBilling projectNO={projectNO}/>
+        <ProjectInvoiceBilling projectNO={projectNO} />
       </div>
 
     </div>

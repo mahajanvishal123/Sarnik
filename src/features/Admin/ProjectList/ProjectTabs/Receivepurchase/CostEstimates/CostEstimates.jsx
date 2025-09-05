@@ -19,6 +19,10 @@ function CostEstimates({projectNO}) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   console.log("projectNO",projectNO)
+
+  const projectID = projectNO;
+  
+
   // State declarations
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPOStatus, setSelectedPOStatus] = useState("All PO Status");
@@ -381,29 +385,29 @@ function CostEstimates({projectNO}) {
           return "bg-info text-dark";
         case "not started":
           return "bg-secondary text-white";
-        case "pending":
-          return "bg-warning text-dark";     // Yellow
+        // case "pending":
+        //   return "bg-warning text-dark";     // Yellow
         case "received":
           return "bg-info text-dark";        // Light Blue
-        case "cancelled":
-          return "bg-danger text-white";     // Red
-        case "completed":
-          return "bg-success text-white";    // Green
-        case "open":
-          return "bg-primary text-white";    // Blue
+        // case "cancelled":
+        //   return "bg-danger text-white";     // Red
+        // case "completed":
+        //   return "bg-success text-white";    // Green
+        // case "open":
+        //   return "bg-primary text-white";    // Blue
         case "invoiced":
           return "bg-dark text-white";       // Dark (You can change it as needed)
-        case "in progress":
+        // case "in progress":
         case "in_progress":
           return "bg-warning text-dark";
-        case "active":
-          return "bg-primary text-white";
+        // case "active":
+        //   return "bg-primary text-white";
         case "reject":
           return "bg-danger text-white";
-        case "review":
-          return "bg-info text-dark";
-        case "not started":
-          return "bg-secondary text-white";
+        // case "review":
+        //   return "bg-info text-dark";
+        // case "not started":
+        //   return "bg-secondary text-white";
         default:
           return "bg-light text-dark";
       }
@@ -854,17 +858,21 @@ function CostEstimates({projectNO}) {
       navigate(`/admin/OvervieCostEstimates`, { state: { po } });
     };
 
+    // const Addcostestimate = () => {
+    //   navigate(`/admin/AddCostEstimates`, { state: {projectNO} });
+    // }
+
     return (
       <div
         className="p-4 m-2"
         style={{ backgroundColor: "white", borderRadius: "10px" }} >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <h2 className="fw-semibold mb-3">Cost Estimates</h2>
-          <Link to={"/admin/AddCostEstimates"}>
-            <button id="btn-All" className=" btn-dark" style={{ border: "none", borderRadius: "10px" }}>
+          {/* <Link to={"/admin/AddCostEstimates"}> */}
+            <button id="btn-All" onClick={()=> {navigate(`/admin/AddCostEstimates`, { state: {idProject : projectID} })}} className=" btn-dark" style={{ border: "none", borderRadius: "10px" }}>
               <BsPlusLg className="me-2" /> New Estimate
             </button>
-          </Link>
+          {/* </Link> */}
         </div>
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div className="filters d-flex flex-wrap gap-1 mb-4">

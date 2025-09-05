@@ -20,9 +20,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         ? employeeMenuItems
         : roleData === "client"
           ? clientMenuItems
-          :roleData === "production"
-          ? ProductionMenuItems :[];
-          
+          : roleData === "production"
+            ? ProductionMenuItems : [];
+
 
 
   useEffect(() => {
@@ -101,12 +101,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <li
             key={index}
             className={`menu-item ${item.submenu
-                ? openMenuIndex === index
-                  ? "open"
-                  : ""
-                : activeMenuIndex === index
-                  ? "active"
-                  : ""
+              ? openMenuIndex === index
+                ? "open"
+                : ""
+              : activeMenuIndex === index
+                ? "active"
+                : ""
               }`}
             onClick={() => {
               if (item.submenu) {

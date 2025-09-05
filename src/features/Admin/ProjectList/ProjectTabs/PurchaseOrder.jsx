@@ -28,7 +28,7 @@
 
 // const { job } = useSelector((state) => state.jobs);
 //   console.log("hhhhhhhhh", job.costEstimates);
-  
+
 //   useEffect(() => {
 //     dispatch(JobsFinace(id))
 //   }, [dispatch]);
@@ -240,7 +240,7 @@
 
 //             </div>
 //           </Form.Group>
-        
+
 
 //           <Form.Group className="mb-3">
 //             <div className="row justify-content-center align-items-start">
@@ -493,8 +493,8 @@
 
 //       const client = estimate.clientId || {};
 //       const project = estimate.projectId || {};
-      
-      
+
+
 //       const lineItems = estimate.lineItems || [];
 
 //       const doc = new jsPDF('p', 'pt', 'a4');
@@ -506,7 +506,7 @@
 //       doc.setTextColor(255, 255, 255);
 //       doc.setFontSize(14);
 //       // Insert logo image instead of text
-      
+
 //       const logoUrl = estimate.image[0];
 //       const logoBase64 = await getImageBase64(logoUrl);
 //       doc.addImage(logoBase64, 'PNG', 45, 45, 60, 40);
@@ -542,7 +542,7 @@
 //       currentY += 14;
 //       doc.text(`Email: ${client?.contactPersons[0].email || "email"}`, 40, currentY);
 //       console.log("kkk",client?.contactPersons[0].email);
-      
+
 //       currentY += 14;
 //       doc.text(`Phone: ${client?.contactPersons[0].phone || "Phone"}`, 40, currentY);
 //       currentY += 25;
@@ -901,9 +901,9 @@
 import React from 'react'
 import CostEstimates from './ReceivePurchase/CostEstimates/CostEstimates'
 
-function PurchaseOrder({projectNO}) {
+function PurchaseOrder({ projectNO }) {
   return (
-    <CostEstimates projectNO={projectNO}/>
+    <CostEstimates projectNO={projectNO} />
   )
 }
 
