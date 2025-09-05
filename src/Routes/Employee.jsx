@@ -46,16 +46,16 @@ function Employee() {
             <Route path="/myJobs" element={<ProtectedRoute><MyJobs /></ProtectedRoute>} />
             <Route path="/TimeTracking" element={<ProtectedRoute><TimeLogs /></ProtectedRoute>} />
             <Route path="/AddTimeLog" element={<ProtectedRoute><AddTimeLog /></ProtectedRoute>} />
-            <Route path="/farhan" element={<ProtectedRoute><Pluginss/></ProtectedRoute>} />
+            <Route path="/farhan" element={<ProtectedRoute><Pluginss /></ProtectedRoute>} />
             <Route path="/Notification" element={<ProtectedRoute><Notification /></ProtectedRoute>} />
             <Route path="/Profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/Settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-            <Route path="/changePassword" element={<ProtectedRoute><ChangePassword/></ProtectedRoute>} />
-            <Route path="/UpdateProfile" element={<ProtectedRoute><UpdateProfile/></ProtectedRoute>} />
-            <Route path="/OvervieJobsTracker" element={<ProtectedRoute><OvervieJobsTracker/></ProtectedRoute>} />
-            <Route path="/employeeJobsTracker" element={<ProtectedRoute><EmployeeJobTracker/></ProtectedRoute>} />
- 
-            <Route path="/TimesheetWorklog" element={<ProtectedRoute><TimesheetWorklog/></ProtectedRoute>} />
+            <Route path="/changePassword" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
+            <Route path="/UpdateProfile" element={<ProtectedRoute><UpdateProfile /></ProtectedRoute>} />
+            <Route path="/OvervieJobsTracker" element={<ProtectedRoute><OvervieJobsTracker /></ProtectedRoute>} />
+            <Route path="/employeeJobsTracker" element={<ProtectedRoute><EmployeeJobTracker /></ProtectedRoute>} />
+
+            <Route path="/TimesheetWorklog" element={<ProtectedRoute><TimesheetWorklog /></ProtectedRoute>} />
           </Routes>
         </div>
       </div>

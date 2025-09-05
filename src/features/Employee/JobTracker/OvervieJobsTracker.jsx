@@ -777,11 +777,11 @@ const OvervieJobsTracker = ({ onClose }) => {
         </Row>
 
         {/* Debug Info - Remove in production */}
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <small className="text-muted">
             Debug: Job data: {JSON.stringify(job?.assignedTo, null, 2)}
           </small>
-        </div>
+        </div> */}
 
         {/* ✅ Work Log Section from API */}
         <div className="mt-4 border-top pt-4">

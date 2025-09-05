@@ -127,7 +127,7 @@ export const employeeMenuItems = [
     icon: <FaTasks className="menu-icon" />,
     path: "/employee/myJobs",
   },
-    {
+  {
     title: "Projects & Jobs",
     icon: <FaProjectDiagram className="menu-icon" />,
     submenu: [
@@ -150,7 +150,7 @@ export const employeeMenuItems = [
   //   icon: <FaCheckCircle className="menu-icon" />,
   //   path: "/submittask",
   // },
-  
+
   {
     title: "Job History",
     icon: <FaHistory className="menu-icon" />,
@@ -185,22 +185,22 @@ export const clientMenuItems = [
   {
     title: "Select Project",
     icon: <FaProjectDiagram className="menu-icon" />,
-    path: "/employee/projectList",
+    path: "/client/projectList",
   },
   {
     title: "Select Job",
     icon: <FaUsersLine className="menu-icon" />,
-    path: "/admin/ProjectOverview",
+    path: "/client/ProjectOverview",
   },
   {
     title: "Notifications",
     icon: <FaBell className="menu-icon" />,
-    path: "/employee/Notification",
+    path: "/client/Notification",
   },
   {
     title: "Settings",
     icon: <FaCog className="menu-icon" />,
-    path: "/admin/Settings",
+    path: "/client/Settings",
   },
 ];
 
@@ -218,7 +218,7 @@ export const ProductionMenuItems = [
     icon: <FaTasks className="menu-icon" />,
     path: "/production/myJobs",
   },
-    {
+  {
     title: "Projects & Jobs",
     icon: <FaProjectDiagram className="menu-icon" />,
     submenu: [
@@ -229,18 +229,18 @@ export const ProductionMenuItems = [
   {
     title: "My Production",
     icon: <FaClock className="menu-icon" />,
-     submenu: [
+    submenu: [
       { title: "Assign", path: "/production/newJobsList" },
       { title: "In Progress", path: "/production/inProgress" },
       { title: "Completed", path: "/production/completedJobs" },
     ],
-    
+
   },
 
   {
-title:"Time Tracking",
-icon:<FaClock className="menu-icon" />,
-path:"/production/TimeTracking",
+    title: "Time Tracking",
+    icon: <FaClock className="menu-icon" />,
+    path: "/production/TimeTracking",
   },
 
 
