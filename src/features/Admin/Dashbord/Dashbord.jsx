@@ -33,33 +33,32 @@ function Dashbord() {
   // ];
   const navigate = useNavigate();
 
-// destructure properly
-const { project = [], status, error } = useSelector((state) => state.projects);
+  // destructure properly
+  const { project = [], status, error } = useSelector((state) => state.projects);
 
-// always ensure it's an array
-const projects = Array.isArray(project?.data) ? project.data : Array.isArray(project) ? project : [];
+  // always ensure it's an array
+  const projects = Array.isArray(project?.data) ? project.data : Array.isArray(project) ? project : [];
 
 
-useEffect(() => {
-  dispatch(fetchProject());
-}, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchProject());
+  }, [dispatch]);
 
-// ✅ Convert projects → activities
-const recentActivities = projects
-  .map((proj) => ({
-    type:
-      proj.status === "Completed"
-        ? "completed"
-        : proj.status === "Active Project"
-        ? "new"
-        : "po",
-    title: proj.projectName,
-    description: `Client: ${proj.clientId?.clientName || "Unknown"} | Budget: ${
-      proj.budgetAmount
-    } ${proj.currency}`,
-    time: new Date(proj.createdAt).toLocaleDateString(),
-  }))
-  .slice(0, 5);
+  // ✅ Convert projects → activities
+  const recentActivities = projects
+    .map((proj) => ({
+      type:
+        proj.status === "Completed"
+          ? "completed"
+          : proj.status === "Active Project"
+            ? "new"
+            : "po",
+      title: proj.projectName,
+      description: `Client: ${proj.clientId?.clientName || "Unknown"} | Budget: ${proj.budgetAmount
+        } ${proj.currency}`,
+      time: new Date(proj.createdAt).toLocaleDateString(),
+    }))
+    .slice(0, 5);
 
 
   // Fetch jobs on component mount
@@ -186,7 +185,7 @@ const recentActivities = projects
                 <div>
                   <h3 className="mb-0">{inProgressProjectsCount}</h3>
                   <p className="text-muted mb-0">Projects in Progress</p>
-                  <small className="text-success">Active Projects</small>
+                  {/* <small className="text-success">Active Projects</small> */}
                 </div>
               </Card.Body>
             </Card>
@@ -203,7 +202,7 @@ const recentActivities = projects
                 <div>
                   <h3 className="mb-0">{inProgressCount}</h3>
                   <p className="text-muted mb-0">Jobs in Progress</p>
-                  <small className="text-info">Active Jobs</small>
+                  {/* <small className="text-info">Active Jobs</small> */}
                 </div>
               </Card.Body>
             </Card>
@@ -221,7 +220,7 @@ const recentActivities = projects
                 <div>
                   <h3 className="mb-0">{todaysJobsCount}</h3>
                   <p className="text-muted mb-0">Jobs Due Today</p>
-                  <small className="text-warning">Requires attention</small>
+                  {/* <small className="text-warning">Requires attention</small> */}
                 </div>
               </Card.Body>
             </Card>
@@ -239,7 +238,7 @@ const recentActivities = projects
                 <div>
                   <h3 className="mb-0">{CostPOStatusfiltered}</h3>
                   <p className="text-muted mb-0">Cost Estimates</p>
-                  <small className="text-danger">Waiting to receive POs</small>
+                  {/* <small className="text-danger">Waiting to receive POs</small> */}
                 </div>
               </Card.Body>
             </Card>
@@ -256,7 +255,7 @@ const recentActivities = projects
                 <div>
                   <h3 className="mb-0">{ReceivablePurchasesCount}</h3>
                   <p className="text-muted mb-0">Reciveable Purchase Order</p>
-                  <small className="text-danger">Waiting to Invoicing</small>
+                  {/* <small className="text-danger">Waiting to Invoicing</small> */}
                 </div>
               </Card.Body>
             </Card>
@@ -274,7 +273,7 @@ const recentActivities = projects
                 <div>
                   <h3 className="mb-0">{projectCompleted}</h3>
                   <p className="text-muted mb-0">Completed Projects</p>
-                  <small className="text-danger">Complete projects</small>
+                  {/* <small className="text-danger">Complete projects</small> */}
                 </div>
               </Card.Body>
             </Card>
@@ -350,10 +349,10 @@ const recentActivities = projects
                 >
                   <div
                     className={`rounded-circle p-2 me-3 ${activity.type === "new"
-                        ? "bg-primary"
-                        : activity.type === "completed"
-                          ? "bg-success"
-                          : "bg-warning"
+                      ? "bg-primary"
+                      : activity.type === "completed"
+                        ? "bg-success"
+                        : "bg-warning"
                       }`}
                   >
                     {activity.type === "new" && (
