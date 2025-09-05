@@ -473,7 +473,11 @@ function Job_History() {
   );
 
   const JobDetails = (job) => {
-    navigate(`/production/OvervieJobsTracker`, { state: { job } });
+    const completeJobData = {
+      ...job,
+      assignedTo: job.assignedEmployee,
+    };
+    navigate(`/production/OvervieJobsTracker`, { state: { job: completeJobData } });
   };
 
   const projectNames = [
