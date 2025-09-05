@@ -1625,8 +1625,8 @@ const OvervieJobsTracker = ({ onClose }) => {
                           <th>Employee Name</th>
                           <th>Assign</th>
                           <th>Task Description</th>
-                          <th className="text-center">Time Spent</th>
-                          <th className="text-center">Overtime</th>
+                          <th className="text-center">Work Time </th>
+                          <th className="text-center">Over Time</th>
                           <th className="text-center">Total Time</th>
                           <th>Status</th>
                         </tr>

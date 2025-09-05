@@ -37,7 +37,7 @@ function Profile() {
             }}
           >
             <div className="card-body text-center p-4 d-flex flex-column align-items-center justify-content-between h-100">
-              <Link to={"/employee/UpdateProfile"}>
+              <Link to={"/production/UpdateProfile"}>
                 <div className="position-relative d-inline-block mb-3">
                   <img
                     src={

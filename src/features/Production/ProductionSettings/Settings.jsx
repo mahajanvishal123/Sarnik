@@ -171,7 +171,7 @@ const SettingsPage = () => {
               </Col>
             </Row>
 
-            <Row className="mb-4">
+            {/* <Row className="mb-4">
               <Col md={6}>
                 <h5>Email Frequency</h5>
                 <Form.Group className="mb-3">
@@ -192,7 +192,7 @@ const SettingsPage = () => {
                   </Form.Select>
                 </Form.Group>
               </Col>
-            </Row>
+            </Row> */}
 
             <Row className="mb-4">
               <Col md={6}>
