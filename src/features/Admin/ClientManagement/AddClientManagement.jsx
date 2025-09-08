@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from 'axios';
 import { apiUrl } from '../../../redux/utils/config';
 import CreatableSelect from "react-select/creatable";
+import { countries } from './countrydata';
 
 // Add this function to format date for input fields
 const formatDate = (dateStr) => {
@@ -170,9 +171,9 @@ function AddClientManagement() {
   const handleContactChange = (index, e) => {
     const { name, value } = e.target;
     let newValue = value;
-    if (name === 'phone') {
-      newValue = newValue.replace(/[^\d]/g, '').slice(0, 10);
-    }
+    // if (name === 'phone') {
+    //   newValue = newValue.replace(/[^\d]/g, '').slice(0, 10);
+    // }
     const updatedContacts = [...contactPersons];
     updatedContacts[index] = {
       ...updatedContacts[index],
@@ -256,84 +257,6 @@ function AddClientManagement() {
     }));
   };
 
-  // Validation function
-  const validate = () => {
-    const newErrors = {};
-
-    // Basic form fields
-    if (!formData.clientName.trim()) newErrors.clientName = 'Name is required';
-    if (!formData.industry) newErrors.industry = 'industry is required';
-    if (!formData.website.trim()) newErrors.website = 'Website is required';
-    else if (!/^https?:\/\//.test(formData.website)) newErrors.website = 'Website must start with http:// or https://';
-    if (!formData.clientAddress.trim()) newErrors.clientAddress = 'Client Address is required';
-    if (!formData.TaxID_VATNumber.trim()) newErrors.TaxID_VATNumber = 'Tax ID/VAT Number is required';
-    if (!formData.CSRCode.trim()) newErrors.CSRCode = 'CSR Code is required';
-    if (!formData.Status) newErrors.Status = 'Status is required';
-
-    // Contact Persons
-    contactPersons.forEach((contact, idx) => {
-      if (!contact.contactName.trim()) newErrors[`contactName_${idx}`] = 'Contact Name is required';
-      if (!contact.jobTitle.trim()) newErrors[`jobTitle_${idx}`] = 'Job Title is required';
-      if (!contact.email.trim()) newErrors[`email_${idx}`] = 'Email is required';
-      else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(contact.email)) newErrors[`email_${idx}`] = 'Invalid email';
-      if (!contact.phone.trim()) newErrors[`phone_${idx}`] = 'Phone is required';
-      else if (!/^\d{10}$/.test(contact.phone)) newErrors[`phone_${idx}`] = 'Phone must be 10 digits';
-      if (!contact.department.trim()) newErrors[`department_${idx}`] = 'Department is required';
-      if (!contact.salesRepresentative.trim()) newErrors[`salesRepresentative_${idx}`] = 'Sales Representative is required';
-    });
-
-    // Billing Information (first item)
-    const billing = billingInformation[0] || {};
-    if (!billing.billingAddress.trim()) newErrors.billingAddress = 'Billing Address is required';
-    if (!billing.billingContactName.trim()) newErrors.billingContactName = 'Billing Contact Name is required';
-    if (!billing.billingEmail.trim()) newErrors.billingEmail = 'Billing Email is required';
-    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(billing.billingEmail)) newErrors.billingEmail = 'Invalid email';
-    if (!billing.billingPhone.trim()) newErrors.billingPhone = 'Billing Phone is required';
-    else if (!/^\d{10}$/.test(billing.billingPhone)) newErrors.billingPhone = 'Phone must be 10 digits';
-    if (!billing.currency) newErrors.currency = 'Currency is required';
-    if (!billing.preferredPaymentMethod) newErrors.preferredPaymentMethod = 'Preferred Payment Method is required';
-
-    // Shipping Information (first item)
-    const shipping = shippingInformation[0] || {};
-    if (!shipping.shippingAddress.trim()) newErrors.shippingAddress = 'Shipping Address is required';
-    if (!shipping.shippingContactName.trim()) newErrors.shippingContactName = 'Shipping Contact Name is required';
-    if (!shipping.shippingEmail.trim()) newErrors.shippingEmail = 'Shipping Email is required';
-    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(shipping.shippingEmail)) newErrors.shippingEmail = 'Invalid email';
-    if (!shipping.shippingPhone.trim()) newErrors.shippingPhone = 'Shipping Phone is required';
-    else if (!/^\d{10}$/.test(shipping.shippingPhone)) newErrors.shippingPhone = 'Phone must be 10 digits';
-    if (!shipping.preferredShippingMethod) newErrors.preferredShippingMethod = 'Preferred Shipping Method is required';
-    if (!shipping.specialInstructions.trim()) newErrors.specialInstructions = 'Special Instructions are required';
-
-    // Financial Information (first item)
-    const financial = financialInformation[0] || {};
-    if (!financial.annualRevenue) newErrors.annualRevenue = 'Annual Revenue is required';
-    else if (isNaN(financial.annualRevenue) || Number(financial.annualRevenue) < 0) newErrors.annualRevenue = 'Annual Revenue must be a positive number';
-    if (!financial.creditRating) newErrors.creditRating = 'Credit Rating is required';
-    else if (isNaN(financial.creditRating) || Number(financial.creditRating) < 1 || Number(financial.creditRating) > 5) newErrors.creditRating = 'Credit Rating must be between 1 and 5';
-    if (!financial.bankName.trim()) newErrors.bankName = 'Bank Name is required';
-    if (!financial.accountNumber.trim()) newErrors.accountNumber = 'Account Number is required';
-    if (!financial.fiscalYearEnd) newErrors.fiscalYearEnd = 'Fiscal Year End is required';
-    if (!financial.financialContact.trim()) newErrors.financialContact = 'Financial Contact is required';
-
-    // Ledger Information (first item)
-    const ledger = ledgerInformation[0] || {};
-    if (!ledger.accountCode.trim()) newErrors.accountCode = 'Account Code is required';
-    if (!ledger.accountType) newErrors.accountType = 'Account Type is required';
-    if (!ledger.openingBalance) newErrors.openingBalance = 'Opening Balance is required';
-    else if (isNaN(ledger.openingBalance)) newErrors.openingBalance = 'Opening Balance must be a number';
-    if (!ledger.balanceDate) newErrors.balanceDate = 'Balance Date is required';
-    if (!ledger.taxCategory) newErrors.taxCategory = 'Tax Category is required';
-    if (!ledger.costCenter.trim()) newErrors.costCenter = 'Cost Center is required';
-
-    // Additional Information
-    if (!additionalInformation.paymentTerms) newErrors.paymentTerms = 'Payment Terms is required';
-    if (!additionalInformation.creditLimit) newErrors.creditLimit = 'Credit Limit is required';
-    else if (isNaN(additionalInformation.creditLimit) || Number(additionalInformation.creditLimit) < 0) newErrors.creditLimit = 'Credit Limit must be a positive number';
-    if (!additionalInformation.notes.trim()) newErrors.notes = 'Notes is required';
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -439,17 +362,17 @@ function AddClientManagement() {
   }, []);
 
   // Generic handler for creating new options
-const [userData, setUserData] = useState({
-  countryCode: "+44",
-  phoneNumber: "",
-});
+  const [userData, setUserData] = useState({
+    countryCode: "+44",
+    phoneNumber: "",
+  });
 
-const validatePhone = () => {
-  const fullNumber = userData.countryCode + userData.phoneNumber;
-  if (!/^\+\d{10,15}$/.test(fullNumber)) {
-    errors.phoneNumber = "Enter a valid phone number with selected country code.";
-  }
-};
+  const validatePhone = () => {
+    const fullNumber = userData.countryCode + userData.phoneNumber;
+    if (!/^\+\d{10,15}$/.test(fullNumber)) {
+      errors.phoneNumber = "Enter a valid phone number with selected country code.";
+    }
+  };
 
   const handleCreateOption = (field) => (inputValue) => {
     axios.post(`${apiUrl}/client/selectclient`, {
@@ -468,6 +391,54 @@ const validatePhone = () => {
   if (!/^\+447\d{9}$/.test(formData.CSRCode)) {
     errors.CSRCode = "Enter valid UK mobile number (e.g. 7912345678)";
   }
+
+  // Country wise phone validation regex (basic formats)
+  const phoneRegexByCountry = {
+    "+44": /^7\d{9}$/,          // UK (07xxxxxxxxx → 10 digit, local mobile)
+    "+91": /^\d{10}$/,          // India
+    "+1": /^\d{10}$/,           // USA/Canada
+    "+61": /^\d{9}$/,           // Australia
+    "+81": /^\d{10}$/,          // Japan
+    "+49": /^\d{10,11}$/,       // Germany
+    "+33": /^\d{9}$/,           // France
+    "+39": /^\d{9,10}$/,        // Italy
+    "+971": /^\d{9}$/,          // UAE
+    "+92": /^\d{10}$/,          // Pakistan
+    "+880": /^\d{10}$/,         // Bangladesh
+    "+94": /^\d{9}$/,           // Sri Lanka
+    "+60": /^\d{9,10}$/,        // Malaysia
+    "+65": /^\d{8}$/,           // Singapore
+    "+34": /^\d{9}$/,           // Spain
+    "+7": /^\d{10}$/,           // Russia
+    "+86": /^\d{11}$/,          // China
+    "+82": /^\d{9,10}$/,        // South Korea
+    "+55": /^\d{10,11}$/,       // Brazil
+    "+20": /^\d{10}$/,          // Egypt
+  };
+
+  const phoneLengthByCountry = {
+    "+44": 10,   // UK
+    "+91": 10,   // India
+    "+1": 10,    // USA/Canada
+    "+61": 9,    // Australia
+    "+81": 10,   // Japan
+    "+49": 11,   // Germany
+    "+33": 9,    // France
+    "+39": 10,   // Italy
+    "+971": 9,   // UAE
+    "+92": 10,   // Pakistan
+    "+880": 10,  // Bangladesh
+    "+94": 9,    // Sri Lanka
+    "+60": 10,   // Malaysia
+    "+65": 8,    // Singapore
+    "+34": 9,    // Spain
+    "+7": 10,    // Russia
+    "+86": 11,   // China
+    "+82": 10,   // South Korea
+    "+55": 11,   // Brazil
+    "+20": 10,   // Egypt
+  };
+
 
   return (
     <>
@@ -513,7 +484,7 @@ const validatePhone = () => {
 
               <div className="col-md-6">
                 <label className="form-label">Website</label>
-                <input required type="url" name="website" value={formData.website} onChange={handleChange} className="form-control" placeholder="https://" />
+                <input value={formData.website} name='website' onChange={handleChange} className="form-control" />
                 {errors.website && <div className="text-danger small">{errors.website}</div>}
               </div>
               <div className="col-md-6">
@@ -537,59 +508,132 @@ const validatePhone = () => {
 
                 {errors.TaxID_VATNumber && <div className="text-danger small">{errors.TaxID_VATNumber}</div>}
               </div>
-             <div className="col-md-6">
-  <label className="form-label">Phone Number</label>
-  <div className="input-group">
-  <select
-  className="form-select"
-  style={{ maxWidth: "120px" }}
-  value={userData.countryCode}
-  onChange={(e) => setUserData({ ...userData, countryCode: e.target.value })}
->
-  <option value="+44">🇬🇧 +44</option>
-  <option value="+91">🇮🇳 +91</option>
-  <option value="+1">🇺🇸 +1</option>
-  <option value="+61">🇦🇺 +61</option>     {/* Australia */}
-  <option value="+81">🇯🇵 +81</option>     {/* Japan */}
-  <option value="+49">🇩🇪 +49</option>     {/* Germany */}
-  <option value="+33">🇫🇷 +33</option>     {/* France */}
-  <option value="+39">🇮🇹 +39</option>     {/* Italy */}
-  <option value="+971">🇦🇪 +971</option>   {/* UAE */}
-  <option value="+92">🇵🇰 +92</option>     {/* Pakistan */}
-  <option value="+880">🇧🇩 +880</option>   {/* Bangladesh */}
-  <option value="+94">🇱🇰 +94</option>     {/* Sri Lanka */}
-  <option value="+60">🇲🇾 +60</option>     {/* Malaysia */}
-  <option value="+65">🇸🇬 +65</option>     {/* Singapore */}
-  <option value="+34">🇪🇸 +34</option>     {/* Spain */}
-  <option value="+7">🇷🇺 +7</option>       {/* Russia */}
-  <option value="+86">🇨🇳 +86</option>     {/* China */}
-  <option value="+82">🇰🇷 +82</option>     {/* South Korea */}
-  <option value="+55">🇧🇷 +55</option>     {/* Brazil */}
-  <option value="+20">🇪🇬 +20</option>     {/* Egypt */}
-</select>
+              {/* <div className="col-md-6">
+                <label className="form-label">Phone Number</label>
+                <div className="input-group">
+                  <select
+                    className="form-select"
+                    value={userData.countryCode}
+                    onChange={(e) => {
+                      const newCode = e.target.value;
+                      const maxLength = phoneLengthByCountry[newCode] || 10;
+
+                      let newPhone = userData.phoneNumber;
+                      if (newPhone.length > maxLength) {
+                        newPhone = newPhone.slice(0, maxLength);
+                      }
+
+                      setUserData({
+                        ...userData,
+                        countryCode: newCode,
+                        phoneNumber: newPhone,
+                      });
+                    }}
+                  >
+                    <option value="+44">🇬🇧 +44 (UK)</option>
+                    <option value="+91">🇮🇳 +91 (India)</option>
+                    <option value="+1">🇺🇸 +1 (USA/Canada)</option>
+                    <option value="+61">🇦🇺 +61 (Australia)</option>
+                    <option value="+81">🇯🇵 +81 (Japan)</option>
+                    <option value="+49">🇩🇪 +49 (Germany)</option>
+                    <option value="+33">🇫🇷 +33 (France)</option>
+                    <option value="+39">🇮🇹 +39 (Italy)</option>
+                    <option value="+971">🇦🇪 +971 (UAE)</option>
+                    <option value="+92">🇵🇰 +92 (Pakistan)</option>
+                    <option value="+880">🇧🇩 +880 (Bangladesh)</option>
+                    <option value="+94">🇱🇰 +94 (Sri Lanka)</option>
+                    <option value="+60">🇲🇾 +60 (Malaysia)</option>
+                    <option value="+65">🇸🇬 +65 (Singapore)</option>
+                    <option value="+34">🇪🇸 +34 (Spain)</option>
+                    <option value="+7">🇷🇺 +7 (Russia)</option>
+                    <option value="+86">🇨🇳 +86 (China)</option>
+                    <option value="+82">🇰🇷 +82 (South Korea)</option>
+                    <option value="+55">🇧🇷 +55 (Brazil)</option>
+                    <option value="+20">🇪🇬 +20 (Egypt)</option>
+                  </select>
+
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    value={userData.phoneNumber}
+                    onChange={(e) => {
+                      let input = e.target.value.replace(/\D/g, ""); // sirf digits allow
+
+                      const maxLength = phoneLengthByCountry[userData.countryCode] || 10;
+
+                      if (input.length > maxLength) {
+                        input = input.slice(0, maxLength); // jyada digit cut kar do
+                      }
+
+                      setUserData({ ...userData, phoneNumber: input });
+                    }}
+                    className="form-control"
+                    inputMode="numeric"
+                    placeholder="Phone number"
+                  />
+
+                </div>
+
+                {errors.phoneNumber && (
+                  <div className="text-danger small">{errors.phoneNumber}</div>
+                )}
+              </div> */}
 
 
-    <input
-      type="tel"
-      name="phoneNumber"
-      value={userData.phoneNumber}
-      onChange={(e) => {
-        let input = e.target.value.replace(/\D/g, "");
-        if (input.length > 10) input = input.slice(0, 10);
-        setUserData({ ...userData, phoneNumber: input });
-      }}
-      className="form-control"
-      inputMode="numeric"
-      maxLength={10}
-      placeholder="Phone number"
-    />
-  </div>
+              <div className="col-md-6">
+                <label className="form-label">Phone Number</label>
+                <div className="input-group">
+                  <select
+                    className="form-select"
+                    value={userData.countryCode}
+                    onChange={(e) => {
+                      const newCode = e.target.value;
+                      const selected = countries.find(c => c.code === newCode);
 
-  {errors.phoneNumber && (
-    <div className="text-danger small">{errors.phoneNumber}</div>
-  )}
-</div>
+                      let newPhone = userData.phoneNumber;
+                      if (newPhone.length > (selected?.length || 10)) {
+                        newPhone = newPhone.slice(0, selected.length);
+                      }
 
+                      setUserData({
+                        ...userData,
+                        countryCode: newCode,
+                        phoneNumber: newPhone,
+                      });
+                    }}
+                  >
+                    {countries.map((c, i) => (
+                      <option key={i} value={c.code}>
+                        {c.name} ({c.code})
+                      </option>
+                    ))}
+                  </select>
+
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    value={userData.phoneNumber}
+                    onChange={(e) => {
+                      let input = e.target.value.replace(/\D/g, ""); // sirf digits
+                      const selected = countries.find(c => c.code === userData.countryCode);
+                      const maxLength = selected?.length || 10;
+
+                      if (input.length > maxLength) {
+                        input = input.slice(0, maxLength); // jyada digit cut kar do
+                      }
+
+                      setUserData({ ...userData, phoneNumber: input });
+                    }}
+                    className="form-control"
+                    inputMode="numeric"
+                    placeholder="Phone number"
+                  />
+                </div>
+
+                {errors.phoneNumber && (
+                  <div className="text-danger small">{errors.phoneNumber}</div>
+                )}
+              </div>
 
               <div className="col-md-6">
                 <label className="form-label">Status</label>
@@ -658,7 +702,7 @@ const validatePhone = () => {
                       <div className="col-md-6">
                         <label className="form-label">Phone</label>
                         <input
-                          type="tel"
+                          type="number"
                           name="phone"
                           required
                           value={contact.phone}
@@ -993,7 +1037,7 @@ const validatePhone = () => {
               {/* Your form fields go here */}
 
               <div className="col-12 d-flex justify-content-end gap-2 mt-4">
-                <button type="button" className="btn btn-outline-secondary">Cancel</button>
+                <button type="button" className="btn btn-outline-secondary" onClick={() => navigate(-1)} >Cancel</button>
 
                 {!(id || client?._id) ? (
                   <>
