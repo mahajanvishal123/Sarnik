@@ -2032,7 +2032,7 @@ function AddCostEstimates() {
               </div>
 
               {/* 🔹 Logo */}
-              <div className="col-md-4 mb-3 ">
+              {/* <div className="col-md-4 mb-3 ">
                 <label className="form-label">Upload PDF Logo</label>
                 <div className="input-group">
                   <input
@@ -2100,7 +2100,7 @@ function AddCostEstimates() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* 🔹 Line Items */}

@@ -10,13 +10,14 @@ import { Form, Table, Badge, InputGroup, Button, Collapse, Dropdown } from "reac
 function TimesheetWorklog() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProject, setSelectedProject] = useState('All timesheet');
-  const [selectedDate, setSelectedDate] = useState('');
+  // Changed from single date to date range
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const { timesheetWorklog, error, loading } = useSelector((state) => state.TimesheetWorklogs);
   console.log(timesheetWorklog.TimesheetWorklogss);
 
@@ -55,8 +56,19 @@ function TimesheetWorklog() {
       );
       const matchesProject = selectedProject === 'All timesheet' ||
         log.projectId?.[0]?.projectName === selectedProject;
-      const matchesDate = !selectedDate ||
-        new Date(log.date).toLocaleDateString() === new Date(selectedDate).toLocaleDateString();
+      
+      // Updated date filtering logic for date range
+      const logDate = new Date(log.date);
+      let matchesDate = true;
+      
+      if (startDate && endDate) {
+        matchesDate = logDate >= new Date(startDate) && logDate <= new Date(endDate);
+      } else if (startDate) {
+        matchesDate = logDate >= new Date(startDate);
+      } else if (endDate) {
+        matchesDate = logDate <= new Date(endDate);
+      }
+      
       return matchesSearch && matchesProject && matchesDate;
     });
 
@@ -140,16 +152,9 @@ function TimesheetWorklog() {
     const minute = parseInt(minuteStr || '0', 10);
     return hour + minute / 60;
   }
+
   return (
     <div className="p-4 m-2" style={{ backgroundColor: "white", borderRadius: "10px" }}>
-      {/* <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-2">
-        <h4 className="mb-0">Timesheet & Worklog</h4>
-        <Link id="All_btn" to="/admin/AddTimesheetWorklog" className="btn btn-dark">
-          + New Time Entry
-        </Link>
-      </div> */}
-
-
       {/* Responsive Filters */}
       <div
         className={`row g-3 mb-4 
@@ -170,17 +175,33 @@ function TimesheetWorklog() {
             />
           </div>
         </div>
+        {/* Updated date range filter */}
         <div className="col-md-4">
-          <div className="input-group">
-            <span className="input-group-text bg-white border-end-0">
-              <FaCalendarAlt className="text-muted" />
-            </span>
-            <input
-              type="date"
-              className="form-control border-start-0"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-            />
+          <div className="d-flex gap-2">
+            <div className="input-group flex-grow-1">
+              <span className="input-group-text bg-white border-end-0">
+                <FaCalendarAlt className="text-muted" />
+              </span>
+              <input
+                type="date"
+                className="form-control border-start-0"
+                placeholder="Start Date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div className="input-group flex-grow-1">
+              <span className="input-group-text bg-white border-end-0">
+                <FaCalendarAlt className="text-muted" />
+              </span>
+              <input
+                type="date"
+                className="form-control border-start-0"
+                placeholder="End Date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
           </div>
         </div>
         <div className="col-md-4">
@@ -210,100 +231,45 @@ function TimesheetWorklog() {
           <table className="table table-hover align-middle mb-0">
             <thead>
               <tr className="bg-light">
-               <th>JobID</th>
-                  <th style={{ whiteSpace: 'nowrap' }}>Project Name</th>
-
-                  <th>Date</th>
-                  <th style={{ whiteSpace: 'nowrap' }}>Time</th>
-                  <th style={{ whiteSpace: 'nowrap' }}>overtime</th>
-                  <th>totalTime</th>
+                <th>JobID</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Project Name</th>
+                <th>Date</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Time</th>
+                <th style={{ whiteSpace: 'nowrap' }}>overtime</th>
+                <th>totalTime</th>
               </tr>
             </thead>
             <tbody>
-                {paginatedTimeLogssFiltered?.map((log, index) => {
-                  const extraHoursDecimal = timeStringToDecimalHours(log.extraHours);
-                  const hoursDecimal = timeStringToDecimalHours(log.hours);
-
-                  const isHoursDiscrepant = hoursDecimal > 8;
-                  const isExtraHoursDiscrepant = extraHoursDecimal < 8;
-                  return (
-                    <tr key={index}>
-               
-                      <td className="no-border-bottom">
-                        {log.jobId?.[0]?.JobNo || '----'}
-                      </td>
-                      <td style={{ whiteSpace: 'nowrap' }} key={index}>
-                        {log.projectId?.[0]?.projectName || 'No Project Name'}
-                      </td>
-                      <td>{new Date(log.date).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
-                      <td>
-                        {log.time}
-                      </td>
-                      <td>
-                        {log.overtime}
-                      </td>
-                      {/* <td>
-                        {(!log.extraHours || log.extraHours === '0' || log.extraHours === '0:00') ? '-' : formatTimeTo12Hour(log.extraHours)}
-                      </td> */}
-                      <td>
-                        {log.totalTime}
-                      </td>
-                      {/* <td
-                        style={{
-                          color: isHoursDiscrepant ? 'red' : 'inherit',
-                          fontWeight: isHoursDiscrepant ? 'bold' : 'normal',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {formatTimeTo12Hour(log.hours)}
-                      </td> */}
-                      {/* <td style={{ whiteSpace: 'nowrap' }}>{log.taskDescription}</td> */}
-                      {/* <td className="text-end" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <button
-                          className="btn btn-link text-dark p-0 me-3"
-                          onClick={() => handleEdit(log)}
-                        >
-                          <FaPencilAlt />
-                        </button>
-                        <button
-                          className="btn btn-link text-danger p-0"
-                          onClick={() => handleDelete(log._id)}
-                        >
-                          <FaTrashAlt />
-                        </button>
-                      </td> */}
-                    </tr>
-                  );
-                })}
+              {paginatedTimeLogssFiltered?.map((log, index) => {
+                const extraHoursDecimal = timeStringToDecimalHours(log.extraHours);
+                const hoursDecimal = timeStringToDecimalHours(log.hours);
+                const isHoursDiscrepant = hoursDecimal > 8;
+                const isExtraHoursDiscrepant = extraHoursDecimal < 8;
+                return (
+                  <tr key={index}>
+                    <td className="no-border-bottom">
+                      {log.jobId?.[0]?.JobNo || '----'}
+                    </td>
+                    <td style={{ whiteSpace: 'nowrap' }} key={index}>
+                      {log.projectId?.[0]?.projectName || 'No Project Name'}
+                    </td>
+                    <td>{new Date(log.date).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
+                    <td>
+                      {log.time}
+                    </td>
+                    <td>
+                      {log.overtime}
+                    </td>
+                    <td>
+                      {log.totalTime}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
-
-      {/* Timesheet Discrepancies */}
-      {/* <div className="card shadow-sm custom-table-card mb-4">
-        <div className="card-header bg-light fw-semibold">
-          Timesheet Discrepancies
-        </div>
-        <div className="table-responsive">
-          <table className="table table-hover align-middle mb-0">
-            <thead>
-              <tr className="bg-light">
-                <th className="py-3">Employee Name</th>
-                <th className="py-3">Issue</th>
-              </tr>
-            </thead>
-            <tbody>
-              {discrepancies.map((entry, index) => (
-                <tr key={index}>
-                  <td className="py-3">{entry.name}</td>
-                  <td className="py-3">{entry.issue}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div> */}
 
       {/* Pagination */}
       {!loading && !error && (
@@ -315,7 +281,6 @@ function TimesheetWorklog() {
             <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
               <button className="page-link" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}>
                 <span aria-hidden="true">&laquo;</span>
-
               </button>
             </li>
             {Array.from({ length: totalPagesFiltered }, (_, i) => (
@@ -327,7 +292,6 @@ function TimesheetWorklog() {
             ))}
             <li className={`page-item ${currentPage === totalPagesFiltered ? 'disabled' : ''}`}>
               <button className="page-link" onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPagesFiltered))}>
-
                 <span aria-hidden="true">&raquo;</span>
               </button>
             </li>

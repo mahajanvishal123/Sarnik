@@ -52,7 +52,7 @@ const Login = () => {
       toast.success("Logged in successfully!");
 
       // Redirect based on role
-      if (role === "admin") {
+      if (role == "admin" || role == "Admin") {
         navigate("/admin/dashboard");
       } else if (role === "production") {
         navigate("/production/dashboard");

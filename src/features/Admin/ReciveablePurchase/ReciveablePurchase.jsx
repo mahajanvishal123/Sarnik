@@ -125,16 +125,44 @@ const getStatusClass = (status) => {
   //   });
   // };
 
+// const handleToBeInvoiced = (po) => {
+//   console.log("po", po._id);
+//   const client = po.ClientId?.[0];
+//   const project = po.projectId?.[0];
+  
+//   const purchaseOrderData = {
+//     clientId: client?._id,
+//     projectId: project?._id,
+//     CostEstimatesId: po.CostEstimatesId?.[0]?._id,
+//     ReceivablePurchaseId: po?._id,
+//   };
+  
+//   console.log("Purchase Order Data:", purchaseOrderData);
+  
+//   navigate("/admin/AddInvoice", {
+//     state: { 
+//       isFromPurchaseOrder: true,
+//       purchaseOrder: purchaseOrderData
+//     }
+//   });
+// };
+
 const handleToBeInvoiced = (po) => {
   console.log("po", po._id);
-  const client = po.ClientId?.[0];
-  const project = po.projectId?.[0];
+  const client = po.ClientId?.[0] || po.clients?.[0];
+  const project = po.projectId?.[0] || po.projects?.[0];
+  const costEstimate = po.CostEstimatesId?.[0] || po.costEstimates?.[0];
+  
+  // Extract line items from the cost estimate
+  const lineItems = costEstimate?.lineItems || [];
   
   const purchaseOrderData = {
-    clientId: client?._id,
-    projectId: project?._id,
-    CostEstimatesId: po.CostEstimatesId?.[0]?._id,
+    clientId: client?._id || client?.clientId,
+    projectId: project?._id || project?.projectId,
+    CostEstimatesId: costEstimate?._id || costEstimate?.costEstimateId,
     ReceivablePurchaseId: po?._id,
+    lineItems: lineItems, // Add the line items here
+    Amount: po.Amount || (lineItems.reduce((sum, item) => sum + (item.amount || 0), 0))
   };
   
   console.log("Purchase Order Data:", purchaseOrderData);
@@ -146,6 +174,7 @@ const handleToBeInvoiced = (po) => {
     }
   });
 };
+
   return (
     <div className="p-4 m-2"
       style={{ backgroundColor: "white", borderRadius: "10px" }}

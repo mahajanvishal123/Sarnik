@@ -55,9 +55,9 @@ function ClientManagement() {
     const matchesSearch = terms.length === 0 || terms.every(term =>
       fields.some(field => field.includes(term))
     );
-    const matchesStatus = statusFilter === 'All' || 
+    const matchesStatus = statusFilter === 'All' ||
       (client.Status || '').toLowerCase() === statusFilter.toLowerCase();
-    const matchesIndustry = formData.industry === 'Client' || 
+    const matchesIndustry = formData.industry === 'Client' ||
       (client.industry || '').toLowerCase() === formData.industry.toLowerCase();
     return matchesSearch && matchesStatus && matchesIndustry;
   });
@@ -151,9 +151,9 @@ function ClientManagement() {
             </Col>
 
             <Col md={2} className="mb-2">
-              <Form.Select 
-                name="industry" 
-                value={formData.industry} 
+              <Form.Select
+                name="industry"
+                value={formData.industry}
                 onChange={handleChange}
               >
                 <option value="Client">Client</option>
@@ -193,7 +193,8 @@ function ClientManagement() {
                     <td style={{ whiteSpace: "nowrap" }}>{client.clientName || 'N/A'}</td>
                     <td style={{ whiteSpace: "nowrap" }}>{client.contactPersons?.[0]?.contactName || 'N/A'}</td>
                     <td style={{ whiteSpace: "nowrap" }}>{client.contactPersons?.[0]?.email || 'N/A'}</td>
-                    <td style={{ whiteSpace: "nowrap" }}>{client.contactPersons?.[0]?.phone || 'N/A'}</td>
+                    <td style={{ whiteSpace: "nowrap" }}>{client?.countryCode || 'N/A'} {client?.phoneNumber || 'N/A'}</td>
+                    {/* <td style={{ whiteSpace: "nowrap" }}>{client.contactPersons?.[0]?.phone || 'N/A'}</td> */}
                     <td style={{ whiteSpace: "nowrap" }}>{client.industry || 'N/A'}</td>
                     <td>
                       <span className={getStatusBadgeClass(client.Status)}>
@@ -222,7 +223,7 @@ function ClientManagement() {
         </div>
 
         {/* Pagination */}
-     
+
       </Row>
     </Container>
   );

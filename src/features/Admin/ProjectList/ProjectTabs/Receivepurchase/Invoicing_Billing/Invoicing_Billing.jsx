@@ -207,12 +207,12 @@ function Invoicing_Billing({ projectNO }) {
     // Try to get client details from the API JSON structure
     const client =
       invoiceData.clientId &&
-      typeof invoiceData.clientId === "object" &&
-      !Array.isArray(invoiceData.clientId)
+        typeof invoiceData.clientId === "object" &&
+        !Array.isArray(invoiceData.clientId)
         ? invoiceData.clientId
         : invoiceData.clients && typeof invoiceData.clients === "object"
-        ? invoiceData.clients
-        : {};
+          ? invoiceData.clients
+          : {};
     const clientDetails = {
       name: client?.clientName || "N/A",
       address1: client?.clientAddress || "N/A",
@@ -224,8 +224,8 @@ function Invoicing_Billing({ projectNO }) {
     };
     const project =
       invoiceData.projectId &&
-      Array.isArray(invoiceData.projectId) &&
-      invoiceData.projectId[0]
+        Array.isArray(invoiceData.projectId) &&
+        invoiceData.projectId[0]
         ? invoiceData.projectId[0]
         : {};
     const projectInfo = {
@@ -249,12 +249,12 @@ function Invoicing_Billing({ projectNO }) {
     const items =
       invoiceData.lineItems && invoiceData.lineItems.length > 0
         ? invoiceData.lineItems.map((item, index) => [
-            (index + 1).toString() + ".",
-            item.description,
-            item.quantity,
-            item.rate,
-            parseFloat(item.amount).toFixed(2),
-          ])
+          (index + 1).toString() + ".",
+          item.description,
+          item.quantity,
+          item.rate,
+          parseFloat(item.amount).toFixed(2),
+        ])
         : [["1.", "No items", 0, 0, "0.00"]];
     const subTotal = items.reduce((sum, item) => sum + parseFloat(item[4]), 0);
     // Use VAT from API if available, else default to 10%
@@ -499,8 +499,8 @@ function Invoicing_Billing({ projectNO }) {
       // Use image from ReceivablePurchaseId.image if available, otherwise fallback to local stamp
       const stampImageUrl =
         invoiceData.ReceivablePurchaseId &&
-        Array.isArray(invoiceData.ReceivablePurchaseId.image) &&
-        invoiceData.ReceivablePurchaseId.image.length > 0
+          Array.isArray(invoiceData.ReceivablePurchaseId.image) &&
+          invoiceData.ReceivablePurchaseId.image.length > 0
           ? invoiceData.ReceivablePurchaseId.image[0]
           : stamp;
       const imgData = await getImageBase64FromUrl(stampImageUrl);
@@ -957,12 +957,12 @@ function Invoicing_Billing({ projectNO }) {
             >
               Amount
             </th>
-            <th
+            {/* <th
               onClick={() => handleSort("status")}
               style={{ cursor: "pointer", whiteSpace: "nowrap" }}
             >
               Status
-            </th>
+            </th> */}
             <th
               onClick={() => handleSort("dueDate")}
               style={{ cursor: "pointer", whiteSpace: "nowrap" }}
@@ -973,13 +973,13 @@ function Invoicing_Billing({ projectNO }) {
           </tr>
         </thead>
         <tbody>
-         {paginatedEstimates
-  ?.filter((Item) => {
-    // Check if projectNO exists and if it matches the projectId in the projects array
-    if (!projectNO) return true; // If no projectNO is provided, show all items
-    return Item.projects && Item.projects.length > 0 && 
-           Item.projects[0].projectId === projectNO;
-  })
+          {paginatedEstimates
+            ?.filter((Item) => {
+              // Check if projectNO exists and if it matches the projectId in the projects array
+              if (!projectNO) return true; // If no projectNO is provided, show all items
+              return Item.projects && Item.projects.length > 0 &&
+                Item.projects[0].projectId === projectNO;
+            })
             ?.map((invoice, index) => (
               <tr key={invoice.invoiceNumber || index}>
                 <td style={{ whiteSpace: "nowrap" }}>
@@ -995,7 +995,7 @@ function Invoicing_Billing({ projectNO }) {
                 <td style={{ whiteSpace: "nowrap" }}>
                   ${invoice.lineItems?.[0]?.amount || "N/A"}
                 </td>
-                <td>
+                {/* <td>
                   <span
                     className={`badge ${getStatusClass(
                       invoice.status
@@ -1003,7 +1003,7 @@ function Invoicing_Billing({ projectNO }) {
                   >
                     {invoice.status}
                   </span>
-                </td>
+                </td> */}
                 <td>
                   {invoice.date
                     ? new Date(invoice.date).toLocaleDateString("en-GB")
@@ -1063,9 +1063,8 @@ function Invoicing_Billing({ projectNO }) {
               </li>
             ))}
             <li
-              className={`page-item ${
-                currentPage === totalPages ? "disabled" : ""
-              }`}
+              className={`page-item ${currentPage === totalPages ? "disabled" : ""
+                }`}
             >
               <button
                 className="page-link"
