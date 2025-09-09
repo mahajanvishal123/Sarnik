@@ -668,6 +668,9 @@ function ProjectJobsTab() {
       toast.success(response.message || "Project assigned successfully!");
       setShowAssignModal(false);
       setSelectedJobs({});
+      setAssignmentDescription('');
+      setSelectedDesigner('');
+      setSelectedEmployee('');
       // navigate("/admin/MyJobs");
     } catch (err) {
       const status = err?.status || err?.data?.statusCode || 500;
