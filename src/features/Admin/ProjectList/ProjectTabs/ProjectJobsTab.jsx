@@ -671,6 +671,7 @@ function ProjectJobsTab() {
       setAssignmentDescription('');
       setSelectedDesigner('');
       setSelectedEmployee('');
+      
       // navigate("/admin/MyJobs");
     } catch (err) {
       const status = err?.status || err?.data?.statusCode || 500;
