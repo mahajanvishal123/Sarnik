@@ -19,7 +19,7 @@ function MyJobs() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   // Get user role from Redux store or authentication context
   const { user } = useSelector((state) => state.auth || {});
   const isDesigner = user?.role === "designer";
@@ -156,7 +156,7 @@ function MyJobs() {
     const matchesEmployee =
       selectedEmployee === "All Employees" ||
       employeeName === selectedEmployee.toLowerCase();
-      
+
     // Fix status filtering to match actual status values
     const assignmentStatus = firstValidJob?.jobId?.Status?.toLowerCase() || '';
     const matchesStatus =
@@ -299,7 +299,7 @@ function MyJobs() {
                     </td>
                     <td>{new Date(assignment.createdAt).toLocaleDateString("en-GB")}</td>
                     <td style={{ whiteSpace: "nowrap" }}>{assignment.selectDesigner}</td>
-                   
+
                     {isDesigner && (
                       <td className="d-flex gap-2">
                         <input

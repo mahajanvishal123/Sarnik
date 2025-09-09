@@ -34,7 +34,7 @@ function ProjectDocumentsTab() {
                     <td>PDF</td>
                     <td>2.5 MB</td>
                     <td>Sarah Johnson</td>
-                    <td>2024-01-15</td>
+                    <td>01-15-2024</td>
                     <td>
                       <button className="btn btn-sm btn-outline-primary me-2">
                         <i className="bi bi-download"></i> Download
@@ -52,7 +52,7 @@ function ProjectDocumentsTab() {
                     <td>DOCX</td>
                     <td>1.8 MB</td>
                     <td>Michael Chen</td>
-                    <td>2024-01-18</td>
+                    <td>01-18-2024</td>
                     <td>
                       <button className="btn btn-sm btn-outline-primary me-2">
                         <i className="bi bi-download"></i> Download
@@ -70,7 +70,7 @@ function ProjectDocumentsTab() {
                     <td>ZIP</td>
                     <td>15.2 MB</td>
                     <td>Emily Wilson</td>
-                    <td>2024-01-20</td>
+                    <td>01-20-2024</td>
                     <td>
                       <button className="btn btn-sm btn-outline-primary me-2">
                         <i className="bi bi-download"></i> Download

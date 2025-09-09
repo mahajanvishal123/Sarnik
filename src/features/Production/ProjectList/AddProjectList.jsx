@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { createProject, fetchProjectById, updateProject } from '../../../redux/slices/ProjectsSlice';
+import { useNavigate, useParams, useLocation, Link } from 'react-router-dom';
+import { createProject, updateProject, fetchProjectById } from '../../../redux/slices/ProjectsSlice';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchClient } from '../../../redux/slices/ClientSlice';
 
+
 function AddProjectList() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { id } = useParams(); // for edit mode
+  const { id: paramId } = useParams();
   const location = useLocation();
   const { project } = location.state || {};
+  const id = paramId || project?._id;
+
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
 
   const [formData, setFormData] = useState({
     projectName: '',
@@ -36,26 +41,27 @@ function AddProjectList() {
     totalTime: ''
   });
 
+  // ✅ Populate form in edit mode
   useEffect(() => {
     if (project) {
-      // Form pre-filled from location.state
       setFormData({
         ...project,
+        clientId: project.clientId?._id || '', // 🔧 Fix here
         projectRequirements: project.projectRequirements?.[0] || {}
       });
-    } else if (id) {
-      // Form pre-filled from API
-      dispatch(fetchProjectById(id)).then((res) => {
+    } else if (paramId) {
+      dispatch(fetchProjectById(paramId)).then((res) => {
         const fetchedProject = res.payload;
         if (fetchedProject) {
           setFormData({
             ...fetchedProject,
+            clientId: fetchedProject.clientId?._id || '', // 🔧 Fix here
             projectRequirements: fetchedProject.projectRequirements?.[0] || {}
           });
         }
       });
     }
-  }, [id, dispatch, project]);
+  }, [paramId, dispatch, project]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -83,11 +89,11 @@ function AddProjectList() {
       projectRequirements: [formData.projectRequirements]
     };
     if (id) {
-      dispatch(updateProject({ id, data: payload }))
+      dispatch(updateProject({ id, payload }))
         .unwrap()
         .then(() => {
           toast.success("Project updated successfully!");
-          navigate("/admin/plantMachinery");
+          navigate("/production/projectList");
         })
         .catch(() => {
           toast.error("Failed to update project!");
@@ -97,7 +103,7 @@ function AddProjectList() {
         .unwrap()
         .then(() => {
           toast.success("Project created successfully!");
-          navigate("/admin/projectList");
+          navigate("/production/projectList");
         })
         .catch(() => {
           toast.error("Error creating project");
@@ -106,41 +112,23 @@ function AddProjectList() {
   };
 
   const handleCancel = () => {
-    navigate("/admin/projectList");
-  }
+    navigate("/production/projectList");
+  };
 
-
-      //  all client 
-    const { Clients } = useSelector((state) => state.client);
-    console.log(Clients);
-  
+  const { Clients } = useSelector((state) => state.client);
   useEffect(() => {
-    if (Clients  && project?.data?.length) {
-      const foundProject = project.data.find(p => p._id === Clients );
-      if (foundProject) {
-        setFormData(prev => ({
-          ...prev,
-          projectsId: foundProject._id,
-        }));
-      }
-    }
-  }, [Clients , project]);
-
-    useEffect(() => {
-      dispatch(fetchClient());
-    }, [dispatch]);
-
+    dispatch(fetchClient());
+  }, [dispatch]);
 
   return (
     <Container className="py-4">
       <div className="form-container p-4 rounded shadow-sm" style={{ backgroundColor: "white", margin: "0 auto" }}>
-       <h2 className="mb-4">{id || project?._id ? "Edit Project" : "New Project"}</h2>
-
+        <h2 className="mb-4 text-center">{id ? "Edit Project" : "New Project"}</h2>
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Col md={6}>
-              <Form.Group>
-                <Form.Label className="text-muted mb-1">Project Name</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label className="text-muted mb-1 fw-bold">Project Name</Form.Label>
                 <Form.Control
                   type="text"
                   name="projectName"
@@ -151,8 +139,15 @@ function AddProjectList() {
               </Form.Group>
             </Col>
             <Col md={6}>
-              <Form.Group>
-                <Form.Label className="text-muted mb-1">Client Name</Form.Label>
+              <Form.Group className="mb-3">
+                <div className="d-flex align-items-center justify-content-between mb-2">
+                  <Form.Label className="text-muted mb-1 fw-bold">Client Name</Form.Label>
+                  <Link to={"/production/AddClientManagement"}>
+                    <button className="btn btn-sm btn-outline-primary rounded-pill px-3 py-1">
+                      + Create
+                    </button>
+                  </Link>
+                </div>
                 <Form.Select
                   name="clientId"
                   value={formData.clientId}
@@ -160,7 +155,6 @@ function AddProjectList() {
                   required
                 >
                   <option value="">Select Client</option>
-                  <option value="662fb9cba77b2e0012345679">Client 1</option>
                   {Clients?.data?.map((client) => (
                     <option key={client._id} value={client._id}>
                       {client.clientName}
@@ -170,52 +164,38 @@ function AddProjectList() {
               </Form.Group>
             </Col>
           </Row>
-
           <Row className="mb-3">
             <Col md={6}>
-              <Form.Group>
-                <Form.Label className="text-muted mb-1">Project Manager</Form.Label>
-                <Form.Select
-                  name="managerId"
-                  value={formData.managerId}
+              <Form.Group className="mb-3">
+                <Form.Label className="text-muted mb-1 fw-bold">Expected Completion Date</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="endDate"
+                  value={formData.endDate?.slice(0, 10)}
                   onChange={handleInputChange}
                   required
-                >
-                  <option value="">Select Manager</option>
-                  <option value="662fb9a2a77b2e0012345678">Manager 1</option>
-                </Form.Select>
+                  min={today} // Disable previous dates
+                />
               </Form.Group>
             </Col>
             <Col md={6}>
-              <Form.Group>
-                <Form.Label className="text-muted mb-1">Start Date</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label className="text-muted mb-1 fw-bold">Start Date</Form.Label>
                 <Form.Control
                   type="date"
                   name="startDate"
-                  value={formData.startDate}
+                  value={formData.startDate?.slice(0, 10)}
                   onChange={handleInputChange}
                   required
+                  min={today} // Disable previous dates
                 />
               </Form.Group>
             </Col>
           </Row>
-
           <Row className="mb-3">
             <Col md={6}>
-              <Form.Group>
-                <Form.Label className="text-muted mb-1">Expected Completion Date</Form.Label>
-                <Form.Control
-                  type="date"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleInputChange}
-                  required
-                />
-              </Form.Group>
-            </Col>
-            <Col md={6}>
-              <Form.Group>
-                <Form.Label className="text-muted mb-1">Project Priority</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label className="text-muted mb-1 fw-bold">Project Priority</Form.Label>
                 <Form.Select
                   name="projectPriority"
                   value={formData.projectPriority}
@@ -229,12 +209,9 @@ function AddProjectList() {
                 </Form.Select>
               </Form.Group>
             </Col>
-          </Row>
-
-          <Row className="mb-3">
             <Col md={6}>
-              <Form.Group>
-                <Form.Label className="text-muted mb-1">Project Status</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label className="text-muted mb-1 fw-bold">Project Status</Form.Label>
                 <Form.Select
                   name="status"
                   value={formData.status}
@@ -251,59 +228,39 @@ function AddProjectList() {
                 </Form.Select>
               </Form.Group>
             </Col>
-            {/* <Col md={6}>
-              <Form.Group>
-                <Form.Label className="text-muted mb-1">Total Time Logged</Form.Label>
-                <Form.Control
-                  type="time"
-                  name="totalTime"
-                  value={formData.totalTime}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
-            </Col> */}
           </Row>
-
-          <Form.Group className="mb-3">
-            <Form.Label className="text-muted mb-1">Project Description</Form.Label>
+          <Form.Group className="mb-4">
+            <Form.Label className="text-muted mb-1 fw-bold">Project Description</Form.Label>
             <Form.Control
               as="textarea"
               rows={4}
               name="description"
               value={formData.description}
               onChange={handleInputChange}
+              style={{ resize: 'none' }}
             />
           </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label className="text-muted mb-1">Project Requirements</Form.Label>
-            <div>
+          <Form.Group className="mb-4">
+            <Form.Label className="text-muted mb-3 fw-bold">Project Requirements</Form.Label>
+            <div className="d-flex flex-wrap">
               {['creativeDesign', 'artworkAdaptation', 'prepress', 'POS', 'mockups', 'rendering'].map((key) => (
-                <Form.Check
-                  key={key}
-                  type="checkbox"
-                  label={key.replace(/([A-Z])/g, ' $1')}
-                  name={key}
-                  checked={formData.projectRequirements[key]}
-                  onChange={() => {
-                    // Reset all to false, set only clicked one to true
-                    setFormData((prevData) => ({
-                      ...prevData,
-                      projectRequirements: Object.fromEntries(
-                        Object.keys(prevData.projectRequirements).map((k) => [k, k === key])
-                      )
-                    }));
-                  }}
-                />
+                <div key={key} className="col-6 col-md-4 mb-2">
+                  <Form.Check
+                    type="checkbox"
+                    label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                    name={key}
+                    checked={formData.projectRequirements[key]}
+                    onChange={handleCheckboxChange}
+                    className="d-flex align-items-center"
+                  />
+                </div>
               ))}
             </div>
           </Form.Group>
-
-
-          <Form.Label className="text-muted mb-1">Budget Information</Form.Label>
-          <Row className="mb-3">
+          <Form.Label className="text-muted mb-3 fw-bold">Budget Information</Form.Label>
+          <Row className="mb-4">
             <Col md={6}>
-              <Form.Group>
+              <Form.Group className="mb-3">
                 <Form.Control
                   type="number"
                   placeholder="Budget Amount"
@@ -314,7 +271,7 @@ function AddProjectList() {
               </Form.Group>
             </Col>
             <Col md={6}>
-              <Form.Group>
+              <Form.Group className="mb-3">
                 <Form.Select
                   name="currency"
                   value={formData.currency}
@@ -332,10 +289,9 @@ function AddProjectList() {
             </Col>
           </Row>
           <div className="d-flex justify-content-end gap-2 mt-4">
-            <Button variant="secondary" className="px-4" style={{ minWidth: "120px" }} onClick={handleCancel}>Cancel</Button>
-            <Button variant="dark" type="submit" className="px-4" style={{ minWidth: "120px" }}>
-        
-               {id || project?._id ? "Save" : "Create Project"}
+            <Button variant="secondary" className="px-4" onClick={handleCancel}>Cancel</Button>
+            <Button id='All_btn' type="submit" className="px-4">
+              {id ? "Update Project" : "Create Project"}
             </Button>
           </div>
         </Form>

@@ -609,7 +609,7 @@ function MyJobs() {
     }
 
     const firstJobId = selectedJobIds[0];
-    dispatch(EmployeeCompletedStatus({ id: firstJobId, data: { Status: "Completed" } }))
+    dispatch(EmployeeCompletedStatus({ id: firstJobId, data: { Status: "Completed", assign: "" } }))
       .unwrap()
       .then(() => {
         setSuccessMessage("Jobs rejected successfully.");
@@ -707,7 +707,8 @@ function MyJobs() {
     const displayId = String((currentPage - 1) * itemsPerPage + index + 1).padStart(4, '0');
 
     // Build file name string
-    const fileName = `${displayId}_${job.JobNo || ''}_${job.brandName || ''}_${job.packCode || ''}_${job.flavour || ''}_${job.packType || ''}`;
+    // const fileName = `${displayId}_${job.JobNo || ''}_${job.brandName || ''}_${job.packCode || ''}_${job.flavour || ''}_${job.packType || ''}`;
+    const fileName = `${job.JobNo || ''}_${job.brandName || ''}_${job.subBrand || ''}_${job.packType || ''}_${job.packSize || ''}_${job.packCode || ''}`;
 
     navigator.clipboard.writeText(fileName)
       .then(() => alert("Copied to clipboard: " + fileName))
@@ -820,9 +821,11 @@ function MyJobs() {
                     onChange={() => handleCheckboxChange(job._id)}
                   />
                 </td>
-                <td>{job.JobNo}</td>
                 <td onClick={() => JobDetails(job)} style={{ whiteSpace: 'nowrap' }}>
-                  <Link style={{ textDecoration: 'none' }}>{job.projectId?.[0]?.projectName || "—"}</Link>
+                  <Link style={{ textDecoration: 'none' }}>{job.JobNo}</Link>
+                </td>
+                <td style={{ whiteSpace: 'nowrap' }}>
+                  {job.projectId?.[0]?.projectName || "—"}
                 </td>
                 <td style={{ whiteSpace: 'nowrap' }}>{job.projectId?.[0]?.projectNo || "—"}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>{job.brandName}</td>

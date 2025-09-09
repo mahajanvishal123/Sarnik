@@ -668,7 +668,7 @@ function ProjectJobsTab() {
       toast.success(response.message || "Project assigned successfully!");
       setShowAssignModal(false);
       setSelectedJobs({});
-      navigate("/admin/MyJobs");
+      // navigate("/admin/MyJobs");
     } catch (err) {
       const status = err?.status || err?.data?.statusCode || 500;
       const message = err?.message || err?.data?.message || "Assignment failed!";
@@ -844,7 +844,7 @@ function ProjectJobsTab() {
                     <td><span className={getPriorityClass(job.priority)}>{job.priority}</span></td>
                     <td>{new Date(job?.createdAt).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
                     {/* <td>{job.assign}</td> */}
-                    <td>{job.assignedTo}</td>
+                    <td>{job.assign ? job.assignedTo : "Not Assigned"}</td>
                     <td>{getEmployeeTotalTime(job.assign)}</td>
                     <td><span className={`badge ${getStatusClass(job.Status)} px-2 py-1`}>{job.Status}</span></td>
                     <td className="d-flex">

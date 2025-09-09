@@ -15,7 +15,8 @@ import Profile from '../features/Production/ProductionProfile/Profile.jsx';
 import SettingsPage from '../features/Production/ProductionSettings/Settings.jsx';
 import ChangePassword from '../features/Layouts/ChangePassword.jsx';
 import UpdateProfile from '../features/Production/ProductionProfile/UpdateProfile.jsx';
-import OvervieJobsTracker from '../features/Production/ProductionJobTracker/OvervieJobsTracker.jsx';
+// import OvervieJobsTracker from '../features/Production/ProductionJobTracker/OvervieJobsTracker.jsx';
+import OvervieJobsTracker from '../features/Production/JobTracker/OvervieJobsTracker.jsx';
 import Pluginss from '../assets/css/Pluginss/Pluginss.jsx';
 import ProductionJobTrackers from '../features/Production/ProductionJobTrackers/ProductionJobTrackers.jsx';
 import NewJobsList from '../features/Production/NewJobsList/NewJobsList.jsx';
@@ -23,6 +24,7 @@ import InProgress from '../features/Production/InProgress/InProgress.jsx';
 import Completed_Jobs from '../features/Production/Completed_Jobs/Completed_Jobs.jsx';
 import TimesheetWorklog from '../features/Production/TimesheetWorklog/TimesheetWorklog.jsx';
 import AddJobTracker from '../features/Production/JobTracker/AddJobTracker.jsx';
+import ProjectOverview from '../features/Production/ProjectList/ProjectOverview.jsx';
 
 
 
@@ -52,23 +54,24 @@ function Production() {
             <Route path="/myJobs" element={<ProtectedRoute><MyJobs /></ProtectedRoute>} />
             <Route path="/TimeTracking" element={<ProtectedRoute><TimeLogs /></ProtectedRoute>} />
             <Route path="/AddTimeLog" element={<ProtectedRoute><AddTimeLog /></ProtectedRoute>} />
-            <Route path="/farhan" element={<ProtectedRoute><Pluginss/></ProtectedRoute>} />
+            <Route path="/farhan" element={<ProtectedRoute><Pluginss /></ProtectedRoute>} />
             <Route path="/Notification" element={<ProtectedRoute><Notification /></ProtectedRoute>} />
             <Route path="/Profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/Settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-            <Route path="/changePassword" element={<ProtectedRoute><ChangePassword/></ProtectedRoute>} />
-            <Route path="/UpdateProfile" element={<ProtectedRoute><UpdateProfile/></ProtectedRoute>} />
-            <Route path="/OvervieJobsTracker" element={<ProtectedRoute><OvervieJobsTracker/></ProtectedRoute>} />
-            <Route path="/ProductionJobTrackers" element={<ProtectedRoute><ProductionJobTrackers/></ProtectedRoute>} />
-            <Route path="/newJobsList" element={<ProtectedRoute><NewJobsList/></ProtectedRoute>} />
-            <Route path="/inProgress" element={<ProtectedRoute><InProgress/></ProtectedRoute>} />
-            <Route path="/completedJobs" element={<ProtectedRoute><Completed_Jobs/></ProtectedRoute>} />
-            <Route path="/TimeTracking" element={<ProtectedRoute><TimeLogs/></ProtectedRoute>} />
-            <Route path="/AddTimeLog" element={<ProtectedRoute><AddTimeLog/></ProtectedRoute>} />
-            <Route path="/TimesheetWorklog" element={<ProtectedRoute><TimesheetWorklog/></ProtectedRoute>} />
-            <Route path="/myJobs" element={<ProtectedRoute><MyJobs/></ProtectedRoute>} />
+            <Route path="/changePassword" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
+            <Route path="/UpdateProfile" element={<ProtectedRoute><UpdateProfile /></ProtectedRoute>} />
+            <Route path="/OvervieJobsTracker" element={<ProtectedRoute><OvervieJobsTracker /></ProtectedRoute>} />
+            <Route path="/ProductionJobTrackers" element={<ProtectedRoute><ProductionJobTrackers /></ProtectedRoute>} />
+            <Route path="/newJobsList" element={<ProtectedRoute><NewJobsList /></ProtectedRoute>} />
+            <Route path="/inProgress" element={<ProtectedRoute><InProgress /></ProtectedRoute>} />
+            <Route path="/completedJobs" element={<ProtectedRoute><Completed_Jobs /></ProtectedRoute>} />
+            <Route path="/TimeTracking" element={<ProtectedRoute><TimeLogs /></ProtectedRoute>} />
+            <Route path="/AddTimeLog" element={<ProtectedRoute><AddTimeLog /></ProtectedRoute>} />
+            <Route path="/TimesheetWorklog" element={<ProtectedRoute><TimesheetWorklog /></ProtectedRoute>} />
+            <Route path="/myJobs" element={<ProtectedRoute><MyJobs /></ProtectedRoute>} />
             <Route path="/AddJobTracker/:id" element={<ProtectedRoute><AddJobTracker /></ProtectedRoute>} />
-            
+            <Route path="/ProjectOverview/:id" element={<ProtectedRoute><ProjectOverview /></ProtectedRoute>} />
+
           </Routes>
         </div>
       </div>

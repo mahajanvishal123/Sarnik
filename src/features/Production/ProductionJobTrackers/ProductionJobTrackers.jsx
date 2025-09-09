@@ -68,9 +68,7 @@ function EmployeeJobTracker() {
   };
 
   // 🔹 Pehle employee ke jobs filter karo
-  const employeeJobs = (job?.jobs || []).filter(
-    (j) => (j.assignedTo?.userId || j.assign) === employeeId
-  );
+  const employeeJobs = (job?.jobs || []);
 
   // 🔹 Uske baad filters aur search lagao
   const filteredJobs = employeeJobs.filter((j) => {

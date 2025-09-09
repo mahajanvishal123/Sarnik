@@ -6,14 +6,14 @@ import './Project.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteproject, fetchProject } from '../../../redux/slices/ProjectsSlice';
 import Swal from 'sweetalert2';
-import { fetchClient } from '../../../redux/slices/ClientSlice';
 
 function ProjectList() {
   const [activeTab, setActiveTab] = useState('Active Project');
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { project, loading, error } = useSelector((state) => state.projects);
   const [selectedJobs, setSelectedJobs] = useState({});
 
@@ -25,21 +25,42 @@ function ProjectList() {
     'Cancelled',
     'On Hold',
     'All',
-    // 'Completed (To Be Invoiced)',
   ];
 
   useEffect(() => {
     dispatch(fetchProject());
   }, [dispatch]);
 
-  const filteredProjects =
+  const filteredProjects = (
     activeTab === 'All'
       ? project.data
       : activeTab === 'Completed (To Be Invoiced)'
         ? project.data?.filter(
           (project) => project.status === 'Completed' && !project.invoiceCreated
         )
-        : project.data?.filter((project) => project.status === activeTab);
+        : project.data?.filter((project) => project.status === activeTab)
+  )?.filter((project) => {
+    const terms = searchTerm.trim().split(/\s+/).filter(Boolean);
+    if (terms.length === 0) return true;
+    const fields = [
+      project.projectName,
+      project.projectNo,
+      project.description,
+      project.client,
+      project.startDate ? new Date(project.startDate).toLocaleDateString('en-GB').replace(/\/20/, '/') : '',
+      project.endDate ? new Date(project.endDate).toLocaleDateString('en-GB').replace(/\/20/, '/') : '',
+      project.projectRequirements && project.projectRequirements.length > 0
+        ? Object.entries(project.projectRequirements[0])
+          .filter(([_, value]) => value === true)
+          .map(([key]) => key)
+          .join(', ')
+        : ''
+    ].map(f => (f || '').toString().toLowerCase());
+
+    return terms.every(term =>
+      fields.some(field => field.includes(term.toLowerCase()))
+    );
+  });
 
   const handleCheckboxChange = (projectId) => {
     setSelectedJobs((prev) => ({
@@ -49,7 +70,6 @@ function ProjectList() {
   };
 
   const handleDelete = (id) => {
-    console.log(id);
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -70,13 +90,21 @@ function ProjectList() {
           });
       }
     });
-  }
-  // const handleUpdate = (project) => {
-  //   navigate(`/admin/AddProjectList`, { state: { project } });
-  // };
-  // const CreatJobs = (id) => {
-  //   navigate('/admin/ProjectOverview', { state: { id, openTab: 'jobs' } });
-  // };
+  };
+
+  const handleUpdate = (project) => {
+    navigate(`/production/AddProjectList`, { state: { project } });
+  };
+
+  const CreatJobs = (project) => {
+    navigate(`/production/ProjectOverview/${project.id}`, {
+      state: {
+        id: project.id,
+        openTab: 'jobs',
+        projectDatah: project
+      }
+    });
+  };
 
   const getStatusClass = (status) => {
     switch ((status || "").toLowerCase().trim()) {
@@ -115,12 +143,37 @@ function ProjectList() {
     <div className="project-container">
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="m-0 fw-bold">View Project Details</h5>
+        <h5 className="m-0 fw-bold">Project List</h5>
+      </div>
+
+      {/* Search and Actions */}
+      <div className="mb-4">
+        <div className="row g-2">
+          <div className="col-12 col-md-6">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search projects.."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="col-12 col-md-6 d-flex justify-content-md-end gap-2">
+            <Button variant="outline-secondary" size="sm">
+              <FaUpload className="me-1" /> Import
+            </Button>
+            <Link to={"/production/AddProjectList"}>
+              <Button id="All_btn" variant="dark" size="sm">
+                <FaPlus className="me-1" /> Add project
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Project Status Tabs */}
       <div className="project-tabs mb-4">
-        <ul className="nav nav-tabs">
+        <ul className="nav nav-tabs d-none d-md-flex">
           {tabs.map((tab) => (
             <li className="nav-item" key={tab}>
               <button
@@ -133,26 +186,24 @@ function ProjectList() {
             </li>
           ))}
         </ul>
-      </div>
 
-      {/* Search and Actions */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div className="search-box">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search projects.."
-          />
-        </div>
-        <div className="actions">
-          <Button variant="outline-secondary" size="sm" className="me-2">
-            <FaUpload className="me-1" /> Import
-          </Button>
-          {/* <Link to={"/admin/AddProjectList"}>
-            <Button id="All_btn" variant="dark" size="sm">
-              <FaPlus className="me-1" /> Add project
-            </Button>
-          </Link> */}
+        <div className="d-flex d-md-none">
+          <Dropdown>
+            <Dropdown.Toggle variant="outline-primary" id="dropdown-tabs" className="w-100">
+              {activeTab}
+            </Dropdown.Toggle>
+            <Dropdown.Menu className="w-100">
+              {tabs.map((tab) => (
+                <Dropdown.Item
+                  key={tab}
+                  active={tab === activeTab}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
       </div>
 
@@ -176,63 +227,36 @@ function ProjectList() {
         <Table responsive className="project-table mb-4">
           <thead>
             <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  onChange={() => {
-                    const isChecked =
-                      Object.keys(selectedJobs).length === project.data.length;
-                    const newSelectedJobs = {};
-                    project.data.forEach((project) => {
-                      newSelectedJobs[project.id] = !isChecked;
-                    });
-                    setSelectedJobs(newSelectedJobs);
-                  }}
-                />
-              </th>
               <th style={{ whiteSpace: 'nowrap' }}>Project No</th>
               <th style={{ textWrap: 'nowrap' }}>Project Name</th>
               <th style={{ whiteSpace: 'nowrap' }}>Start Date</th>
               <th style={{ whiteSpace: 'nowrap' }}>End Date</th>
               <th>Client</th>
-              <th style={{ whiteSpace: 'nowrap' }}>project Requirements</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Project Requirements</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Priority</th>
               <th>Status</th>
-              {/* <th>Actions</th> */}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedProjects.slice().reverse().map((project, index) => (
+            {paginatedProjects.map((project, index) => (
               <tr key={project.id}>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={selectedJobs[project.id] || false}
-                    onChange={() => handleCheckboxChange(project.id)}
-                  />
-                </td>
-                {/* <td onClick={() => CreatJobs(project.id)}>
-                  <Link>
-                    {String(index + 1).padStart(4, '0')}
-                  </Link>
-                </td> */}
-                <td>
-              <Link to={"/production/myJobs"}>
-                    {/* {String((currentPage - 1) * itemsPerPage + index + 1).padStart(4, '0')} */}
-                    {project.projectNo}
-                  </Link>
+                <td onClick={() => CreatJobs(project)}>
+                  <Link style={{ textDecoration: 'none' }}>{project.projectNo}</Link>
                 </td>
                 <td style={{ whiteSpace: 'nowrap' }}>{project.projectName}</td>
                 <td>{new Date(project.startDate).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
                 <td>{new Date(project.endDate).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
-                <td>{project.clientId.clientName || 'Client'}</td>
-                <th>
+                <td style={{ whiteSpace: 'nowrap' }}>{project?.clientId.clientName}</td>
+                <td>
                   {project.projectRequirements && project.projectRequirements.length > 0
                     ? Object.entries(project.projectRequirements[0])
                       .filter(([_, value]) => value === true)
                       .map(([key]) => key)
                       .join(', ')
                     : 'N/A'}
-                </th>
+                </td>
+                <td>{project.projectPriority || 'N/A'}</td>
                 <td>
                   <span className={`badge ${getStatusClass(project.status)} px-2 py-1`}>
                     {project.status}
@@ -240,20 +264,9 @@ function ProjectList() {
                 </td>
                 <td>
                   <div className="action-buttons d-flex">
-                    {/* <Button style={{ color: "#0d6efd" }} variant="link" className="p-0 me-2">
-                      <FaEye />
-                    </Button> */}
-                    {/* <Button style={{ color: "#0d6efd" }} variant="link" className="p-0 me-2" onClick={() => handleUpdate(project)}>
+                    <Button style={{ color: "#0d6efd" }} variant="link" className="p-0 me-2" onClick={() => handleUpdate(project)}>
                       <FaEdit />
-                    </Button> */}
-                    {/* <Button
-                      style={{ color: "red" }}
-                      variant="link"
-                      className="p-0"
-                      onClick={() => handleDelete(project.id)}
-                    >
-                      <FaTrash />
-                    </Button> */}
+                    </Button>
                   </div>
                 </td>
               </tr>
@@ -266,12 +279,14 @@ function ProjectList() {
       {!loading && !error && (
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div className="text-muted small">
-            Showing 1 to {filteredProjects?.length || 0} of {project.data?.length || 0} entries
+            Showing {filteredProjects?.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}
+            to {(currentPage - 1) * itemsPerPage + paginatedProjects?.length}
+            of {project.data?.length || 0} entries
           </div>
           <ul className="pagination pagination-sm mb-0">
             <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
               <button className="page-link" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}>
-                Previous
+                <span aria-hidden="true">&laquo;</span>
               </button>
             </li>
             {Array.from({ length: totalPages }, (_, i) => (
@@ -283,11 +298,10 @@ function ProjectList() {
             ))}
             <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
               <button className="page-link" onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}>
-                Next
+                <span aria-hidden="true">&raquo;</span>
               </button>
             </li>
           </ul>
-
         </div>
       )}
     </div>

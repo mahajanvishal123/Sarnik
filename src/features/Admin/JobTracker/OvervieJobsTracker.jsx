@@ -1158,51 +1158,51 @@ const OvervieJobsTracker = ({ onClose }) => {
                     >
                       <thead className="bg-light">
                         <tr>
-                          <th>Date</th>
-                          <th>Employee Name</th>
-                          <th>Assign</th>
-                          <th>Task Description</th>
-                          <th className="text-center">Time Spent</th>
-                          <th className="text-center">Overtime</th>
-                          <th className="text-center">Total Time</th>
-                          <th>Status</th>
+                          <th className="col-md-1">Date</th>
+                          <th className="col-md-4">Task Description</th>
+                          <th className="col-md-2">Employee Name</th>
+                          {/* <th>Assign</th> */}
+                          <th className="col-md-1 text-center">Time Spent</th>
+                          <th className="col-md-1 text-center">Overtime</th>
+                          <th className="col-md-1 text-center">Total Time</th>
+                          {/* <th>Status</th> */}
                         </tr>
                       </thead>
                       <tbody>
                         {employeeData.worklogs.map((log, logIndex) => (
                           <tr key={logIndex}>
-                            <td>{log.date ? new Date(log.date).toLocaleDateString() : "-"}</td>
-                            <td>
-                              {employeeData.employee.firstName} {employeeData.employee.lastName}
-                            </td>
-                            <td>
-                              {employeeData.employee.assign || "-"}
-                            </td>
-                            <td style={{ whiteSpace: "pre-line" }}>
+                            <td className="col-md-1">{log.date ? new Date(log.date).toLocaleDateString() : "-"}</td>
+                            <td className="col-md-4" style={{ whiteSpace: "pre-line" }}>
                               {log.taskDescription || "-"}
                             </td>
-                            <td className="text-center fw-bold text-primary">
+                            <td className="col-md-2">
+                              {employeeData.employee.firstName} {employeeData.employee.lastName}
+                            </td>
+                            {/* <td>
+            {employeeData.employee.assign || "-"}
+          </td> */}
+                            <td className="col-md-1 text-center fw-bold text-primary">
                               {formatTime(log.time)}
                             </td>
-                            <td className="text-center fw-bold text-danger">
+                            <td className="col-md-1 text-center fw-bold text-danger">
                               {formatTime(log.overtime)}
                             </td>
-                            <td className="text-center fw-bold text-success">
+                            <td className="col-md-1 text-center fw-bold text-success">
                               {addTimes(log.time, log.overtime)}
                             </td>
-                            <td>
-                              <Badge
-                                bg={
-                                  log.status === "Approved"
-                                    ? "success"
-                                    : log.status === "Rejected"
-                                      ? "danger"
-                                      : "warning"
-                                }
-                              >
-                                {log.status || "Pending"}
-                              </Badge>
-                            </td>
+                            {/* <td>
+            <Badge
+              bg={
+                log.status === "Approved"
+                  ? "success"
+                  : log.status === "Rejected"
+                    ? "danger"
+                    : "warning"
+              }
+            >
+              {log.status || "Pending"}
+            </Badge>
+          </td> */}
                           </tr>
                         ))}
                       </tbody>

@@ -1114,7 +1114,8 @@ function MyJobs() {
 
   const handleCopyFileName = (job, index) => {
     const displayId = String((currentPage - 1) * itemsPerPage + index + 1).padStart(4, '0');
-    const fileName = `${displayId}_${job.JobNo || ''}_${job.brandName || ''}_${job.packCode || ''}_${job.flavour || ''}_${job.packType || ''}`;
+    const fileName = `${job.JobNo || ''}_${job.brandName || ''}_${job.subBrand || ''}_${job.packType || ''}_${job.packSize || ''}_${job.packCode || ''}`;
+    // const fileName = `${displayId}_${job.JobNo || ''}_${job.brandName || ''}_${job.packCode || ''}_${job.flavour || ''}_${job.packType || ''}`;
     navigator.clipboard.writeText(fileName)
       .then(() => alert("Copied to clipboard: " + fileName))
       .catch((err) => console.error("Failed to copy!", err));
@@ -1158,7 +1159,7 @@ function MyJobs() {
   const handleSubmitComplete = () => {
     dispatch(EmployeeCompletedStatus({
       id: currentJob._id,
-      data: { Status: selectedStatus }
+      data: { Status: selectedStatus, assign: '' }
     }))
       .unwrap()
       .then(() => {
@@ -1236,11 +1237,13 @@ function MyJobs() {
             {paginatedProjects.length > 0 ? (
               paginatedProjects.map((job, index) => (
                 <tr key={job._id} style={{ cursor: "pointer" }}>
-                  <td>{job.JobNo}</td>
                   <td onClick={() => JobDetails(job)} style={{ whiteSpace: 'nowrap' }}>
                     <Link style={{ textDecoration: 'none' }}>
-                      {job.projectId?.[0]?.projectName || "—"}
+                      {job.JobNo}
                     </Link>
+                  </td>
+                  <td style={{ whiteSpace: 'nowrap' }}>
+                    {job.projectId?.[0]?.projectName || "—"}
                   </td>
                   <td style={{ whiteSpace: 'nowrap' }}>
                     {job.projectId?.[0]?.projectNo || "—"}
@@ -1260,7 +1263,7 @@ function MyJobs() {
                       {job.Status || "N/A"}
                     </span>
                   </td>
-                  <td style={{ display: "flex", gap: "5px" }}>
+                  <td style={{ display: "flex", gap: "2px" }}>
                     <Button
                       id="All_btn"
                       size="sm"
@@ -1279,7 +1282,7 @@ function MyJobs() {
                     >
                       CF
                     </Button>
-                    <Button
+                    {/* <Button
                       id="All_btn"
                       size="sm"
                       variant="danger"
@@ -1287,15 +1290,16 @@ function MyJobs() {
                       title="Reject Job"
                     >
                       Reject
-                    </Button>
+                    </Button> */}
                     <Button
                       id="All_btn"
                       size="sm"
                       variant="success"
                       onClick={() => handleCompleteJob(job)}
                       title="Complete Job"
+                      style={{ whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center' }}
                     >
-                      Complete
+                      <span>I'm Done</span>
                     </Button>
                   </td>
                 </tr>

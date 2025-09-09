@@ -37,7 +37,7 @@ export const adminMenuItems = [
     submenu: [
       { title: "Projects", path: "/admin/projectList" },
       { title: "Job Tracker", path: "/admin/JobTracker" },
-      { title: "Completed Production jobs", path: "/admin/Completed" },
+      // { title: "Completed Production jobs", path: "/admin/Completed" },
     ],
   },
   {

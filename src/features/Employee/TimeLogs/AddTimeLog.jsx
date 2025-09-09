@@ -17,12 +17,12 @@ function AddTimeLog() {
   const { UserSingle } = useSelector((state) => state.user);
   const empid = UserSingle?._id;
   const { myjobs } = useSelector((state) => state.MyJobs);
-  
+
   const getTodayDate = () => {
     const today = new Date();
     return today.toISOString().split("T")[0];
   };
-  
+
   const [formData, setFormData] = useState({
     projectId: '',
     jobId: '',
@@ -33,11 +33,11 @@ function AddTimeLog() {
     overtimeTime: '',
     taskDescription: '',
   });
-  
+
   // Extract all projects and jobs from myjobs data
   const [projects, setProjects] = useState([]);
   const [jobs, setJobs] = useState([]);
-  
+
   useEffect(() => {
     dispatch(SingleUser());
     dispatch(fetchProject());
@@ -45,13 +45,13 @@ function AddTimeLog() {
     dispatch(fetchusers());
     dispatch(fetchMyJobs());
   }, [dispatch]);
-  
+
   // Process myjobs data to extract projects and jobs
   useEffect(() => {
     if (myjobs && myjobs.assignments) {
       const allProjects = [];
       const allJobs = [];
-      
+
       myjobs.assignments.forEach(assignment => {
         if (assignment.jobs && assignment.jobs.length > 0) {
           assignment.jobs.forEach(job => {
@@ -61,7 +61,7 @@ function AddTimeLog() {
               if (!allProjects.some(p => p._id === project._id)) {
                 allProjects.push(project);
               }
-              
+
               // Add job to jobs list
               allJobs.push({
                 _id: job.jobId._id,
@@ -74,12 +74,12 @@ function AddTimeLog() {
           });
         }
       });
-      
+
       setProjects(allProjects);
       setJobs(allJobs);
     }
   }, [myjobs]);
-  
+
   useEffect(() => {
     if (entry || job) {
       const data = entry || job;
@@ -96,15 +96,15 @@ function AddTimeLog() {
       });
     }
   }, [entry, job, empid]);
-  
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
+
     if (name === 'projectId') {
       // When project changes, find the first job for that project
       const projectJobs = jobs.filter(j => j.projectId === value);
       const firstJobId = projectJobs.length > 0 ? projectJobs[0]._id : '';
-      
+
       setFormData(prev => ({
         ...prev,
         projectId: value,
@@ -117,20 +117,20 @@ function AddTimeLog() {
       }));
     }
   };
-  
+
   // Handle time input formatting
   const handleTimeChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Only allow numbers and colon
     if (!/^[0-9:]*$/.test(value)) return;
-    
+
     // Format as HH:MM
     let formattedValue = value
       .replace(/\D/g, '') // Remove non-digits
       .replace(/^(\d{0,2})(\d{0,2})/, '$1:$2') // Add colon
       .replace(/(\d{2}):(\d{2}).*/, '$1:$2'); // Limit to HH:MM
-    
+
     // Validate hours and minutes
     const [hours, minutes] = formattedValue.split(':');
     if (hours && parseInt(hours) > 23) {
@@ -139,13 +139,13 @@ function AddTimeLog() {
     if (minutes && parseInt(minutes) > 59) {
       formattedValue = `${hours || '00'}:59`;
     }
-    
+
     setFormData(prev => ({
       ...prev,
       [name]: formattedValue
     }));
   };
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const payload = {
@@ -161,18 +161,18 @@ function AddTimeLog() {
       .unwrap()
       .then((res) => {
         toast.success(res?.message || "Timesheet created successfully!");
-        navigate("/employee/TimeTracking");
+        navigate(-1);
       })
       .catch((err) => {
         toast.error(err?.message || "Error creating timesheet!");
       });
   };
-  
+
   // Get jobs for the selected project
   const filteredJobs = jobs.filter(job => job.projectId === formData.projectId);
   // Get the selected job object
   const selectedJob = jobs.find(job => job._id === formData.jobId);
-  
+
   return (
     <div className="container py-4">
       <div className="row justify-content-center">
@@ -277,7 +277,11 @@ function AddTimeLog() {
                   </div>
                 </div>
                 <div className="d-flex justify-content-end gap-2 mt-4">
-                  <Link to="/employee/TimesheetWorklog" className="btn btn-light">Cancel</Link>
+                  {/* <Link to="/employee/TimesheetWorklog" className="btn btn-light">Cancel</Link> */}
+                  {/* <Link to="/employee/TimesheetWorklog" className="btn btn-light">Cancel</Link> */}
+                  <button className="btn btn-light" onClick={() => navigate(-1)}>
+                    Cancel
+                  </button>
                   <button type="submit" className="btn btn-dark">
                     {id ? "Update Time Entry" : "Submit Time Entry"}
                   </button>

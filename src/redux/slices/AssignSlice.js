@@ -15,30 +15,52 @@ export const fetchAssign = createAsyncThunk(
   }
 );
 
+// export const createAssigns = createAsyncThunk(
+//   'Assigns/createAssigns',
+//   async (payload, { rejectWithValue }) => {
+//     // Defensive: sanitize employeeId
+//     if (payload.selectDesigner === "Production") {
+//       payload.employeeId = null;
+//     } else if (payload.selectDesigner === "Designer") {
+//       if (
+//         Array.isArray(payload.employeeId) &&
+//         payload.employeeId.length === 1 &&
+//         payload.employeeId[0]
+//       ) {
+//         // keep as is
+//       } else {
+//         payload.employeeId = [];
+//       }
+//     } else if (
+//       Array.isArray(payload.employeeId) &&
+//       payload.employeeId.length === 1 &&
+//       !payload.employeeId[0]
+//     ) {
+//       payload.employeeId = null;
+//     }
+//     try {
+//       const response = await axiosInstance.post(
+//         `${apiUrl}/AssignmentJob`,
+//         payload,
+//         {
+//           headers: {
+//             'Content-Type': 'application/json',
+//           },
+//         }
+//       );
+//       return response.data;
+//     } catch (error) {
+//       return rejectWithValue(error.response?.data || error.message);
+//     }
+//   }
+// );
+
+
 export const createAssigns = createAsyncThunk(
   'Assigns/createAssigns',
   async (payload, { rejectWithValue }) => {
-    // Defensive: sanitize employeeId
-    if (payload.selectDesigner === "Production") {
-      payload.employeeId = null;
-    } else if (payload.selectDesigner === "Designer") {
-      if (
-        Array.isArray(payload.employeeId) &&
-        payload.employeeId.length === 1 &&
-        payload.employeeId[0]
-      ) {
-        // keep as is
-      } else {
-        payload.employeeId = [];
-      }
-    } else if (
-      Array.isArray(payload.employeeId) &&
-      payload.employeeId.length === 1 &&
-      !payload.employeeId[0]
-    ) {
-      payload.employeeId = null;
-    }
     try {
+      // No restrictions - send the payload exactly as provided
       const response = await axiosInstance.post(
         `${apiUrl}/AssignmentJob`,
         payload,
@@ -55,6 +77,7 @@ export const createAssigns = createAsyncThunk(
   }
 );
 
+
 export const deleteAssigns = createAsyncThunk(
   'Assigns/deleteAssigns',
   async (id, { rejectWithValue }) => {
@@ -68,21 +91,21 @@ export const deleteAssigns = createAsyncThunk(
 );
 
 export const fetchAssignsById = createAsyncThunk('Assign/fetchById', async (id) => {
-    const response = await fetch(`/api/Assign/${id}`);
-    if (!response.ok) throw new Error("Failed to fetch Assigns");
-    return await response.json();
-  });
+  const response = await fetch(`/api/Assign/${id}`);
+  if (!response.ok) throw new Error("Failed to fetch Assigns");
+  return await response.json();
+});
 
-  export const updateAssigns = createAsyncThunk('Assign/updateAssigns', async ({ id, data }) => {
-    const response = await fetch(`/api/Assign/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) throw new Error("Failed to update Assigns");
-    return await response.json();
+export const updateAssigns = createAsyncThunk('Assign/updateAssigns', async ({ id, data }) => {
+  const response = await fetch(`/api/Assign/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
   });
-  
+  if (!response.ok) throw new Error("Failed to update Assigns");
+  return await response.json();
+});
+
 
 export const UpdateAssignsAssign = createAsyncThunk('Assign/updateAssigns', async ({ id, assign }) => {
   const response = await fetch(`${apiUrl}/Assign`, {
@@ -90,7 +113,7 @@ export const UpdateAssignsAssign = createAsyncThunk('Assign/updateAssigns', asyn
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ id, assign }),  
+    body: JSON.stringify({ id, assign }),
   });
   if (!response.ok) throw new Error("Failed to update Assign");
   return await response.json();
@@ -120,19 +143,19 @@ const AssignSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-          // Add
-        //   .addCase(createAssigns.pending, (state) => {
-        //     state.loading = true;
-        //     state.error = null;
-        //   })
-        //   .addCase(createAssigns.fulfilled, (state, action) => {
-        //     state.loading = false;
-        //     state.Assigns.push(action.payload);
-        //   })
-        //   .addCase(createAssigns.rejected, (state, action) => {
-        //     state.loading = false;
-        //     state.error = action.payload;
-        //   })
+      // Add
+      //   .addCase(createAssigns.pending, (state) => {
+      //     state.loading = true;
+      //     state.error = null;
+      //   })
+      //   .addCase(createAssigns.fulfilled, (state, action) => {
+      //     state.loading = false;
+      //     state.Assigns.push(action.payload);
+      //   })
+      //   .addCase(createAssigns.rejected, (state, action) => {
+      //     state.loading = false;
+      //     state.error = action.payload;
+      //   })
       .addCase(fetchAssign.pending, (state) => {
         state.status = 'loading';
       })
@@ -144,37 +167,37 @@ const AssignSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload;
       })
-    //   .addCase(createAssigns.fulfilled, (state, action) => {
-    //     state.Assigns.push(action.payload);
-    //   })
-    //   .addCase(createAssigns.rejected, (state, action) => {
-    //     state.status = 'failed';
-    //     state.error = action.payload;
-    //   })
-    //   .addCase(deleteAssigns.fulfilled, (state, action) => {
-    //     state.Assigns = state.Assigns.filter(
-    //       (Assigns) => Assigns.id !== action.payload
-    //     );
-    //   })
-    //   .addCase(deleteAssigns.rejected, (state, action) => {
-    //     state.status = 'failed';
-    //     state.error = action.payload;
-    //   })
+      //   .addCase(createAssigns.fulfilled, (state, action) => {
+      //     state.Assigns.push(action.payload);
+      //   })
+      //   .addCase(createAssigns.rejected, (state, action) => {
+      //     state.status = 'failed';
+      //     state.error = action.payload;
+      //   })
+      //   .addCase(deleteAssigns.fulfilled, (state, action) => {
+      //     state.Assigns = state.Assigns.filter(
+      //       (Assigns) => Assigns.id !== action.payload
+      //     );
+      //   })
+      //   .addCase(deleteAssigns.rejected, (state, action) => {
+      //     state.status = 'failed';
+      //     state.error = action.payload;
+      //   })
 
-    //   .addCase(updateAssigns.fulfilled, (state, action) => {
-    //     const index = state.Assigns.findIndex(
-    //       (Assigns) => Assigns.id === action.payload.id
-    //     );
-    //     if (index !== -1) {
-    //       state.Assigns[index] = action.payload; 
-    //     }
-    //   })
-    //   .addCase(updateAssigns.rejected, (state, action) => {
-    //     state.status = 'failed';
-    //     state.error = action.payload;
-    //   });
+      //   .addCase(updateAssigns.fulfilled, (state, action) => {
+      //     const index = state.Assigns.findIndex(
+      //       (Assigns) => Assigns.id === action.payload.id
+      //     );
+      //     if (index !== -1) {
+      //       state.Assigns[index] = action.payload; 
+      //     }
+      //   })
+      //   .addCase(updateAssigns.rejected, (state, action) => {
+      //     state.status = 'failed';
+      //     state.error = action.payload;
+      //   });
 
-       .addCase(RetunjobGet.pending, (state) => {
+      .addCase(RetunjobGet.pending, (state) => {
         state.status = 'loading';
       })
       .addCase(RetunjobGet.fulfilled, (state, action) => {
