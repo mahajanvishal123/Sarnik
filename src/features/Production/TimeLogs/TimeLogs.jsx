@@ -537,7 +537,7 @@ function TimeLogs() {
   // Calculate totals based on filtered data
   const totalTimeSum = sumTime(filteredTimeLogs.map(log => log.time));
   const overtimeSum = sumTime(filteredTimeLogs.map(log => log.overtime));
-
+  const totalTimeColumnSum = sumTime(filteredTimeLogs.map(log =>log.totalTime));
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
@@ -663,7 +663,7 @@ function TimeLogs() {
                   <td colSpan="4" className="text-end"> Total Time:</td>
                   <td>{totalTimeSum}</td>
                   <td>{overtimeSum}</td>
-                  <td>-</td>
+                  <td>{totalTimeColumnSum}</td>
                 </tr>
               </tbody>
             </table>

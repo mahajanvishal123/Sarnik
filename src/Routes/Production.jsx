@@ -25,6 +25,7 @@ import Completed_Jobs from '../features/Production/Completed_Jobs/Completed_Jobs
 import TimesheetWorklog from '../features/Production/TimesheetWorklog/TimesheetWorklog.jsx';
 import AddJobTracker from '../features/Production/JobTracker/AddJobTracker.jsx';
 import ProjectOverview from '../features/Production/ProjectList/ProjectOverview.jsx';
+import AddProjectList from '../features/Production/ProjectList/AddProjectList.jsx';
 
 
 
@@ -50,6 +51,7 @@ function Production() {
             <Route path="dashboard" element={<ProtectedRoute><Dashbord /></ProtectedRoute>} />
             <Route path="/jobhistory" element={<ProtectedRoute><Job_History /></ProtectedRoute>} />
             <Route path="/projectList" element={<ProtectedRoute><ProjectList /></ProtectedRoute>} />
+            <Route path="/AddProjectList" element={<ProtectedRoute><AddProjectList /></ProtectedRoute>} />
             <Route path="/picktask" element={<ProtectedRoute><PickTask /></ProtectedRoute>} />
             <Route path="/myJobs" element={<ProtectedRoute><MyJobs /></ProtectedRoute>} />
             <Route path="/TimeTracking" element={<ProtectedRoute><TimeLogs /></ProtectedRoute>} />
