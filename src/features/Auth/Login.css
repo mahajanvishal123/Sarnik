@@ -1,0 +1,171 @@
+/* General page layout */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f8fb;
+  font-family: sans-serif;
+}
+
+/* Hero section */
+.hero-section {
+  /* Use a high-resolution, royalty-free image relevant to project management */
+  background-image: url("https://i.postimg.cc/JzSnxPXC/360-F-281970265-KR6-Ey4-XF3mi-LYq0-QDp3-Ws-H0m35-MR2t-GC.jpg");
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1rem;
+  position: relative;
+  height: 300px;
+}
+
+/* Dark overlay on top of the background */
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Adjust the alpha for more or less darkness */
+}
+
+/* Ensure text sits above the overlay */
+.hero-section h1,
+.hero-section p {
+  position: relative;
+  z-index: 1;
+  margin: 1.5rem auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 2rem 1rem;
+  }
+  .hero-section h1 {
+    font-size: 1.5rem;
+  }
+  .hero-section p {
+    font-size: 0.85rem;
+  }
+}
+
+
+/* Login card */
+.login-card {
+  background: #ffffff;
+  width: 90%;
+  max-width: 450px;
+  margin: -80px auto 0; /* lifts the card up over the background */
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+.login-title {
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+/* Input wrappers */
+.input-wrapper {
+  margin-bottom: 1.25rem;
+}
+.input-wrapper label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+.input-wrapper input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #495057;
+  transition: border-color 0.2s;
+}
+.input-wrapper input:focus {
+  border-color: #66afe9;
+  outline: none;
+}
+
+/* Password container with eye icon */
+.password-container {
+  position: relative;
+}
+.password-container input {
+  padding-right: 2.5rem;
+}
+.password-container span {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6c757d;
+}
+
+/* Remember-me and forgot-link row */
+.remember-forgot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #6c757d;
+}
+.forgot-link {
+  color: #007bff;
+  text-decoration: none;
+}
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+/* Login button */
+.login-button {
+  width: 100%;
+  padding: 0.65rem;
+background-color: blue;
+  border: none;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.login-button:hover:not(:disabled) {
+  background: #2b4beb;
+}
+.login-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Social signup button (Google) */
+.social-signup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.6rem 0;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #5f6368;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
