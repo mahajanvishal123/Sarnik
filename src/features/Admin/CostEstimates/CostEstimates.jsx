@@ -2419,7 +2419,7 @@ function CostEstimates() {
         );
         // ✅ Now fetch updated list
         dispatch(fetchReceivablePurchases());
-        navigate("/admin/receivable");
+        // navigate("/admin/receivable");
       } else {
         Swal.fire({
           icon: "error",

@@ -1056,7 +1056,8 @@ function AddInvoice() {
         .unwrap()
         .then(() => {
           toast.success("Invoice created successfully!");
-          navigate("/admin/Invoicing_Billing", { state: { openTab: "jobs" } });
+          // navigate("/admin/Invoicing_Billing", { state: { openTab: "jobs" } });
+          navigate("/admin/receivable");
         })
         .catch((error) => {
           console.error("Error creating invoice:", error);

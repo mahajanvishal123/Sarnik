@@ -9,6 +9,7 @@ import { Button } from 'react-bootstrap';
 import { FaEdit } from 'react-icons/fa';
 import { Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { apiUrl } from '../../../redux/utils/config';
 
 function ProjectOverview() {
   const location = useLocation();
@@ -21,6 +22,7 @@ function ProjectOverview() {
       setActiveTab(location.state.openTab);
     }
   }, [location.state]);
+
 
 
   const getStatusClass = (status) => {

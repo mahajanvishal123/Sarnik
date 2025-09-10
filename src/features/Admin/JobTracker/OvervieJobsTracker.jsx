@@ -1081,7 +1081,19 @@ const OvervieJobsTracker = ({ onClose }) => {
     },
   ];
   const BackButton = () => {
-    navigate(-1);
+    // Check if we have the job and project data
+    if (job?.projectId?.[0]) {
+      navigate(`/admin/ProjectOverview/${job.projectId[0]._id}`, {
+        state: {
+          id: job.projectId[0]._id,
+          openTab: 'jobs', // or whatever tab you want to show
+          projectDatah: job.projectId[0]
+        }
+      });
+    } else {
+      // Fallback to just going back if we don't have the data
+      navigate(-1);
+    }
   };
   return (
     <div className="container py-4 px-1 px-md-4">
