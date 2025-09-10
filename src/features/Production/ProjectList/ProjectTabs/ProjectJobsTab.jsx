@@ -877,7 +877,7 @@ function ProjectJobsTab() {
               >
                 <option value="">-- Select --</option>
                 <option value="Designer">Designer</option>
-                <option value="production">Production</option>
+                {/* <option value="production">Production</option> */}
               </Form.Select>
             </Form.Group>
 

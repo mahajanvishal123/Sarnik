@@ -19,6 +19,7 @@ import OvervieJobsTracker from '../features/Employee/JobTracker/OvervieJobsTrack
 import Pluginss from '../assets/css/Pluginss/Pluginss.jsx';
 import EmployeeJobTracker from '../features/Employee/EmployeeJobTrackers/EmployeeJobTrackers.jsx';
 import TimesheetWorklog from '../features/Employee/TimesheetWorklog/TimesheetWorklog.jsx';
+import AddJobTracker from '../features/Employee/EmployeeJobTrackers/AddJobTracker.jsx';
 
 function Employee() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
@@ -54,7 +55,7 @@ function Employee() {
             <Route path="/UpdateProfile" element={<ProtectedRoute><UpdateProfile /></ProtectedRoute>} />
             <Route path="/OvervieJobsTracker" element={<ProtectedRoute><OvervieJobsTracker /></ProtectedRoute>} />
             <Route path="/employeeJobsTracker" element={<ProtectedRoute><EmployeeJobTracker /></ProtectedRoute>} />
-
+<Route path="/AddJobTracker/:id" element={<ProtectedRoute><AddJobTracker /></ProtectedRoute>} />
             <Route path="/TimesheetWorklog" element={<ProtectedRoute><TimesheetWorklog /></ProtectedRoute>} />
           </Routes>
         </div>

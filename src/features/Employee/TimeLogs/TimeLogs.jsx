@@ -528,6 +528,7 @@ function TimeLogs() {
   // Calculate totals (after filters)
   const totalTimeSum = sumTime(filteredTimeLogs.map(log => log.time));
   const overtimeSum = sumTime(filteredTimeLogs.map(log => log.overtime));
+  const totalTimeColumnSum = sumTime(filteredTimeLogs.map(log => log.totalTime));
 
   return (
     <div className="container py-4">
@@ -655,12 +656,12 @@ function TimeLogs() {
                 ))}
 
                 {/* Summary Row at bottom */}
-                <tr className="fw-bold bg-light">
-                  <td colSpan="4" className="text-end">Total Time:</td>
-                  <td>{totalTimeSum}</td>
-                  <td>{overtimeSum}</td>
-                  <td>-</td>
-                </tr>
+              <tr className="fw-bold bg-light">
+  <td colSpan="4" className="text-end">Total:</td>
+  <td>{totalTimeSum}</td>
+  <td>{overtimeSum}</td>
+  <td>{totalTimeColumnSum}</td>
+</tr>
               </tbody>
             </table>
           </div>
