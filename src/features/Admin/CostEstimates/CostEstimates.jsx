@@ -2407,7 +2407,7 @@ function CostEstimates() {
         setSelectedPoNumber(""); // Reset PO number
         setPODocument(null);
         setShowAddPOModal(false);
-        dispatch(
+        await dispatch(
           updateCostEstimate({
             id: costEstimatesId,
             data: {
@@ -2417,8 +2417,9 @@ function CostEstimates() {
             },
           })
         );
+
         // ✅ Now fetch updated list
-        dispatch(fetchReceivablePurchases());
+        // dispatch(fetchReceivablePurchases());
         // navigate("/admin/receivable");
       } else {
         Swal.fire({
@@ -2427,6 +2428,9 @@ function CostEstimates() {
           text: "Failed to create purchase order.",
         });
       }
+
+
+      window.location.reload();
     } catch (err) {
       console.error("Error creating PO:", err);
       Swal.fire({

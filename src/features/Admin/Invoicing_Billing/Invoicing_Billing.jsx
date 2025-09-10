@@ -1426,8 +1426,16 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
 
   const clientObj = invoiceData?.clientId || invoiceData?.clients?.[0] || {};
   const projObj = Array.isArray(invoiceData?.projectId) ? invoiceData.projectId[0] : invoiceData?.projects?.[0] || {};
-  const poNo = invoiceData?.ReceivablePurchaseId?.PONumber || invoiceData?.receivablePurchase?.PONumber || 'N/A';
-  const costEst = invoiceData?.CostEstimatesId?.estimateRef || invoiceData?.costEstimate?.estimateRef || 'N/A';
+  const poNo =
+    invoiceData?.ReceivablePurchaseId?.PONumber ||
+    invoiceData?.receivablePurchase?.PONumber ||
+    'N/A';
+
+  const costEst =
+    invoiceData?.ReceivablePurchaseId?.CostEstimatesId?.[0]?.estimateRef ||
+    invoiceData?.receivablePurchase?.CostEstimatesId?.[0]?.estimateRef ||
+    'N/A';
+
   const projName = projObj?.projectName || 'N/A';
 
   const co = {
