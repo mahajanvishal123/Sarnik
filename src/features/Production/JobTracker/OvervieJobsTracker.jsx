@@ -1037,7 +1037,7 @@ const OvervieJobsTracker = ({ onClose }) => {
     },
     {
       label: "Assign",
-      value: job?.assignedTo?.firstName ? `${job.assignedTo.firstName} ${job.assignedTo.lastName}` : job?.assign,
+      value: job?.assignedTo?.firstName ? `${job.assignedTo.firstName} ${job.assignedTo.lastName}` : job?.assignedTo,
       icon: <FaUser className="me-2 text-primary" />,
     },
     {
