@@ -20,7 +20,7 @@
 //   const navigate = useNavigate()
 
 // const { job } = useSelector((state) => state.jobs);
-  
+
 // useEffect(() => {
 //     dispatch(JobsFinace(id))
 //   }, [dispatch]);
@@ -479,10 +479,10 @@
 //   const itemsPerPage = 7;
 
 //   console.log("new",job.invoicingData);
-  
+
 //   const filteredEstimates = job.invoicingData
 //   console.log("invocing kk",filteredEstimates)
-  
+
 //     ?.slice()
 //     .reverse()
 //     .filter((invoice) => {
@@ -747,9 +747,9 @@
 import React from 'react'
 import Invoicing_Billing from './ReceivePurchase/Invoicing_Billing/Invoicing_Billing'
 
-function ProjectInvoiceBilling({projectNO}) {
+function ProjectInvoiceBilling({ projectNO }) {
   return (
-    <Invoicing_Billing projectNO={projectNO}/>
+    <Invoicing_Billing projectNO={projectNO} />
   )
 }
 

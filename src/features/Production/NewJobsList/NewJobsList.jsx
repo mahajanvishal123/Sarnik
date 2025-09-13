@@ -2144,7 +2144,7 @@ function NewJobsList() {
   const fetchInProgressJobs = async () => {
     setLoadingInProgress(true);
     try {
-      const response = await axios.get("https://sarnic-backend-production-690c.up.railway.app/api/jobs/filter/In%20Progress");
+      const response = await axios.get("https://sarnic-backend-production.up.railway.app/api/jobs/filter/In%20Progress");
       if (response.data && response.data.success) {
         setInProgressJobs(response.data.jobs);
       }
@@ -2542,11 +2542,11 @@ function NewJobsList() {
       )}
 
       {/* Debug Info - Remove in production */}
-      <div className="mb-2">
+      {/* <div className="mb-2">
         <small className="text-muted">
           Debug: Found {productionAssignments.length} production assignments, {productionJobIds.size} unique job IDs, {inProgressJobIds.size} in-progress jobs, showing {filteredJobs.length} filtered jobs
         </small>
-      </div>
+      </div> */}
 
       {/* Filters */}
       <div className="d-flex flex-wrap gap-2 mb-3 align-items-center">
@@ -2604,121 +2604,123 @@ function NewJobsList() {
             </div>
             <p className="mt-2">Loading jobs data...</p>
           </div>
-        ) : error ? (
-          <div className="alert alert-danger">
-            Error loading jobs: {error.message || "Unknown error"}
-          </div>
-        ) : (
-          <Table hover className="align-middle sticky-header">
-            <thead className="bg-light">
-              <tr>
-                <th>
-                  <input
-                    type="checkbox"
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-                      const newSelectedJobs = {};
-                      filteredJobs.forEach((job) => {
-                        newSelectedJobs[job._id] = checked;
-                      });
-                      setSelectedJobs(newSelectedJobs);
-                    }}
-                    checked={filteredJobs.length > 0 && filteredJobs.every((j) => selectedJobs[j._id])}
-                  />
-                </th>
-                <th>JobNo</th>
-                <th style={{ whiteSpace: "nowrap" }}>Project Name</th>
-                <th style={{ whiteSpace: "nowrap" }}>Project No</th>
-                <th>Brand</th>
-                <th style={{ whiteSpace: "nowrap" }}>Sub Brand</th>
-                <th>Flavour</th>
-                <th>PackType</th>
-                <th>PackSize</th>
-                <th>PackCode</th>
-                <th>TimeLogged</th>
-                <th>Due Date</th>
-                <th>assign</th>
-                <th>Priority</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedProjects.length > 0 ? (
-                paginatedProjects
-                  .slice()
-                  .reverse()
-                  .filter((item) => item.Status != "Completed")
-                  .map((job, index) => (
-                    <tr key={job._id}>
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={selectedJobs[job._id] || false}
-                          onChange={() => handleCheckboxChange(job._id)}
-                        />
-                      </td>
-                      <td onClick={() => JobDetails(job)}>
-                        <Link style={{ textDecoration: "none" }}>{job.JobNo}</Link>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>
-                        {job.projectId?.[0]?.projectName || "N/A"}
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>
-                        {job.projectId?.[0]?.projectNo || "N/A"}
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>{job.brandName}</td>
-                      <td style={{ whiteSpace: "nowrap" }}>{job.subBrand}</td>
-                      <td style={{ whiteSpace: "nowrap" }}>{job.flavour}</td>
-                      <td style={{ whiteSpace: "nowrap" }}>{job.packType}</td>
-                      <td style={{ whiteSpace: "nowrap" }}>{job.packSize}</td>
-                      <td style={{ whiteSpace: "nowrap" }}>{job?.packCode}</td>
-                      <td>
-                        {job.updatedAt ? new Date(job.updatedAt).toLocaleTimeString('en-US', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: false
-                        }) : 'N/A'}
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>
-                        {job.createdAt ? new Date(job.createdAt).toLocaleDateString("en-GB") : 'N/A'}
-                      </td>
-                      <td style={{ whiteSpace: 'nowrap' }}>
-                        {job.assignedTo ? (
-                          <>
-                            {job.assignedTo.firstName} {job.assignedTo.lastName}
-                          </>
-                        ) : (
-                          'Not Assigned'
-                        )}
-                      </td>
-                      <td>
-                        <span className={getPriorityClass(job.priority)}>{job.priority || 'N/A'}</span>
-                      </td>
-                      <td>
-                        <span className={`badge ${getStatusClass(job.Status)} px-2 py-1`}>
-                          {job.Status || 'N/A'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="d-flex gap-2">
-                          <Button id="icone_btn" size="sm" onClick={() => handleUpdate(job)}>
-                            <FaEdit />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-              ) : (
+        )
+          // : error ? (
+          //   <div className="alert alert-danger">
+          //     {error.message || "Unknown error"}
+          //   </div>
+          // ) 
+          : (
+            <Table hover className="align-middle sticky-header">
+              <thead className="bg-light">
                 <tr>
-                  <td colSpan="16" className="text-center py-4">
-                    No production-assigned jobs found
-                  </td>
+                  <th>
+                    <input
+                      type="checkbox"
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        const newSelectedJobs = {};
+                        filteredJobs.forEach((job) => {
+                          newSelectedJobs[job._id] = checked;
+                        });
+                        setSelectedJobs(newSelectedJobs);
+                      }}
+                      checked={filteredJobs.length > 0 && filteredJobs.every((j) => selectedJobs[j._id])}
+                    />
+                  </th>
+                  <th>JobNo</th>
+                  <th style={{ whiteSpace: "nowrap" }}>Project Name</th>
+                  <th style={{ whiteSpace: "nowrap" }}>Project No</th>
+                  <th>Brand</th>
+                  <th style={{ whiteSpace: "nowrap" }}>Sub Brand</th>
+                  <th>Flavour</th>
+                  <th>PackType</th>
+                  <th>PackSize</th>
+                  <th>PackCode</th>
+                  <th>TimeLogged</th>
+                  <th>Due Date</th>
+                  <th>assign</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              )}
-            </tbody>
-          </Table>
-        )}
+              </thead>
+              <tbody>
+                {paginatedProjects.length > 0 ? (
+                  paginatedProjects
+                    .slice()
+                    .reverse()
+                    .filter((item) => item.Status != "Completed")
+                    .map((job, index) => (
+                      <tr key={job._id}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedJobs[job._id] || false}
+                            onChange={() => handleCheckboxChange(job._id)}
+                          />
+                        </td>
+                        <td onClick={() => JobDetails(job)}>
+                          <Link style={{ textDecoration: "none" }}>{job.JobNo}</Link>
+                        </td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          {job.projectId?.[0]?.projectName || "N/A"}
+                        </td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          {job.projectId?.[0]?.projectNo || "N/A"}
+                        </td>
+                        <td style={{ whiteSpace: "nowrap" }}>{job.brandName}</td>
+                        <td style={{ whiteSpace: "nowrap" }}>{job.subBrand}</td>
+                        <td style={{ whiteSpace: "nowrap" }}>{job.flavour}</td>
+                        <td style={{ whiteSpace: "nowrap" }}>{job.packType}</td>
+                        <td style={{ whiteSpace: "nowrap" }}>{job.packSize}</td>
+                        <td style={{ whiteSpace: "nowrap" }}>{job?.packCode}</td>
+                        <td>
+                          {job.updatedAt ? new Date(job.updatedAt).toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                          }) : 'N/A'}
+                        </td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          {job.createdAt ? new Date(job.createdAt).toLocaleDateString("en-GB") : 'N/A'}
+                        </td>
+                        <td style={{ whiteSpace: 'nowrap' }}>
+                          {job.assignedTo ? (
+                            <>
+                              {job.assignedTo.firstName} {job.assignedTo.lastName}
+                            </>
+                          ) : (
+                            'Not Assigned'
+                          )}
+                        </td>
+                        <td>
+                          <span className={getPriorityClass(job.priority)}>{job.priority || 'N/A'}</span>
+                        </td>
+                        <td>
+                          <span className={`badge ${getStatusClass(job.Status)} px-2 py-1`}>
+                            {job.Status || 'N/A'}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="d-flex gap-2">
+                            <Button id="icone_btn" size="sm" onClick={() => handleUpdate(job)}>
+                              <FaEdit />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan="16" className="text-center py-4">
+                      No production-assigned jobs found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          )}
       </div>
 
       {/* Assign Modal */}

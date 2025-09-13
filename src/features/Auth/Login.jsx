@@ -229,13 +229,13 @@ const Login = () => {
   return (
     <div className="login-page">
       {/* Hero section */}
-  <div className="hero-section">
-  <h1>Project Management</h1>
-  <p>
-    Organize tasks, track progress, and collaborate effectively with Gantt charts,
-    3D graphics, and more.
-  </p>
-</div>
+      <div className="hero-section">
+        <h1>Project Management</h1>
+        <p>
+          Organize tasks, track progress, and collaborate effectively with Gantt charts,
+          3D graphics, and more.
+        </p>
+      </div>
 
       {/* Login card */}
       <div className="login-card">

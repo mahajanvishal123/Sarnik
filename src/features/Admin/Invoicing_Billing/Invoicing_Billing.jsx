@@ -2216,7 +2216,8 @@ function Invoicing_Billing() {
       </div>
 
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-        <h2>Invoicing &amp; Billing</h2>
+        {/* <h2>Invoicing &amp; Billing</h2> */}
+        <h2>Invoicing </h2>
       </div>
 
       <div className={`row g-3 mb-4 ${showFilters ? 'd-block' : 'd-none d-md-flex'}`}>
@@ -2291,6 +2292,7 @@ function Invoicing_Billing() {
           <tr>
             <th onClick={() => handleSort('invoiceNumber')} style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}>Invoice #</th>
             <th onClick={() => handleSort('project')} style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}>Project</th>
+            <th onClick={() => handleSort('project')} style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}>PO Number</th>
             <th onClick={() => handleSort('client')} style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}>Client Name</th>
             <th onClick={() => handleSort('amount')} style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}>Amount</th>
             <th onClick={() => handleSort('dueDate')} style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}>Date</th>
@@ -2302,6 +2304,7 @@ function Invoicing_Billing() {
             <tr key={invoice._id || idx}>
               <td style={{ whiteSpace: 'nowrap' }}>{invoice.InvoiceNo || 'N/A'}</td>
               <td style={{ whiteSpace: 'nowrap' }}>{invoice.projectId?.[0]?.projectName || 'N/A'}</td>
+              <td style={{ whiteSpace: 'nowrap' }}>{invoice.ReceivablePurchaseId?.PONumber || 'N/A'}</td>
               <td style={{ whiteSpace: 'nowrap' }}>{invoice.clientId?.clientName || 'N/A'}</td>
               <td style={{ whiteSpace: 'nowrap' }}>
                 {invoice.currency || 'USD'} {Number(invoice.lineItems?.[0]?.amount || 0).toFixed(2)}
@@ -2309,9 +2312,9 @@ function Invoicing_Billing() {
               <td>{invoice.date ? new Date(invoice.date).toLocaleDateString('en-GB') : 'N/A'}</td>
               <td>
                 <div className="d-flex gap-2">
-                  <button className="btn btn-sm btn-outline-primary" onClick={() => UpdateInvocing(invoice)}>
+                  {/* <button className="btn btn-sm btn-outline-primary" onClick={() => UpdateInvocing(invoice)}>
                     <FaEdit />
-                  </button>
+                  </button> */}
                   <button
                     className="btn btn-sm btn-outline-primary"
                     onClick={() => handleDownloadPDF(invoice)}

@@ -2362,7 +2362,7 @@ function CostEstimates() {
   };
   const handleSavePO = async () => {
     // Make sure we have the amount value
-    const poAmount = selectedPO?.lineItems?.[0]?.amount || amount;
+    const poAmount = selectedPO?.lineItems?.reduce((sum, item) => sum + (item.amount || 0), 0) || amount;
     // Make sure we have the date value and format it correctly
     const formattedDate = selectedPO?.estimateDate
       ? new Date(selectedPO.estimateDate).toISOString().split('T')[0]
@@ -2528,11 +2528,16 @@ function CostEstimates() {
                 <Form.Label className="d-block">PO Amount</Form.Label>
                 <Form.Control
                   type="number"
-                  value={selectedPO?.lineItems?.[0]?.amount || amount}
+                  // value={selectedPO?.lineItems?.[0]?.amount || amount}
+                  value={
+                    selectedPO?.lineItems
+                      ? selectedPO.lineItems.reduce((sum, item) => sum + (item.amount || 0), 0)
+                      : amount
+                  }
                   onChange={(e) => setAmount(e.target.value)}
                   className="form-control"
                   placeholder="Enter amount"
-                  readOnly={!!selectedPO?.lineItems?.[0]?.amount}
+                  // readOnly={!!selectedPO?.lineItems?.[0]?.amount}
                   required
                 />
               </div>
@@ -3032,7 +3037,7 @@ function CostEstimates() {
                     .slice(0, 8)}
                 </td>
                 <td>
-                  {po.lineItems
+                  {po?.currency} {po.lineItems
                     ?.reduce((total, item) => total + (item.amount || 0), 0)
                     .toFixed(2)}
                 </td>

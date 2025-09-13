@@ -516,7 +516,7 @@ function Notiifcations() {
   const deleteNotification = async (id) => {
     try {
       const response = await fetch(
-        `https://sarnic-backend-production-690c.up.railway.app/api/notifiction/deleteNotification/${id}`,
+        `https://sarnic-backend-production.up.railway.app/api/notifiction/deleteNotification/${id}`,
         {
           method: "DELETE",
         }

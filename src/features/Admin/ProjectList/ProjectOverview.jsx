@@ -14,15 +14,32 @@ import { apiUrl } from '../../../redux/utils/config';
 function ProjectOverview() {
   const location = useLocation();
   const { id, openTab, projectDatah, projectNo, projectName, clientName } = location.state || {};
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('jobs');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (location.state?.openTab) {
-      setActiveTab(location.state.openTab);
-    }
-  }, [location.state]);
+  // useEffect(() => {
+  //   if (location.state?.openTab) {
+  //     setActiveTab(location.state.openTab);
+  //   }
+  // }, [location.state]);
 
+  // useEffect(() => {
+  //   if (location.state?.openTab) {
+  //     setActiveTab(location.state.openTab);
+  //   }
+  // }, [location.state]);
+
+  useEffect(() => {
+    if (location.state?.from === "AddCostEstimates" || location.state?.openFinanceTab) {
+      setActiveTab("finance");
+    } else {
+      const shouldOpenFinance = localStorage.getItem("openFinanceTab");
+      if (shouldOpenFinance === "true") {
+        setActiveTab("finance");
+        localStorage.removeItem("openFinanceTab"); // clear after using it
+      }
+    }
+  }, []);
 
 
   const getStatusClass = (status) => {

@@ -347,7 +347,7 @@ const handleToBeInvoiced = (po) => {
                 </td>
 
                 <td>{new Date(po.ReceivedDate).toLocaleDateString()}</td>
-                <td>${po.Amount?.toFixed(2)}</td>
+                <td>{po?.CostEstimatesId[0]?.currency} {po.Amount?.toFixed(2)}</td>
                 <td>
                 <span className={`badge ${getStatusClass(po.POStatus)} px-2 py-1`}>
                   {/* {po.POStatus} */}

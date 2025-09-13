@@ -1357,6 +1357,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BiCopy } from "react-icons/bi";
 import axios from "axios"; // Add this import
+import { apiUrl } from "../../../redux/utils/config";
 
 function NewJobsList() {
   const [showRejectModal, setShowRejectModal] = useState(false);
@@ -1397,7 +1398,7 @@ function NewJobsList() {
   const fetchInProgressJobs = async () => {
     setLoadingInProgress(true);
     try {
-      const response = await axios.get("https://sarnic-backend-production-690c.up.railway.app/api/jobs/filter/In%20Progress");
+      const response = await axios.get(`${apiUrl}/jobs/filter/In%20Progress`);
       if (response.data && response.data.success) {
         setInProgressJobs(response.data.jobs);
       }
@@ -1538,17 +1539,116 @@ function NewJobsList() {
   console.log("In-progress job IDs:", inProgressJobIds);
 
   // Filter jobs to only show those assigned to production and not in progress
+  // const filteredJobs = productionJobs.filter((j) => {
+  //   // Split searchQuery by spaces, ignore empty terms
+  //   const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
+
+  //   // Check if job is in progress (from the API)
+  //   const isJobInProgress = inProgressJobIds.has(j._id);
+
+  //   // If job is in progress, don't show it
+  //   if (isJobInProgress) {
+  //     return false;
+  //   }
+
+  //   if (terms.length === 0) {
+  //     const matchesProject =
+  //       selectedProject === "All Projects" ||
+  //       (j.projectId?.[0]?.projectName?.toLowerCase() === selectedProject.toLowerCase());
+  //     const matchesPriority =
+  //       selectedPriority === "All Priorities" ||
+  //       (j.priority?.toLowerCase() === selectedPriority.toLowerCase());
+  //     const matchesStatus =
+  //       selectedStatus === "All Status" ||
+  //       (j.Status?.toLowerCase() === selectedStatus.toLowerCase());
+  //     const matchesStage =
+  //       selectedStage === "All Stages" ||
+  //       (j.stage?.toLowerCase() === selectedStage.toLowerCase());
+  //     return (
+  //       matchesProject &&
+  //       matchesPriority &&
+  //       matchesStatus &&
+  //       matchesStage
+  //     );
+  //   }
+
+  //   // Prepare searchable fields as strings
+  //   const fields = [
+  //     j.JobNo,
+  //     j.projectId?.[0]?.projectName,
+  //     j.brandName,
+  //     j.subBrand,
+  //     j.flavour,
+  //     j.packType,
+  //     j.packSize,
+  //     j.packCode,
+  //     j.updatedAt ? new Date(j.updatedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : '',
+  //     j.createdAt ? new Date(j.createdAt).toLocaleDateString("en-GB") : '',
+  //     j.assign,
+  //     j.priority,
+  //     j.Status
+  //   ].map(f => (f || '').toString().toLowerCase());
+
+  //   // Every term must be found in at least one field
+  //   const matchesSearch = terms.every(term =>
+  //     fields.some(field => field.includes(term.toLowerCase()))
+  //   );
+
+  //   const matchesProject =
+  //     selectedProject === "All Projects" ||
+  //     (j.projectId?.[0]?.projectName?.toLowerCase() === selectedProject.toLowerCase());
+  //   const matchesPriority =
+  //     selectedPriority === "All Priorities" ||
+  //     (j.priority?.toLowerCase() === selectedPriority.toLowerCase());
+  //   const matchesStatus =
+  //     selectedStatus === "All Status" ||
+  //     (j.Status?.toLowerCase() === selectedStatus.toLowerCase());
+  //   const matchesStage =
+  //     selectedStage === "All Stages" ||
+  //     (j.stage?.toLowerCase() === selectedStage.toLowerCase());
+
+  //   return (
+  //     matchesSearch &&
+  //     matchesProject &&
+  //     matchesPriority &&
+  //     matchesStatus &&
+  //     matchesStage
+  //   );
+  // });
+  // Filter jobs to only show those assigned to production and not in progress
   const filteredJobs = productionJobs.filter((j) => {
+    // Find the assignment for this job
+    const assignment = productionAssignments.find(assignment =>
+      assignment.jobs?.some(jobItem => jobItem.jobId._id === j._id)
+    );
+
+    // If no assignment, skip
+    if (!assignment) return false;
+
+    console.log(assignment);
+
+
+    // ✅ Ensure the employee role is "production"
+    if (assignment.employeeId?.role?.toLowerCase() != "production") {
+      return false;
+    }
+
+    // ✅ Find this specific job inside the assignment
+    const jobItem = assignment.jobs.find(jobItem => jobItem.jobId._id === j._id);
+
+    // ✅ Check if this job is assigned to the same production user
+    if (!jobItem?.assignedTo || jobItem.assignedTo.userId !== assignment.employeeId._id) {
+      return false;
+    }
+
     // Split searchQuery by spaces, ignore empty terms
     const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
 
     // Check if job is in progress (from the API)
-    const isJobInProgress = inProgressJobIds.has(j._id);
-
-    // If job is in progress, don't show it
-    if (isJobInProgress) {
-      return false;
-    }
+    // const isJobInProgress = inProgressJobIds.has(j._id);
+    // if (isJobInProgress) {
+    //   return false;
+    // }
 
     if (terms.length === 0) {
       const matchesProject =
@@ -1563,12 +1663,7 @@ function NewJobsList() {
       const matchesStage =
         selectedStage === "All Stages" ||
         (j.stage?.toLowerCase() === selectedStage.toLowerCase());
-      return (
-        matchesProject &&
-        matchesPriority &&
-        matchesStatus &&
-        matchesStage
-      );
+      return matchesProject && matchesPriority && matchesStatus && matchesStage;
     }
 
     // Prepare searchable fields as strings
@@ -1588,7 +1683,6 @@ function NewJobsList() {
       j.Status
     ].map(f => (f || '').toString().toLowerCase());
 
-    // Every term must be found in at least one field
     const matchesSearch = terms.every(term =>
       fields.some(field => field.includes(term.toLowerCase()))
     );
@@ -1614,6 +1708,7 @@ function NewJobsList() {
       matchesStage
     );
   });
+
 
   console.log("Filtered jobs:", filteredJobs);
 
@@ -1866,7 +1961,7 @@ function NewJobsList() {
                 paginatedProjects
                   .slice()
                   .reverse()
-                  .filter((item) => item.Status != "Completed")
+                  // .filter((item) => item.Status != "Completed")
                   .map((job, index) => (
                     <tr key={job._id}>
                       <td>
@@ -1902,12 +1997,30 @@ function NewJobsList() {
                         {job.createdAt ? new Date(job.createdAt).toLocaleDateString("en-GB") : 'N/A'}
                       </td>
                       <td style={{ whiteSpace: 'nowrap' }}>
-                        {productionAssignments.find(assignment =>
+                        {/* {productionAssignments.find(assignment =>
                           assignment.jobs?.some(jobItem => jobItem.jobId._id === job._id)
                         )?.employeeId?.firstName || 'N/A'} {' '}
                         {productionAssignments.find(assignment =>
                           assignment.jobs?.some(jobItem => jobItem.jobId._id === job._id)
-                        )?.employeeId?.lastName || ''}
+                        )?.employeeId?.lastName || ''} */}
+                        {(() => {
+                          const assignment = productionAssignments.find(a =>
+                            a.jobs?.some(jobItem => jobItem.jobId._id === job._id)
+                          );
+
+                          if (!assignment) return 'N/A';
+
+                          // Find this specific job inside the assignment
+                          const jobItem = assignment.jobs.find(jItem => jItem.jobId._id === job._id);
+
+                          // Prefer jobItem.assignedTo if available
+                          if (jobItem?.assignedTo) {
+                            return `${jobItem.assignedTo.firstName || ''} ${jobItem.assignedTo.lastName || ''}`;
+                          }
+
+                          // Fallback to assignment.employeeId
+                          return `${assignment.employeeId?.firstName || ''} ${assignment.employeeId?.lastName || ''}`;
+                        })()}
                       </td>
                       <td>
                         <span className={getPriorityClass(job.priority)}>{job.priority || 'N/A'}</span>

@@ -322,7 +322,7 @@ const handleToBeInvoiced = (po) => {
                 </td>
 
                 <td>{new Date(po.ReceivedDate).toLocaleDateString()}</td>
-                <td>${po.Amount?.toFixed(2)}</td>
+                <td>{po.CostEstimatesId[0]?.currency} {po.Amount?.toFixed(2)}</td>
                 <td>
                 <span className={`badge ${getStatusClass(po.POStatus)} px-2 py-1`}>
                   {/* {po.POStatus} */}
@@ -335,11 +335,6 @@ const handleToBeInvoiced = (po) => {
                     variant="outline-primary"
                     size="sm"
                     // onClick={() => handleToBeInvoiced(po)}
-                    onClick={() => 
-                      po.POStatus === "Pending" 
-                        ? handleToBeInvoiced(po) 
-                        : navigate("/admin/Invoicing_Billing")
-                    }
                     className="px-3 py-1 fw-semibold border-2"
                     style={{
                       transition: 'all 0.3s ease',

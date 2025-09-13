@@ -27,15 +27,15 @@
 //     const [currentPage, setCurrentPage] = useState(1);
 //     const [showFilters, setShowFilters] = useState(false);
 
-  
+
 //     const { purchases, loading, error } = useSelector(
 //       (state) => state.receivablePurchases
 //     );
- 
+
 //     useEffect(() => {
 //       dispatch(fetchReceivablePurchases());
 //     }, [dispatch]);
-  
+
 //     const itemsPerPage = 7;
 //     const allOrders =job.receivablePurchases|| [];
 
@@ -63,38 +63,38 @@
 //         po?.Status?.toLowerCase() === selectedStatus.toLowerCase();
 //       return matchesSearch && matchesStatus;
 //     });
-  
+
 //     // ↕️ Sorting
 //     const sortedOrders = [...filteredOrders].sort((a, b) => {
 //       if (!sortField) return 0;
 //       const aVal = a[sortField] || "";
 //       const bVal = b[sortField] || "";
-  
+
 //       if (sortField === "Amount") {
 //         return sortDirection === "asc" ? aVal - bVal : bVal - aVal;
 //       }
-  
+
 //       return sortDirection === "asc"
 //         ? String(aVal).localeCompare(String(bVal))
 //         : String(bVal).localeCompare(String(aVal));
 //     });
-  
+
 //     const totalPages = Math.ceil(sortedOrders.length / itemsPerPage);
 //     const paginatedData = sortedOrders.slice(
 //       (currentPage - 1) * itemsPerPage,
 //       currentPage * itemsPerPage
 //     );
-  
+
 //     const pendingPOs = filteredOrders.filter(
 //       (po) => po.POStatus?.toLowerCase() === "pending"
 //     ).length;
-  
+
 //     const handleSort = (field) => {
 //       const isAsc = sortField === field && sortDirection === "asc";
 //       setSortDirection(isAsc ? "desc" : "asc");
 //       setSortField(field);
 //     };
-  
+
 //   const getStatusClass = (status) => {
 //     switch (status.toLowerCase().trim()) {
 //       case "pending":
@@ -124,19 +124,19 @@
 //         return "bg-light text-dark";       // Default light background
 //     }
 //   };
-  
-  
+
+
 //     // const handleToBeInvoiced = (clientName, projectName) => {
 //     //   const invoice = {
 //     //     clientName,
 //     //     projectName
 //     //   };
-  
+
 //     //   navigate("/admin/AddInvoice", {
 //     //     state: { invoice }
 //     //   });
 //     // };
-  
+
 //     const handleToBeInvoiced = (po) => {
 //       console.log("po", po._id)
 //       const ReceivablePurchaseId = po._id;
@@ -153,8 +153,8 @@
 //         ReceivablePurchaseId: po?._id,
 //       };
 //       console.log("Invoice Data:", invoice);
-  
-  
+
+
 //       navigate("/admin/AddInvoice", {
 //         state: { invoice }
 //       });
@@ -413,7 +413,7 @@
 import React from 'react'
 import ReciveablePurchase from './ReceivePurchase/ReciveablePurchase/ReciveablePurchase'
 
-function ReceivablePurchaseOrders({projectNO}) {
+function ReceivablePurchaseOrders({ projectNO }) {
   return (
     <ReciveablePurchase projectNO={projectNO} />
   )

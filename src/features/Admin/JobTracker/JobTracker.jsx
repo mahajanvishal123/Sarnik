@@ -269,9 +269,15 @@ function JobTracker() {
                     </span>
                   </td>
                   <td style={{ whiteSpace: "nowrap" }}>
-                    {job.assignedTo
+                    {/* {job.assignedTo
                       ? `${job.assignedTo.firstName} ${job.assignedTo.lastName}`
-                      : job.assign || "Unassigned"}
+                      : job.assign || "Unassigned"} */}
+                    {job.assignedTo
+                      ? `${job.assignedTo.firstName || ''} ${job.assignedTo.lastName || ''}`.trim() || "Not Assigned"
+                      : job.assign
+                        ? job.assign
+                        : "Not Assigned"
+                    }
                   </td>
 
                   <td>{new Date(job.createdAt).toLocaleDateString("en-GB")}</td>

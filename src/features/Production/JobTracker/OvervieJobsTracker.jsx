@@ -456,7 +456,7 @@
 //       setError(null);
 //       try {
 //         const response = await fetch(
-//           `https://sarnic-backend-production-690c.up.railway.app/api/jobs/worklog-project/${job.projectId[0]._id}`
+//           `https://sarnic-backend-production.up.railway.app/api/jobs/worklog-project/${job.projectId[0]._id}`
 //         );
 
 //         if (!response.ok) {
