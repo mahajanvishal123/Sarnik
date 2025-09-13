@@ -978,7 +978,7 @@ function AddInvoice() {
         ReceivablePurchaseId: purchaseOrderData.ReceivablePurchaseId || "",
         date: new Date().toISOString().substring(0, 10), // Set today's date as default
         status: "Active", // Default status
-        currency: "USD", // Default currency
+        currency: purchaseOrderData.currency || "USD", // Default currency
         document: "Tax Invoice", // Default document type
         output: "PDF", // Default output format
         InvoiceNo: `INV-${Date.now()}`, // Generate a temporary invoice number

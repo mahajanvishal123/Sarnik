@@ -16,6 +16,8 @@ function TimesheetWorklog() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
+  // Add this with your other state variables
+  const [selectedEmployee, setSelectedEmployee] = useState('All employees');
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { timesheetWorklog, error, loading } = useSelector((state) => state.TimesheetWorklogs);
@@ -56,11 +58,15 @@ function TimesheetWorklog() {
       );
       const matchesProject = selectedProject === 'All timesheet' ||
         log.projectId?.[0]?.projectName === selectedProject;
-      
+
+      // Add this to your filter conditions
+      const matchesEmployee = selectedEmployee === 'All employees' ||
+        `${log.employeeId?.[0]?.firstName || ''} ${log.employeeId?.[0]?.lastName || ''}` === selectedEmployee;
+
       // Updated date filtering logic for date range
       const logDate = new Date(log.date);
       let matchesDate = true;
-      
+
       if (startDate && endDate) {
         matchesDate = logDate >= new Date(startDate) && logDate <= new Date(endDate);
       } else if (startDate) {
@@ -68,8 +74,8 @@ function TimesheetWorklog() {
       } else if (endDate) {
         matchesDate = logDate <= new Date(endDate);
       }
-      
-      return matchesSearch && matchesProject && matchesDate;
+
+      return matchesSearch && matchesProject && matchesDate && matchesEmployee;
     });
 
   // Update pagination to use filtered data
@@ -223,6 +229,26 @@ function TimesheetWorklog() {
             </Dropdown.Menu>
           </Dropdown>
         </div>
+
+        <div className="col-md-3">
+          <Dropdown>
+            <Dropdown.Toggle variant="light" id="employee-dropdown" className="w-100">
+              {selectedEmployee}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => setSelectedEmployee("All employees")}>
+                All employees
+              </Dropdown.Item>
+              {[...new Set((timesheetWorklog.TimesheetWorklogss || []).map((log) =>
+                `${log.employeeId?.[0]?.firstName || ''} ${log.employeeId?.[0]?.lastName || ''}`
+              ))].filter(name => name.trim() !== '').map((employeeName, index) => (
+                <Dropdown.Item key={index} onClick={() => setSelectedEmployee(employeeName)}>
+                  {employeeName}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
       </div>
 
       {/* Time Entries Table */}
@@ -233,6 +259,7 @@ function TimesheetWorklog() {
               <tr className="bg-light">
                 <th>JobID</th>
                 <th style={{ whiteSpace: 'nowrap' }}>Project Name</th>
+                <th>Employee</th>
                 <th>Date</th>
                 <th style={{ whiteSpace: 'nowrap' }}>Time</th>
                 <th style={{ whiteSpace: 'nowrap' }}>overtime</th>
@@ -252,6 +279,11 @@ function TimesheetWorklog() {
                     </td>
                     <td style={{ whiteSpace: 'nowrap' }} key={index}>
                       {log.projectId?.[0]?.projectName || 'No Project Name'}
+                    </td>
+                    <td>
+                      {log.employeeId?.[0]
+                        ? `${log.employeeId[0].firstName} ${log.employeeId[0].lastName}`
+                        : 'No Employee Assigned'}
                     </td>
                     <td>{new Date(log.date).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
                     <td>
