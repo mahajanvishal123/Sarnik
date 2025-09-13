@@ -113,6 +113,7 @@ export const adminMenuItems = [
     icon: <FaCog className="menu-icon" />,
     path: "/admin/Settings",
   },
+  
 ];
 
 // Employee Menu
@@ -266,4 +267,5 @@ export const ProductionMenuItems = [
     icon: <FaCog className="menu-icon" />,
     path: "/production/Settings",
   },
+  
 ];

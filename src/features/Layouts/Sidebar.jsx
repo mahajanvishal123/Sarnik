@@ -71,43 +71,26 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   };
 
   return (
-    <div className={`sidebar ${isOpen ? "expanded" : "collapsed"}`}>
-      {/* <div className="sidebar-header">
-        <div className="logo">
-          <span className="logo-text">Saaranik</span>
-        </div>
 
-        <div className="logo" style={{
-          display: 'flex',
-          alignItems: 'center',
-          height: '30px',
-          paddingLeft: '10px'
-        }}>
-          <img
-            src={logo}
-            alt="Logo"
-            style={{
-              height: '50px',
-              display: 'block',
-              objectFit: 'contain'
-            }}
-          />
-        </div>
 
-      </div> */}
+  <div className={`sidebar ${isOpen ? "expanded" : "collapsed"}`}>
+    {/* header/logo agar ho to yahan rahe */}
 
+    {/* ⬇️ NEW: scrollable wrapper */}
+    <div className="menu-scroll">
       <ul className="menu" style={{ whiteSpace: "nowrap" }}>
         {menuItems.map((item, index) => (
           <li
             key={index}
-            className={`menu-item ${item.submenu
-              ? openMenuIndex === index
-                ? "open"
-                : ""
-              : activeMenuIndex === index
+            className={`menu-item ${
+              item.submenu
+                ? openMenuIndex === index
+                  ? "open"
+                  : ""
+                : activeMenuIndex === index
                 ? "active"
                 : ""
-              }`}
+            }`}
             onClick={() => {
               if (item.submenu) {
                 toggleMenu(index);
@@ -121,18 +104,21 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               {isOpen && <span className="menu-text">{item.title}</span>}
               {item.submenu && isOpen && (
                 <i
-                  className={`fas fa-chevron-down menu-toggle-icon ${openMenuIndex === index ? "open" : ""
-                    }`}
+                  className={`fas fa-chevron-down menu-toggle-icon ${
+                    openMenuIndex === index ? "open" : ""
+                  }`}
                 />
               )}
             </div>
+
             {item.submenu && isOpen && (
               <ul className={`submenu ${openMenuIndex === index ? "open" : ""}`}>
                 {item.submenu.map((subItem, subIndex) => (
                   <li
                     key={subIndex}
-                    className={`submenu-item ${activeSubmenuPath === subItem.path ? "active-submenu-item" : ""
-                      }`}
+                    className={`submenu-item ${
+                      activeSubmenuPath === subItem.path ? "active-submenu-item" : ""
+                    }`}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleMenuClick(index, subItem.path, true);
@@ -147,6 +133,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         ))}
       </ul>
     </div>
+  </div>
+
+
   );
 };
 

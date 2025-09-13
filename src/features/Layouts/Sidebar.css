@@ -366,3 +366,35 @@
 
 
   /* Navbar */
+
+
+  /* sidebar full height + flex layout */
+.sidebar {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* scroll area for the menus */
+.menu-scroll {
+  flex: 1;            /* take remaining height */
+  min-height: 0;      /* important so overflow works in flex */
+  overflow-y: auto;
+  scrollbar-width: none;   /* scroll when needed */
+}
+
+/* menus list with extra bottom space */
+.menu {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0 96px; /* ⬅️ bottom padding gives breathing room for last item */
+}
+
+/* extra safety: spacer block at the end (works even if padding gets overridden) */
+.menu::after {
+  content: "";
+  display: block;
+  height: 32px;       /* small spacer so last item never touches bottom edge */
+}
+
+/* (rest of your styles as-is) */
