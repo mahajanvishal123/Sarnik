@@ -2690,6 +2690,7 @@ import { FaRegCopy } from "react-icons/fa";
 import axios from "axios";
 import axiosInstance from "../../../../../../redux/utils/axiosInstance";
 import { fetchInvoicingBilling } from "../../../../../../redux/slices/InvoicingBillingSlice";
+import { apiUrl } from "../../../../../../redux/utils/config";
 
 function CostEstimates({ projectNO }) {
   const dispatch = useDispatch()
@@ -3141,187 +3142,323 @@ function CostEstimates({ projectNO }) {
     });
   };
 
-  const handleDownloadPDF = async (po) => {
-    try {
-      const response = await axiosInstance.post(
-        `/pdf?CostEstimatesId=${po._id}`,
-        {
-          projectId: po.projectId?.map((p) => p._id),
-          clientId: po.clientId?.map((c) => c._id),
-        }
-      );
-      const estimate = response.data?.data?.[0];
-      if (!estimate) throw new Error("No estimate data found");
-      const client = estimate.clientId || {};
-      const project = estimate.projectId || {};
-      const lineItems = estimate.lineItems || [];
-      const doc = new jsPDF("p", "pt", "a4");
-      const pageWidth = doc.internal.pageSize.width;
-      const pageHeight = doc.internal.pageSize.height;
-      const marginLeft = 40;
-      const contentWidth = pageWidth - marginLeft * 2;
-      // === HEADER ===
-      doc.setFillColor(229, 62, 62);
-      doc.rect(marginLeft, 40, 200, 50, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(14);
-      const logoUrl = estimate.image[0];
-      const logoBase64 = await getImageBase64(logoUrl);
-      doc.addImage(logoBase64, "PNG", marginLeft + 5, 45, 60, 40);
-      doc.setFont("helvetica", "bold");
-      doc.text("SAARANIK", marginLeft + 70, 60);
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "normal");
-      doc.text("COMPANY ADDRESS DETAILS", marginLeft + 70, 75);
-      doc.setTextColor(0, 0, 0);
-      // === Estimate Info (Right) ===
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text(
-        `Cost Estimate No. ${estimate.estimateRef || "---"}`,
-        pageWidth - marginLeft - 180,
-        50
-      );
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-      doc.text(
-        `Date: ${new Date(estimate.estimateDate).toLocaleDateString("en-GB")}`,
-        pageWidth - marginLeft - 180,
-        65
-      );
-      doc.text(`Req. Ref.: --`, pageWidth - marginLeft - 180, 80);
-      // === Client Info ===
-      let currentY = 120;
-      doc.setFontSize(10);
-      doc.text("To,", marginLeft, currentY);
-      currentY += 15;
-      doc.text(
-        ` ${client?.clientName || "Client Name"}`,
-        marginLeft,
-        currentY
-      );
-      currentY += 14;
-      doc.text(
-        ` ${project?.projectName || "Client Company Name"}`,
-        marginLeft,
-        currentY
-      );
-      currentY += 14;
-      doc.text(
-        ` ${client?.clientAddress?.split(",")[0] || "Address Line 1"
-        }`,
-        marginLeft,
-        currentY
-      );
-      currentY += 14;
-      doc.text(
-        ` ${client?.shippingInformation?.[0]?.shippingAddress ||
-        "Address Line 2"
-        }`,
-        marginLeft,
-        currentY
-      );
-      currentY += 14;
-      doc.text(
-        ` ${client?.contactPersons?.[0]?.email || "email"}`,
-        marginLeft,
-        currentY
-      );
-      currentY += 14;
-      doc.text(
-        ` ${client?.contactPersons?.[0]?.phone || "Phone"}`,
-        marginLeft,
-        currentY
-      );
-      currentY += 25;
-      // === Table Data ===
-      const tableData = lineItems.map((item, index) => [
-        (index + 1).toString(),
-        item.description || "",
-        (item.quantity || 0).toString(),
-        (item.rate || 0).toLocaleString("en-IN", {
-          minimumFractionDigits: 2,
-        }),
-        ((item.quantity || 0) * (item.rate || 0)).toLocaleString("en-IN", {
-          minimumFractionDigits: 2,
-        }),
-      ]);
-      for (let i = 0; i < 15; i++) tableData.push(["", "", "", "", ""]);
-      let finalY;
-      autoTable(doc, {
-        startY: currentY,
-        head: [
-          [
-            "ITEM #",
-            "Brand & Design / Description",
-            "QTY",
-            "Unit Price (INR)",
-            "Amount (INR)",
-          ],
-        ],
-        body: tableData,
-        styles: {
-          fontSize: 9,
-          cellPadding: 4,
-          lineColor: [0, 0, 0],
-          lineWidth: 0.3,
-          halign: "center",
-          valign: "middle",
-        },
-        headStyles: {
-          fillColor: [230, 230, 230],
-          textColor: [0, 0, 0],
-          fontStyle: "bold",
-          fontSize: 9,
-          halign: "center",
-        },
-        columnStyles: {
-          0: { halign: "center", cellWidth: 50 },
-          1: { halign: "left", cellWidth: contentWidth - 260 },
-          2: { halign: "center", cellWidth: 40 },
-          3: { halign: "right", cellWidth: 80 },
-          4: { halign: "right", cellWidth: 90 },
-        },
-        theme: "grid",
-        margin: { left: marginLeft, right: marginLeft },
-        didDrawPage: (data) => {
-          finalY = data.cursor.y;
-        },
+const handleDownloadPDF = async (po) => {
+  try {
+    // ===== API =====
+    const response = await axiosInstance.post(
+      `/pdf?CostEstimatesId=${po._id}`,
+      {
+        projectId: po.projectId?.map((p) => p._id),
+        clientId: po.clientId?.map((c) => c._id),
+      }
+    );
+    
+    // Fetch company info with logo
+    const userid = localStorage.getItem("_id"); 
+// agar localStorage me save hai
+
+const companyInfoResponse = await axiosInstance.get(`${apiUrl}/user/${userid}`);
+console.log(companyInfoResponse.data);  
+
+    const companyInfo = companyInfoResponse.data.companyInfo;
+    const logoUrl = companyInfo.logoUrl && companyInfo.logoUrl.length > 0 ? companyInfo.logoUrl[0] : null;
+    
+    const estimate = response.data?.data?.[0];
+    if (!estimate) throw new Error("No estimate data found");
+    const client = estimate.clientId || {};
+    const project = estimate.projectId || {};
+    const lineItems = estimate.lineItems || [];
+    const currency = (estimate.currency || "INR").toUpperCase();
+    
+    // ===== Helpers =====
+    const toMoney = (n) =>
+      Number(n || 0).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       });
-      // === Totals Section ===
-      const subTotal = lineItems.reduce(
-        (sum, item) =>
-          sum + (item.quantity || 0) * (item.rate || 0),
-        0
-      );
-      const vat = (subTotal * (estimate.VATRate || 0)) / 100;
-      const total = subTotal + vat;
-      const totalsBoxX = pageWidth - marginLeft - 120;
-      const totalsBoxY = finalY + 20;
-      const footerY = totalsBoxY + 65;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.text("• Cost based on One-off prices.", marginLeft, footerY);
-      doc.text(
-        "• The above prices valid for 2 weeks and thereafter subject to our reconfirmation.",
-        marginLeft,
-        footerY + 12
-      );
-      doc.setFont("helvetica", "bold");
-      doc.text(`For Your Company Name`, marginLeft, footerY + 40);
-      doc.setFont("helvetica", "normal");
-      doc.text(
-        "(This is system generated document, hence not signed.)",
-        marginLeft,
-        footerY + 55
-      );
-      // === Save PDF ===
-      doc.save(`Cost_Estimate_${estimate.estimateRef || "Estimate"}.pdf`);
-    } catch (error) {
-      console.error("❌ Error generating PDF:", error);
-      alert("Failed to generate PDF.");
-    }
-  };
+    
+    // simple image -> base64 helper (browser)
+    const getImageBase64 = async (url) => {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      return await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    };
+    
+    // ===== PDF init =====
+    const doc = new jsPDF("p", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.width;
+    const marginLeft = 40;
+    const contentWidth = pageWidth - marginLeft * 2;
+    
+    // ===== HEADER =====
+    // ===== HEADER =====
+doc.setFillColor(229, 62, 62);
+// Red background box
+doc.rect(marginLeft, 40, contentWidth, 65, "F");
+
+// Use company logo from API
+if (logoUrl) {
+  try {
+    const logoBase64 = await getImageBase64(logoUrl);
+
+    // Show logo INSIDE red background
+    // (centered inside box, maintain aspect ratio)
+    const logoHeight = 55;       // thoda gap upar-niche ke liye
+    const logoWidth = contentWidth - 40; // thoda margin left-right
+    const logoX = marginLeft + 20;
+    const logoY = 45; // red box ke andar
+    
+    doc.addImage(logoBase64, "PNG", logoX, logoY, logoWidth, logoHeight);
+  } catch (e) {
+    console.error("Error loading logo:", e);
+  }
+}
+
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+   
+    
+    // ===== Estimate Info (below header, right) =====
+    const estimateDate = estimate.estimateDate
+      ? new Date(estimate.estimateDate)
+      : new Date();
+    const formattedDate = `${estimateDate
+      .getDate()
+      .toString()
+      .padStart(2, "0")}.${(estimateDate.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}.${estimateDate.getFullYear()}`;
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    let estimateY = 120;
+    const infoX = pageWidth - marginLeft - 180;
+    doc.text(
+      `Cost Estimate No. ${estimate.estimateRef || "0000"}`,
+      infoX,
+      estimateY
+    );
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Date: ${formattedDate}`, infoX, estimateY + 15);
+    doc.text(`Req. Ref.: --`, infoX, estimateY + 30);
+    
+    // ===== Client block (left) =====
+    let currentY = 120;
+    doc.setFontSize(10);
+    doc.text("To,", marginLeft, currentY);
+    currentY += 15;
+    doc.text(
+      ` ${client?.clientName || "Cadbury India ltd"}`,
+      marginLeft,
+      currentY
+    );
+    currentY += 14;
+    doc.text(
+      ` ${project?.projectName || "Cadbury Chocolate Renovation"}`,
+      marginLeft,
+      currentY
+    );
+    currentY += 14;
+    doc.text(
+      ` ${client?.clientAddress?.split(",")[0] || "9a"}`,
+      marginLeft,
+      currentY
+    );
+    currentY += 14;
+    doc.text(
+      ` ${
+        client?.shippingInformation?.[0]?.shippingAddress || "Address Line 2"
+      }`,
+      marginLeft,
+      currentY
+    );
+    currentY += 14;
+    doc.text(
+      ` ${client?.contactPersons?.[0]?.email || "ghosh@cadbury.co.in"}`,
+      marginLeft,
+      currentY
+    );
+    currentY += 14;
+    doc.text(
+      ` ${client?.contactPersons?.[0]?.phone || "00913322308629"}`,
+      marginLeft,
+      currentY
+    );
+    currentY += 25;
+    
+    // ===== Items Table =====
+    const head = [
+      "ITEM #",
+      "Brand & Design / Description",
+      "QTY",
+      `Unit Price (${currency})`,
+      `Amount (${currency})`,
+    ];
+    const body = lineItems.map((item, idx) => {
+      const qty = Number(item.quantity || 0);
+      const rate = Number(item.rate || 0);
+      const amt = qty * rate;
+      return [
+        String(idx + 1),
+        item.description || "",
+        String(qty),
+        toMoney(rate),
+        toMoney(amt),
+      ];
+    });
+    
+    // pad to 15 rows if you want fixed height
+    while (body.length < 15) body.push(["", "", "", "", ""]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [head],
+      body,
+      styles: {
+        fontSize: 9,
+        cellPadding: 4,
+        lineColor: [0, 0, 0],
+        lineWidth: 0.3,
+        halign: "center",
+        valign: "middle",
+      },
+      headStyles: {
+        fillColor: [230, 230, 230],
+        textColor: [0, 0, 0],
+        fontStyle: "bold",
+        fontSize: 9,
+        halign: "center",
+      },
+      columnStyles: {
+        0: { halign: "center", cellWidth: 50 },
+        1: { halign: "left", cellWidth: contentWidth - 260 },
+        2: { halign: "center", cellWidth: 40 },
+        3: { halign: "right", cellWidth: 80 },
+        4: { halign: "right", cellWidth: 90 },
+      },
+      theme: "grid",
+      margin: { left: marginLeft, right: marginLeft },
+    });
+    
+    const finalY = doc.lastAutoTable.finalY;
+    
+    // ===== Totals =====
+    const subTotal = lineItems.reduce(
+      (sum, it) => sum + Number(it.quantity || 0) * Number(it.rate || 0),
+      0
+    );
+    const vatRate = Number(estimate.vatRate ?? 18);
+    const vat = (subTotal * vatRate) / 100;
+    const total = subTotal + vat;
+    
+    // ===== Amount in Words + Totals (merged, aligned) =====
+    const totalInWords =
+      estimate.amountInWords ||
+      "Rupees One Thousand Eight Hundred Twenty-Three and Ten Paise only";
+    
+    autoTable(doc, {
+      startY: finalY + 10,
+      margin: { left: marginLeft },
+      tableWidth: contentWidth,
+      head: [],
+      body: [
+        [
+          {
+            content: totalInWords,
+            styles: {
+              font: "helvetica",
+              fontStyle: "bold",
+              fontSize: 10,
+              textColor: [0, 112, 192],
+              halign: "left",
+            },
+          },
+          { content: "Sub-Total", styles: { halign: "left" } },
+          {
+            content: toMoney(subTotal),
+            styles: { halign: "right", textColor: [0, 112, 192] },
+          },
+        ],
+        [
+          { content: "", styles: {} },
+          { content: `VAT (${vatRate}%)`, styles: { halign: "left" } },
+          {
+            content: toMoney(vat),
+            styles: { halign: "right", textColor: [0, 112, 192] },
+          },
+        ],
+        [
+          { content: "", styles: {} },
+          { content: "TOTAL", styles: { halign: "left", fontStyle: "bold" } },
+          {
+            content: toMoney(total),
+            styles: {
+              halign: "right",
+              fontStyle: "bold",
+              textColor: [0, 112, 192],
+            },
+          },
+        ],
+      ],
+      columnStyles: {
+        0: { cellWidth: contentWidth - 200 },
+        1: { cellWidth: 100 },
+        2: { cellWidth: 100 },
+      },
+      styles: {
+        fontSize: 9,
+        cellPadding: 6,
+        lineWidth: 0.5,
+        lineColor: [0, 0, 0],
+        valign: "middle",
+      },
+      theme: "grid",
+    });
+    
+    const afterTotalsY = doc.lastAutoTable.finalY;
+    
+    // ===== Notes & Signature =====
+    let footerY = afterTotalsY + 12;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text("• Cost based on One-off prices.", marginLeft, footerY);
+    doc.text(
+      "• The above prices valid for 2 weeks and thereafter subject to our reconfirmation.",
+      marginLeft,
+      footerY + 12
+    );
+    
+    footerY += 50;
+    doc.setFont("helvetica", "bold");
+    doc.text("For Company Name", marginLeft, footerY);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text(
+      "(This is system generated document, hence not signed.)",
+      marginLeft,
+      footerY + 15
+    );
+    
+    // ===== Save =====
+    doc.save(`Cost_Estimate_${estimate.estimateRef || "Estimate"}.pdf`);
+  } catch (error) {
+    console.error("❌ Error generating PDF:", error);
+    Swal.fire({
+      icon: "error",
+      title: "PDF Generation Failed",
+      text: error?.message || "Something went wrong while generating the PDF.",
+    });
+  }
+};
+
 
   const CostEstimatesDetails = (po) => {
     navigate(`/admin/OvervieCostEstimates`, { state: { po } });
