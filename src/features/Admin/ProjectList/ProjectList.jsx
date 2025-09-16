@@ -161,9 +161,9 @@ function ProjectList() {
             />
           </div>
           <div className="col-12 col-md-6 d-flex justify-content-md-end gap-2">
-            <Button variant="outline-secondary" size="sm">
+            {/*<Button variant="outline-secondary" size="sm">
               <FaUpload className="me-1" /> Import
-            </Button>
+            </Button>*/}
             <Link to={"/admin/AddProjectList"}>
               <Button id="All_btn" variant="dark" size="sm">
                 <FaPlus className="me-1" /> Add project
@@ -258,7 +258,7 @@ function ProjectList() {
                       .join(', ')
                     : 'N/A'}
                 </td>
-                <td>{project.projectPriority || 'N/A'}</td>  
+                <td>{project.projectPriority || 'N/A'}</td>
                 <td>
                   <span className={`badge ${getStatusClass(project.status)} px-2 py-1`}>
                     {project.status}
@@ -281,8 +281,8 @@ function ProjectList() {
       {!loading && !error && (
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div className="text-muted small">
-            Showing {filteredProjects?.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} 
-            to {(currentPage - 1) * itemsPerPage + paginatedProjects?.length} 
+            Showing {filteredProjects?.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}
+            to {(currentPage - 1) * itemsPerPage + paginatedProjects?.length}
             of {project.data?.length || 0} entries
           </div>
           <ul className="pagination pagination-sm mb-0">
