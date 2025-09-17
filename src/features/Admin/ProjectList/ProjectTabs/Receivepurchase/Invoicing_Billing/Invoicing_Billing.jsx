@@ -4592,7 +4592,7 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
         backgroundColor: '#D21015',
         height: '80px',
         width: '100%',
-        marginBottom: '40px',
+        marginBottom: '20px',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
@@ -4607,7 +4607,7 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
       </div>
 
       {/* TITLE "Tax Invoice" just below red band (right aligned) */}
-      <div style={{ textAlign: 'right', marginBottom: '40px' }}>
+      <div style={{ textAlign: 'right', marginBottom: '20px' }}>
         <h2 style={{
           fontFamily: 'Helvetica, Arial, sans-serif',
           fontWeight: 'bold',
@@ -4618,26 +4618,28 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
         </h2>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+      <div style={{ display: 'flex', gap: '4px', justifyContent: 'space-between', marginBottom: '10px' }}>
         {/* LEFT "Invoice To" PANEL (boxed) */}
         <div style={{
           width: 'calc(100% - 350px)',
           border: '1px solid #000',
-          padding: '16px 8px 8px 8px',
           boxSizing: 'border-box'
         }}>
           <div style={{
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontWeight: 'bold',
             fontSize: '10pt',
-            marginBottom: '16px'
+            marginBottom: '16px',
+            padding: '8px',
+            borderBottom: '1px solid #000',
           }}>
             Invoice To
           </div>
           <div style={{
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontSize: '9pt',
-            lineHeight: '1.3'
+            lineHeight: '1.3',
+            padding: '8px'
           }}>
             <div style={{ marginBottom: '12px' }}>{clientObj.clientName || 'Client Name'}</div>
             <div style={{ marginBottom: '12px' }}>{addrLines[0] || '-'}</div>
@@ -4647,9 +4649,13 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
         </div>
 
         {/* RIGHT META TABLE: TRN / Date / Invoice No. */}
-        <div style={{ width: '350px' }}>
+        <div style={{
+          width: '350px',
+          position: 'relative',
+          left: '35px'
+        }}>
           <table style={{
-            width: '100%',
+            width: '90%',
             borderCollapse: 'collapse',
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontSize: '9pt'
@@ -4705,7 +4711,7 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
 
           {/* COST EST / P.O. / PROJECT STRIP (positioned directly below meta table) */}
           <table style={{
-            width: '100%',
+            width: '90%',
             borderCollapse: 'collapse',
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontSize: '9pt',
@@ -4774,7 +4780,7 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
           <tr>
             <th style={{
               border: '0.6px solid #000',
-              padding: '3px',
+              padding: '10px',
               width: '25%',
               backgroundColor: '#fff',
               color: '#000',
@@ -4783,7 +4789,7 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
             }}>Bank Account Name</th>
             <th style={{
               border: '0.6px solid #000',
-              padding: '3px',
+              padding: '10px',
               width: '20%',
               backgroundColor: '#fff',
               color: '#000',
@@ -4792,7 +4798,7 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
             }}>Bank Name</th>
             <th style={{
               border: '0.6px solid #000',
-              padding: '3px',
+              padding: '10px',
               width: '25%',
               backgroundColor: '#fff',
               color: '#000',
@@ -4801,7 +4807,7 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
             }}>IBAN</th>
             <th style={{
               border: '0.6px solid #000',
-              padding: '3px',
+              padding: '10px',
               width: '15%',
               backgroundColor: '#fff',
               color: '#000',
@@ -4810,7 +4816,7 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
             }}>Swift Code</th>
             <th style={{
               border: '0.6px solid #000',
-              padding: '3px',
+              padding: '10px',
               width: '15%',
               backgroundColor: '#fff',
               color: '#000',
@@ -4823,23 +4829,23 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
           <tr>
             <td style={{
               border: '0.6px solid #000',
-              padding: '3px'
+              padding: '10px'
             }}>{co.bankAccountName}</td>
             <td style={{
               border: '0.6px solid #000',
-              padding: '3px'
+              padding: '10px'
             }}>{co.bankName}</td>
             <td style={{
               border: '0.6px solid #000',
-              padding: '3px'
+              padding: '10px'
             }}>{co.iban}</td>
             <td style={{
               border: '0.6px solid #000',
-              padding: '3px'
+              padding: '10px'
             }}>{co.swiftCode}</td>
             <td style={{
               border: '0.6px solid #000',
-              padding: '3px',
+              padding: '10px',
               textAlign: 'right'
             }}>Net 30</td>
           </tr>
@@ -4904,6 +4910,7 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
           </tr>
         </thead>
         <tbody>
+          {/* Generate line items */}
           {items.map((item) => (
             <tr key={item.id}>
               <td style={{
@@ -4931,6 +4938,37 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
                 padding: '5px',
                 textAlign: 'right'
               }}>{Number(item.amount).toFixed(2)}</td>
+            </tr>
+          ))}
+
+          {/* Generate empty rows if there are fewer than 8 items */}
+          {Array.from({ length: 8 - items.length }).map((_, index) => (
+            <tr key={`empty-${index}`}>
+              <td style={{
+                border: '0.6px solid #000',
+                padding: '5px',
+                textAlign: 'left'
+              }}>{items.length + index + 1}</td>
+              <td style={{
+                border: '0.6px solid #000',
+                padding: '5px',
+                textAlign: 'left'
+              }}>&nbsp;</td>
+              <td style={{
+                border: '0.6px solid #000',
+                padding: '5px',
+                textAlign: 'right'
+              }}>&nbsp;</td>
+              <td style={{
+                border: '0.6px solid #000',
+                padding: '5px',
+                textAlign: 'right'
+              }}>&nbsp;</td>
+              <td style={{
+                border: '0.6px solid #000',
+                padding: '5px',
+                textAlign: 'right'
+              }}>&nbsp;</td>
             </tr>
           ))}
         </tbody>
