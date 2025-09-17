@@ -880,7 +880,7 @@ function ProjectJobsTab() {
                 onChange={(e) => { setSelectedDesigner(e.target.value); setSelectedEmployee(""); }}
               >
                 <option value="">-- Select --</option>
-                {/* <option value="Designer">Designer</option> */}
+                <option value="Designer">Designer</option>
                 <option value="production">Production</option>
               </Form.Select>
             </Form.Group>

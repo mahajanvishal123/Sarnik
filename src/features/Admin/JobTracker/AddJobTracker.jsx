@@ -159,7 +159,7 @@
 //     idToIndexMap[project._id] = String(index + 1).padStart(4, '0');
 //   });
 
- 
+
 //   // Keep the options in local state so we can push newly‑created ones
 //   const [brandOptions, setBrandOptions] = useState([
 //     { value: "Coca‑Cola", label: "Coca‑Cola" },
@@ -447,7 +447,7 @@
 //                   <option value="high">High</option>
 //                 </select>
 //               </div>
-              
+
 
 //               {/* Status */}
 //               {/* <div className="col-md-6">

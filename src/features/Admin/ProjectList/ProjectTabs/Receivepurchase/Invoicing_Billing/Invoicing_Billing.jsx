@@ -3378,6 +3378,7 @@ function Invoicing_Billing() {
           <tr>
             <th onClick={() => handleSort('invoiceNumber')} style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}>Invoice #</th>
             <th onClick={() => handleSort('project')} style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}>Project</th>
+            <th onClick={() => handleSort('project')} style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}>CE-No</th>
             <th onClick={() => handleSort('project')} style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}>PO Number</th>
             <th onClick={() => handleSort('client')} style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}>Client Name</th>
             <th onClick={() => handleSort('amount')} style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}>Amount</th>
@@ -3390,6 +3391,8 @@ function Invoicing_Billing() {
             <tr key={invoice._id || idx}>
               <td style={{ whiteSpace: 'nowrap' }}>{invoice.InvoiceNo || 'N/A'}</td>
               <td style={{ whiteSpace: 'nowrap' }}>{invoice.projectId?.[0]?.projectName || 'N/A'}</td>
+              <td style={{ whiteSpace: 'nowrap' }}>{invoice.ReceivablePurchaseId?.CostEstimatesId?.[0]?.estimateRef
+                || 'CE-NO'}</td>
               <td style={{ whiteSpace: 'nowrap' }}>{invoice.ReceivablePurchaseId?.PONumber || 'N/A'}</td>
               <td style={{ whiteSpace: 'nowrap' }}>{invoice.clientId?.clientName || 'N/A'}</td>
               <td style={{ whiteSpace: 'nowrap' }}>
