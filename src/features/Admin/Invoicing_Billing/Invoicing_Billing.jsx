@@ -4752,7 +4752,7 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
         fontFamily: 'Helvetica, Arial, sans-serif',
         fontSize: '9pt',
         marginTop: '6px',
-        marginBottom: '6px'
+        // marginBottom: '6px'
       }}>
         <thead>
           <tr>
@@ -4835,7 +4835,7 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
           ))}
 
           {/* Generate empty rows if there are fewer than 8 items */}
-          {Array.from({ length: 8 - items.length }).map((_, index) => (
+          {Array.from({ length: 10 - items.length }).map((_, index) => (
             <tr key={`empty-${index}`}>
               <td style={{
                 border: '0.6px solid #000',
@@ -4867,15 +4867,18 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
         </tbody>
       </table>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         {/* LEFT - AMOUNT IN WORDS */}
         <div style={{
           width: 'calc(100% - 200px)',
           fontFamily: 'Helvetica, Arial, sans-serif',
-          fontSize: '9pt',
-          paddingTop: '12px'
+          fontSize: '9pt'
         }}>
-          {numberToWords(grandTotal, invoiceCurrency)}
+          <div style={{ border: '0.6px solid #000', width: '100%' }}>
+            <span style={{ padding: '7px', display: 'inline-block', fontWeight: 'bold', fontSize: '7pt' }}>
+              {numberToWords(grandTotal, invoiceCurrency)}
+            </span>
+          </div>
         </div>
 
         {/* RIGHT - TOTALS BOX */}
@@ -4891,13 +4894,13 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
                 <td style={{
                   border: '0.6px solid #000',
                   padding: '5px',
-                  width: '60%',
+                  width: '40%',
                   fontWeight: 'bold'
                 }}>Subtotal</td>
                 <td style={{
                   border: '0.6px solid #000',
                   padding: '5px',
-                  width: '40%',
+                  width: '60%',
                   textAlign: 'right'
                 }}>{invoiceCurrency} {subTotal.toFixed(2)}</td>
               </tr>
@@ -4935,7 +4938,6 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'flex-end',
-        marginTop: '42px'
       }}>
         {/* LEFT - For Company Name / Accounts Department */}
         <div>
@@ -4990,7 +4992,15 @@ const InvoiceTemplate = ({ invoiceData, companyInfo, refProp }) => {
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontSize: '9pt'
           }}>
-            Terms: Net 30
+            {/* Terms: Net 30 */}
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontSize: '9pt'
+          }}>
+            {/* Terms: Net 30 */}
           </div>
         </div>
       </div>
