@@ -247,6 +247,7 @@ function EmployeeJobTracker() {
           </thead>
           <tbody>
             {paginatedProjects
+              .filter((job) => job.assign == employeeId)
               .slice()
               .reverse()
               .map((job) => (

@@ -1854,13 +1854,6 @@ function NewJobsList() {
         </div>
       )}
 
-      {/* Debug Info - Remove in production */}
-      <div className="mb-2">
-        <small className="text-muted">
-          Debug: Found {productionAssignments.length} production assignments, {productionJobIds.size} unique job IDs, {inProgressJobIds.size} in-progress jobs, showing {filteredJobs.length} filtered jobs
-        </small>
-      </div>
-
       {/* Filters */}
       <div className="d-flex flex-wrap gap-2 mb-3 align-items-center">
         <Form.Control
@@ -1916,10 +1909,6 @@ function NewJobsList() {
               <span className="visually-hidden">Loading...</span>
             </div>
             <p className="mt-2">Loading jobs data...</p>
-          </div>
-        ) : error ? (
-          <div className="alert alert-danger">
-            Error loading jobs: {error.message || "Unknown error"}
           </div>
         ) : (
           <Table hover className="align-middle sticky-header">

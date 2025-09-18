@@ -616,6 +616,7 @@ function ProjectJobsTab() {
   const [assignmentDescription, setAssignmentDescription] = useState('');
 
   const { userAll } = useSelector((state) => state.user);
+  const userID = localStorage.getItem("_id");
 
   useEffect(() => {
     dispatch(fetchusers());
@@ -642,6 +643,16 @@ function ProjectJobsTab() {
     if (id) fetchWorklogs();
   }, [id]);
 
+  // const getEmployeeTotalTime = (assignee) => {
+  //   const emp = worklogData.find(
+  //     (e) =>
+  //       e.employee?._id === assignee ||
+  //       e.employee?.email === assignee ||
+  //       `${e.employee?.firstName} ${e.employee?.lastName}` === assignee
+  //   );
+  //   return emp ? emp.totalTimeSpent : "00:00";
+  // };
+
   const getEmployeeTotalTime = (assignee) => {
     const emp = worklogData.find(
       (e) =>
@@ -649,8 +660,33 @@ function ProjectJobsTab() {
         e.employee?.email === assignee ||
         `${e.employee?.firstName} ${e.employee?.lastName}` === assignee
     );
-    return emp ? emp.totalTimeSpent : "00:00";
+
+    if (!emp) return "00:00";
+
+    let totalMinutes = 0;
+
+    // Base totalTimeSpent
+    if (emp.totalTimeSpent) {
+      const [h, m] = emp.totalTimeSpent.split(":").map(Number);
+      totalMinutes += h * 60 + m;
+    }
+
+    // Overtime add karo
+    if (emp.worklogs) {
+      emp.worklogs.forEach((log) => {
+        if (log.overtime) {
+          const [oh, om] = log.overtime.split(":").map(Number);
+          totalMinutes += oh * 60 + om;
+        }
+      });
+    }
+
+    // Convert back to HH:MM
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
   };
+
 
   const handleSubmitAssignment = async () => {
     const selectedJobIds = Object.keys(selectedJobs).filter(id => selectedJobs[id]);
@@ -821,7 +857,7 @@ function ProjectJobsTab() {
                 </tr>
               </thead>
               <tbody>
-                {paginatedProjects?.map((job) => (
+                {paginatedProjects?.filter((item) => item.assign == userID)?.map((job) => (
                   <tr key={job._id}>
                     <td>
                       <input

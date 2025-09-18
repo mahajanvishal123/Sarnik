@@ -285,7 +285,7 @@
 //           </Dropdown>
 //         </div>
 //       </div>
-      
+
 //       <div className="card shadow-sm">
 //         <div className="card-body p-0">
 //           <div className="table-responsive">
@@ -454,6 +454,229 @@
 
 
 
+// import React, { useState, useEffect } from 'react';
+// import { FaSearch, FaPlus, FaFilter } from 'react-icons/fa';
+// import { Link } from 'react-router-dom';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { Button, Dropdown } from "react-bootstrap";
+// import { fetchTimesheetWorklogs } from '../../../redux/slices/TimesheetWorklogSlice';
+
+// function TimeLogs() {
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [fromDate, setFromDate] = useState('');
+//   const [toDate, setToDate] = useState('');
+//   const [selectedProject, setSelectedProject] = useState('All Projects');
+//   const [selectedJobs, setSelectedJobs] = useState({});
+//   const [showFilters, setShowFilters] = useState(false);
+
+//   const dispatch = useDispatch();
+//   const { timesheetWorklog } = useSelector((state) => state.TimesheetWorklogs);
+//   const userID = localStorage.getItem("_id");
+
+//   useEffect(() => {
+//     dispatch(fetchTimesheetWorklogs());
+//   }, [dispatch]);
+
+//   const itemsPerPage = 15;
+
+//   const filteredTimeLogs = (timesheetWorklog.TimesheetWorklogss || []).filter((log) => {
+//     const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
+//     const employeeName = log.employeeId?.[0]
+//       ? `${log.employeeId[0].firstName} ${log.employeeId[0].lastName}`.toLowerCase()
+//       : '';
+//     const projectName = (log.projectId?.[0]?.projectName || '').toLowerCase();
+//     const jobNo = (log.jobId?.[0]?.JobNo || '').toString().toLowerCase();
+//     const taskDescription = (log.taskDescription || '').toLowerCase();
+//     const status = (log.status || '').toLowerCase();
+
+//     const fields = [employeeName, projectName, jobNo, taskDescription, status];
+//     const matchesSearch = terms.length === 0 || terms.every(term =>
+//       fields.some(field => field.includes(term.toLowerCase()))
+//     );
+
+//     const matchesDate =
+//       (!fromDate || new Date(log.date) >= new Date(fromDate)) &&
+//       (!toDate || new Date(log.date) <= new Date(toDate));
+
+//     const matchesProject =
+//       selectedProject === "All Projects" ||
+//       projectName === selectedProject.toLowerCase();
+
+//     return matchesSearch && matchesDate && matchesProject;
+//   });
+
+//   const totalPages = Math.ceil(filteredTimeLogs.length / itemsPerPage);
+//   const paginatedTimeLogss = filteredTimeLogs.slice(
+//     (currentPage - 1) * itemsPerPage,
+//     currentPage * itemsPerPage
+//   );
+
+//   // Helper to sum times (hh:mm format)
+//   const sumTime = (timeArray) => {
+//     let totalMinutes = 0;
+//     timeArray.forEach(time => {
+//       if (time) {
+//         const [h, m] = time.split(':').map(Number);
+//         totalMinutes += h * 60 + m;
+//       }
+//     });
+//     const hours = Math.floor(totalMinutes / 60);
+//     const minutes = totalMinutes % 60;
+//     return `${hours}:${minutes.toString().padStart(2, '0')}`;
+//   };
+
+//   // Calculate totals (after filters)
+//   const totalTimeSum = sumTime(filteredTimeLogs.map(log => log.time));
+//   const overtimeSum = sumTime(filteredTimeLogs.map(log => log.overtime));
+//   const totalTimeColumnSum = sumTime(filteredTimeLogs.map(log => log.totalTime));
+
+//   return (
+//     <div className="container py-4">
+//       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+//         <h3 className="mb-0">Time Logs</h3>
+//         <div className="d-flex gap-3 mt-4 flex-wrap align-items-center">
+//           {/* Reverted: Add Time Log opens existing working page */}
+//           <Link to={"/employee/AddTimelog"} className="text-decoration-none">
+//             <button id='All_btn' className="btn btn-dark d-flex align-items-center gap-2">
+//               <FaPlus /> Add Time Log
+//             </button>
+//           </Link>
+
+//           <Button
+//             className="d-md-none d-flex align-items-center gap-2 mb-2"
+//             size="sm"
+//             variant="secondary"
+//             onClick={() => setShowFilters(!showFilters)}
+//           >
+//             <FaFilter /> Filters
+//           </Button>
+//         </div>
+//       </div>
+
+//       {/* Total Time Row (Summary) */}
+//       <div className="d-flex justify-content-end mb-2 fw-bold">
+//         <span className="me-4">Work Time: {totalTimeSum}</span>
+//         <span>Over Time: {overtimeSum}</span>
+//       </div>
+
+//       {/* Filters Section */}
+//       <div className={`row g-3 mb-4 ${showFilters ? 'd-block' : 'd-none d-md-flex'}`}>
+//         <div className="col-md-3">
+//           <div className="input-group">
+//             <span className="input-group-text bg-white border-end-0">
+//               <FaSearch className="text-muted" />
+//             </span>
+//             <input
+//               type="text"
+//               className="form-control border-start-0"
+//               placeholder="Search time logs..."
+//               value={searchQuery}
+//               onChange={(e) => setSearchQuery(e.target.value)}
+//             />
+//           </div>
+//         </div>
+
+//         <div className="col-md-3">
+//           <input
+//             type="date"
+//             className="form-control"
+//             value={fromDate}
+//             onChange={(e) => setFromDate(e.target.value)}
+//           />
+//         </div>
+
+//         <div className="col-md-3">
+//           <input
+//             type="date"
+//             className="form-control"
+//             value={toDate}
+//             onChange={(e) => setToDate(e.target.value)}
+//           />
+//         </div>
+
+//         <div className="col-md-3">
+//           <Dropdown>
+//             <Dropdown.Toggle variant="light" id="project-dropdown" className="w-100">
+//               {selectedProject}
+//             </Dropdown.Toggle>
+//             <Dropdown.Menu>
+//               <Dropdown.Item onClick={() => setSelectedProject("All Projects")}>
+//                 All Projects
+//               </Dropdown.Item>
+//               {[...new Set((timesheetWorklog.TimesheetWorklogss || []).map((log) =>
+//                 log.projectId?.[0]?.projectName || "N/A"
+//               ))].filter(name => name !== "N/A").map((projectName, index) => (
+//                 <Dropdown.Item key={index} onClick={() => setSelectedProject(projectName)}>
+//                   {projectName}
+//                 </Dropdown.Item>
+//               ))}
+//             </Dropdown.Menu>
+//           </Dropdown>
+//         </div>
+//       </div>
+
+//       {/* Table */}
+//       <div className="card shadow-sm">
+//         <div className="card-body p-0">
+//           <div className="table-responsive">
+//             <table className="table table-hover mb-0">
+//               <thead className="bg-light">
+//                 <tr>
+//                   <th></th>
+//                   <th>JobID</th>
+//                   <th>Project Name</th>
+//                   <th>Assign</th>
+//                   <th>Date</th>
+//                   <th>Work Time</th>
+//                   <th>Over Time</th>
+//                   <th>Total Time</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {paginatedTimeLogss.filter((item) => item.employeeId[0]._id == userID).map((log, index) => (
+//                   <tr key={index}>
+//                     <td>
+//                       <input
+//                         type="checkbox"
+//                         checked={selectedJobs[log._id] || false}
+//                         onChange={() =>
+//                           setSelectedJobs((prev) => ({
+//                             ...prev,
+//                             [log._id]: !prev[log._id],
+//                           }))
+//                         }
+//                       />
+//                     </td>
+//                     <td>{log.jobId?.[0]?.JobNo || '----'}</td>
+//                     <td>{log.projectId?.[0]?.projectName || 'No Project Name'}</td>
+//                     <td>{log.employeeId?.[0]?.firstName} {log.employeeId?.[0]?.lastName}</td>
+//                     <td>{new Date(log.date).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
+//                     <td>{log.time}</td>
+//                     <td>{log.overtime}</td>
+//                     <td>{log.totalTime}</td>
+//                   </tr>
+//                 ))}
+
+//                 {/* Summary Row at bottom */}
+//                 <tr className="fw-bold bg-light">
+//                   <td colSpan="4" className="text-end">Total:</td>
+//                   <td>{totalTimeSum}</td>
+//                   <td>{overtimeSum}</td>
+//                   <td>{totalTimeColumnSum}</td>
+//                 </tr>
+//               </tbody>
+//             </table>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default TimeLogs;
+
+
 import React, { useState, useEffect } from 'react';
 import { FaSearch, FaPlus, FaFilter } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
@@ -472,6 +695,7 @@ function TimeLogs() {
 
   const dispatch = useDispatch();
   const { timesheetWorklog } = useSelector((state) => state.TimesheetWorklogs);
+  const userID = localStorage.getItem("_id");
 
   useEffect(() => {
     dispatch(fetchTimesheetWorklogs());
@@ -479,31 +703,34 @@ function TimeLogs() {
 
   const itemsPerPage = 15;
 
-  const filteredTimeLogs = (timesheetWorklog.TimesheetWorklogss || []).filter((log) => {
-    const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
-    const employeeName = log.employeeId?.[0] 
-      ? `${log.employeeId[0].firstName} ${log.employeeId[0].lastName}`.toLowerCase()
-      : '';
-    const projectName = (log.projectId?.[0]?.projectName || '').toLowerCase();
-    const jobNo = (log.jobId?.[0]?.JobNo || '').toString().toLowerCase();
-    const taskDescription = (log.taskDescription || '').toLowerCase();
-    const status = (log.status || '').toLowerCase();
+  // ✅ Filter with employee first
+  const filteredTimeLogs = (timesheetWorklog.TimesheetWorklogss || [])
+    .filter((log) => log.employeeId?.[0]?._id === userID)
+    .filter((log) => {
+      const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
+      const employeeName = log.employeeId?.[0]
+        ? `${log.employeeId[0].firstName} ${log.employeeId[0].lastName}`.toLowerCase()
+        : '';
+      const projectName = (log.projectId?.[0]?.projectName || '').toLowerCase();
+      const jobNo = (log.jobId?.[0]?.JobNo || '').toString().toLowerCase();
+      const taskDescription = (log.taskDescription || '').toLowerCase();
+      const status = (log.status || '').toLowerCase();
 
-    const fields = [employeeName, projectName, jobNo, taskDescription, status];
-    const matchesSearch = terms.length === 0 || terms.every(term =>
-      fields.some(field => field.includes(term.toLowerCase()))
-    );
+      const fields = [employeeName, projectName, jobNo, taskDescription, status];
+      const matchesSearch = terms.length === 0 || terms.every(term =>
+        fields.some(field => field.includes(term.toLowerCase()))
+      );
 
-    const matchesDate =
-      (!fromDate || new Date(log.date) >= new Date(fromDate)) &&
-      (!toDate || new Date(log.date) <= new Date(toDate));
+      const matchesDate =
+        (!fromDate || new Date(log.date) >= new Date(fromDate)) &&
+        (!toDate || new Date(log.date) <= new Date(toDate));
 
-    const matchesProject =
-      selectedProject === "All Projects" ||
-      projectName === selectedProject.toLowerCase();
+      const matchesProject =
+        selectedProject === "All Projects" ||
+        projectName === selectedProject.toLowerCase();
 
-    return matchesSearch && matchesDate && matchesProject;
-  });
+      return matchesSearch && matchesDate && matchesProject;
+    });
 
   const totalPages = Math.ceil(filteredTimeLogs.length / itemsPerPage);
   const paginatedTimeLogss = filteredTimeLogs.slice(
@@ -525,7 +752,7 @@ function TimeLogs() {
     return `${hours}:${minutes.toString().padStart(2, '0')}`;
   };
 
-  // Calculate totals (after filters)
+  // Calculate totals (after filters and employee check)
   const totalTimeSum = sumTime(filteredTimeLogs.map(log => log.time));
   const overtimeSum = sumTime(filteredTimeLogs.map(log => log.overtime));
   const totalTimeColumnSum = sumTime(filteredTimeLogs.map(log => log.totalTime));
@@ -535,7 +762,7 @@ function TimeLogs() {
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <h3 className="mb-0">Time Logs</h3>
         <div className="d-flex gap-3 mt-4 flex-wrap align-items-center">
-          {/* Reverted: Add Time Log opens existing working page */}
+          {/* Add Time Log */}
           <Link to={"/employee/AddTimelog"} className="text-decoration-none">
             <button id='All_btn' className="btn btn-dark d-flex align-items-center gap-2">
               <FaPlus /> Add Time Log
@@ -584,7 +811,7 @@ function TimeLogs() {
             onChange={(e) => setFromDate(e.target.value)}
           />
         </div>
-        
+
         <div className="col-md-3">
           <input
             type="date"
@@ -593,7 +820,7 @@ function TimeLogs() {
             onChange={(e) => setToDate(e.target.value)}
           />
         </div>
-        
+
         <div className="col-md-3">
           <Dropdown>
             <Dropdown.Toggle variant="light" id="project-dropdown" className="w-100">
@@ -603,7 +830,7 @@ function TimeLogs() {
               <Dropdown.Item onClick={() => setSelectedProject("All Projects")}>
                 All Projects
               </Dropdown.Item>
-              {[...new Set((timesheetWorklog.TimesheetWorklogss || []).map((log) => 
+              {[...new Set((timesheetWorklog.TimesheetWorklogss || []).map((log) =>
                 log.projectId?.[0]?.projectName || "N/A"
               ))].filter(name => name !== "N/A").map((projectName, index) => (
                 <Dropdown.Item key={index} onClick={() => setSelectedProject(projectName)}>
@@ -625,6 +852,7 @@ function TimeLogs() {
                   <th></th>
                   <th>JobID</th>
                   <th>Project Name</th>
+                  <th>Assign</th>
                   <th>Date</th>
                   <th>Work Time</th>
                   <th>Over Time</th>
@@ -648,6 +876,7 @@ function TimeLogs() {
                     </td>
                     <td>{log.jobId?.[0]?.JobNo || '----'}</td>
                     <td>{log.projectId?.[0]?.projectName || 'No Project Name'}</td>
+                    <td>{log.employeeId?.[0]?.firstName} {log.employeeId?.[0]?.lastName}</td>
                     <td>{new Date(log.date).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
                     <td>{log.time}</td>
                     <td>{log.overtime}</td>
@@ -656,12 +885,12 @@ function TimeLogs() {
                 ))}
 
                 {/* Summary Row at bottom */}
-              <tr className="fw-bold bg-light">
-  <td colSpan="4" className="text-end">Total:</td>
-  <td>{totalTimeSum}</td>
-  <td>{overtimeSum}</td>
-  <td>{totalTimeColumnSum}</td>
-</tr>
+                <tr className="fw-bold bg-light">
+                  <td colSpan="5" className="text-end">Total:</td>
+                  <td>{totalTimeSum}</td>
+                  <td>{overtimeSum}</td>
+                  <td>{totalTimeColumnSum}</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -672,4 +901,3 @@ function TimeLogs() {
 }
 
 export default TimeLogs;
-

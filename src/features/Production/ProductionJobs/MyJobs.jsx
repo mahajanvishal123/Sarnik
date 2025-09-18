@@ -472,6 +472,8 @@ function MyJobs() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const USERID = localStorage.getItem("_id");
+
   const handleLogTime = (job) => {
     navigate(`/production/AddTimeLog`, {
       state: {
@@ -520,6 +522,7 @@ function MyJobs() {
             (j.jobId?.Status || "")
               .toLowerCase()
               .replace(/\s|_/g, "") === "inprogress"
+            && j.assignedTo?.userId == USERID
           )
           .map(j => ({
             ...j.jobId,

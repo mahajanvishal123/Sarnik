@@ -73,67 +73,64 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   return (
 
 
-  <div className={`sidebar ${isOpen ? "expanded" : "collapsed"}`}>
-    {/* header/logo agar ho to yahan rahe */}
+    <div className={`sidebar ${isOpen ? "expanded" : "collapsed"}`}>
+      {/* header/logo agar ho to yahan rahe */}
 
-    {/* ⬇️ NEW: scrollable wrapper */}
-    <div className="menu-scroll">
-      <ul className="menu" style={{ whiteSpace: "nowrap" }}>
-        {menuItems.map((item, index) => (
-          <li
-            key={index}
-            className={`menu-item ${
-              item.submenu
-                ? openMenuIndex === index
-                  ? "open"
-                  : ""
-                : activeMenuIndex === index
-                ? "active"
-                : ""
-            }`}
-            onClick={() => {
-              if (item.submenu) {
-                toggleMenu(index);
-              } else {
-                handleMenuClick(index, item.path);
-              }
-            }}
-          >
-            <div className="menu-link menu-i">
-              {item.icon}
-              {isOpen && <span className="menu-text">{item.title}</span>}
+      {/* ⬇️ NEW: scrollable wrapper */}
+      <div className="menu-scroll">
+        <ul className="menu" style={{ whiteSpace: "nowrap" }}>
+          {menuItems.map((item, index) => (
+            <li
+              key={index}
+              className={`menu-item ${item.submenu
+                  ? openMenuIndex === index
+                    ? "open"
+                    : ""
+                  : activeMenuIndex === index
+                    ? "active"
+                    : ""
+                }`}
+              onClick={() => {
+                if (item.submenu) {
+                  toggleMenu(index);
+                } else {
+                  handleMenuClick(index, item.path);
+                }
+              }}
+            >
+              <div className="menu-link menu-i">
+                {item.icon}
+                {isOpen && <span className="menu-text">{item.title}</span>}
+                {item.submenu && isOpen && (
+                  <i
+                    className={`fas fa-chevron-down menu-toggle-icon ${openMenuIndex === index ? "open" : ""
+                      }`}
+                  />
+                )}
+              </div>
+
               {item.submenu && isOpen && (
-                <i
-                  className={`fas fa-chevron-down menu-toggle-icon ${
-                    openMenuIndex === index ? "open" : ""
-                  }`}
-                />
+                <ul className={`submenu ${openMenuIndex === index ? "open" : ""}`}>
+                  {item.submenu.map((subItem, subIndex) => (
+                    <li
+                      key={subIndex}
+                      className={`submenu-item ${activeSubmenuPath === subItem.path ? "active-submenu-item" : ""
+                        }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMenuClick(index, subItem.path, true);
+                      }}
+                    >
+                      {subItem.title}
+                    </li>
+                  ))}
+                </ul>
               )}
-            </div>
-
-            {item.submenu && isOpen && (
-              <ul className={`submenu ${openMenuIndex === index ? "open" : ""}`}>
-                {item.submenu.map((subItem, subIndex) => (
-                  <li
-                    key={subIndex}
-                    className={`submenu-item ${
-                      activeSubmenuPath === subItem.path ? "active-submenu-item" : ""
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleMenuClick(index, subItem.path, true);
-                    }}
-                  >
-                    {subItem.title}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
-  </div>
 
 
   );

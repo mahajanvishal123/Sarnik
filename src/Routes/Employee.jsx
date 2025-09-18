@@ -55,7 +55,7 @@ function Employee() {
             <Route path="/UpdateProfile" element={<ProtectedRoute><UpdateProfile /></ProtectedRoute>} />
             <Route path="/OvervieJobsTracker" element={<ProtectedRoute><OvervieJobsTracker /></ProtectedRoute>} />
             <Route path="/employeeJobsTracker" element={<ProtectedRoute><EmployeeJobTracker /></ProtectedRoute>} />
-<Route path="/AddJobTracker/:id" element={<ProtectedRoute><AddJobTracker /></ProtectedRoute>} />
+            <Route path="/AddJobTracker/:id" element={<ProtectedRoute><AddJobTracker /></ProtectedRoute>} />
             <Route path="/TimesheetWorklog" element={<ProtectedRoute><TimesheetWorklog /></ProtectedRoute>} />
           </Routes>
         </div>

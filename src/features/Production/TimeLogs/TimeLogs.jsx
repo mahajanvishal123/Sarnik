@@ -478,7 +478,7 @@ function TimeLogs() {
   }, [dispatch]);
 
   const itemsPerPage = 15;
-  
+
   // First, filter by employee ID to ensure we only show logs for the current employee
   const employeeFilteredLogs = (timesheetWorklog.TimesheetWorklogss || []).filter((log) => {
     return log?.employeeId &&
@@ -486,7 +486,7 @@ function TimeLogs() {
       log.employeeId.length > 0 &&
       log.employeeId[0]?._id === employeeId;
   });
-  
+
   // Then apply the other filters
   const filteredTimeLogs = employeeFilteredLogs.filter((log) => {
     const terms = searchQuery.trim().split(/\s+/).filter(Boolean);
@@ -498,19 +498,19 @@ function TimeLogs() {
     const taskDescription = (log.taskDescription || '').toLowerCase();
     const status = (log.status || '').toLowerCase();
     const fields = [employeeName, projectName, jobNo, taskDescription, status];
-    
+
     const matchesSearch = terms.length === 0 || terms.every(term =>
       fields.some(field => field.includes(term.toLowerCase()))
     );
-    
+
     const matchesDate =
       (!fromDate || new Date(log.date) >= new Date(fromDate)) &&
       (!toDate || new Date(log.date) <= new Date(toDate));
-    
+
     const matchesProject =
       selectedProject === "All Projects" ||
       projectName === selectedProject.toLowerCase();
-    
+
     return matchesSearch && matchesDate && matchesProject;
   });
 
@@ -537,7 +537,7 @@ function TimeLogs() {
   // Calculate totals based on filtered data
   const totalTimeSum = sumTime(filteredTimeLogs.map(log => log.time));
   const overtimeSum = sumTime(filteredTimeLogs.map(log => log.overtime));
-  const totalTimeColumnSum = sumTime(filteredTimeLogs.map(log =>log.totalTime));
+  const totalTimeColumnSum = sumTime(filteredTimeLogs.map(log => log.totalTime));
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
@@ -559,13 +559,13 @@ function TimeLogs() {
           </Button>
         </div>
       </div>
-      
+
       {/* Total Time Row (Summary) */}
       <div className="d-flex justify-content-end mb-2 fw-bold">
         <span className="me-4">Work Time: {totalTimeSum}</span>
         <span>Over Time: {overtimeSum}</span>
       </div>
-      
+
       {/* Filters Section */}
       <div className={`row g-3 mb-4 ${showFilters ? 'd-block' : 'd-none d-md-flex'}`}>
         <div className="col-md-3">
@@ -618,7 +618,7 @@ function TimeLogs() {
           </Dropdown>
         </div>
       </div>
-      
+
       {/* Table */}
       <div className="card shadow-sm">
         <div className="card-body p-0">
@@ -629,6 +629,7 @@ function TimeLogs() {
                   <th></th>
                   <th>JobID</th>
                   <th>Project Name</th>
+                  <th>Assign</th>
                   <th>Date</th>
                   <th>Work Time</th>
                   <th>Over Time</th>
@@ -636,7 +637,7 @@ function TimeLogs() {
                 </tr>
               </thead>
               <tbody>
-                {paginatedTimeLogss.map((log, index) => (
+                {paginatedTimeLogss.filter(log => log.employeeId?.[0]?._id === employeeId).map((log, index) => (
                   <tr key={index}>
                     <td>
                       <input
@@ -652,6 +653,7 @@ function TimeLogs() {
                     </td>
                     <td>{log.jobId?.[0]?.JobNo || '----'}</td>
                     <td>{log.projectId?.[0]?.projectName || 'No Project Name'}</td>
+                    <td>{log.employeeId?.[0]?.firstName} {log.employeeId?.[0]?.lastName}</td>
                     <td>{new Date(log.date).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
                     <td>{log.time}</td>
                     <td>{log.overtime}</td>

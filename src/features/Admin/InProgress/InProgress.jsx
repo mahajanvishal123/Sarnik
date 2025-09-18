@@ -1365,7 +1365,7 @@ function InProgress() {
               <Form.Select onChange={(e) => handleDesignerChange(e.target.value)}>
                 <option value="">Select designer...</option>
                 {designers && designers.length > 0 ? (
-                  designers.map((designer) => (
+                  designers.filter((item) => item.role == "employee").map((designer) => (
                     <option key={designer._id || designer.id} value={designer._id || designer.id}>
                       {designer.firstName} {designer.lastName}
                     </option>

@@ -210,45 +210,45 @@ function TimesheetWorklog() {
           <table className="table table-hover align-middle mb-0">
             <thead>
               <tr className="bg-light">
-               <th>JobID</th>
-                  <th style={{ whiteSpace: 'nowrap' }}>Project Name</th>
+                <th>JobID</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Project Name</th>
 
-                  <th>Date</th>
-                  <th style={{ whiteSpace: 'nowrap' }}>Time</th>
-                  <th style={{ whiteSpace: 'nowrap' }}>overtime</th>
-                  <th>totalTime</th>
+                <th>Date</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Time</th>
+                <th style={{ whiteSpace: 'nowrap' }}>overtime</th>
+                <th>totalTime</th>
               </tr>
             </thead>
             <tbody>
-                {paginatedTimeLogssFiltered?.map((log, index) => {
-                  const extraHoursDecimal = timeStringToDecimalHours(log.extraHours);
-                  const hoursDecimal = timeStringToDecimalHours(log.hours);
+              {paginatedTimeLogssFiltered?.map((log, index) => {
+                const extraHoursDecimal = timeStringToDecimalHours(log.extraHours);
+                const hoursDecimal = timeStringToDecimalHours(log.hours);
 
-                  const isHoursDiscrepant = hoursDecimal > 8;
-                  const isExtraHoursDiscrepant = extraHoursDecimal < 8;
-                  return (
-                    <tr key={index}>
-               
-                      <td className="no-border-bottom">
-                        {log.jobId?.[0]?.JobNo || '----'}
-                      </td>
-                      <td style={{ whiteSpace: 'nowrap' }} key={index}>
-                        {log.projectId?.[0]?.projectName || 'No Project Name'}
-                      </td>
-                      <td>{new Date(log.date).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
-                      <td>
-                        {log.time}
-                      </td>
-                      <td>
-                        {log.overtime}
-                      </td>
-                      {/* <td>
+                const isHoursDiscrepant = hoursDecimal > 8;
+                const isExtraHoursDiscrepant = extraHoursDecimal < 8;
+                return (
+                  <tr key={index}>
+
+                    <td className="no-border-bottom">
+                      {log.jobId?.[0]?.JobNo || '----'}
+                    </td>
+                    <td style={{ whiteSpace: 'nowrap' }} key={index}>
+                      {log.projectId?.[0]?.projectName || 'No Project Name'}
+                    </td>
+                    <td>{new Date(log.date).toLocaleDateString('en-GB').replace(/\/20/, '/')}</td>
+                    <td>
+                      {log.time}
+                    </td>
+                    <td>
+                      {log.overtime}
+                    </td>
+                    {/* <td>
                         {(!log.extraHours || log.extraHours === '0' || log.extraHours === '0:00') ? '-' : formatTimeTo12Hour(log.extraHours)}
                       </td> */}
-                      <td>
-                        {log.totalTime}
-                      </td>
-                      {/* <td
+                    <td>
+                      {log.totalTime}
+                    </td>
+                    {/* <td
                         style={{
                           color: isHoursDiscrepant ? 'red' : 'inherit',
                           fontWeight: isHoursDiscrepant ? 'bold' : 'normal',
@@ -257,8 +257,8 @@ function TimesheetWorklog() {
                       >
                         {formatTimeTo12Hour(log.hours)}
                       </td> */}
-                      {/* <td style={{ whiteSpace: 'nowrap' }}>{log.taskDescription}</td> */}
-                      {/* <td className="text-end" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {/* <td style={{ whiteSpace: 'nowrap' }}>{log.taskDescription}</td> */}
+                    {/* <td className="text-end" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <button
                           className="btn btn-link text-dark p-0 me-3"
                           onClick={() => handleEdit(log)}
@@ -272,9 +272,9 @@ function TimesheetWorklog() {
                           <FaTrashAlt />
                         </button>
                       </td> */}
-                    </tr>
-                  );
-                })}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

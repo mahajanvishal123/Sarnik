@@ -113,7 +113,7 @@ export const adminMenuItems = [
     icon: <FaCog className="menu-icon" />,
     path: "/admin/Settings",
   },
-  
+
 ];
 
 // Employee Menu
@@ -232,7 +232,7 @@ export const ProductionMenuItems = [
     icon: <FaClock className="menu-icon" />,
     submenu: [
       { title: "Assign", path: "/production/newJobsList" },
-      { title: "In Progress", path: "/production/inProgress" },
+      // { title: "In Progress", path: "/production/inProgress" },
       { title: "Completed", path: "/production/completedJobs" },
     ],
 
@@ -267,5 +267,5 @@ export const ProductionMenuItems = [
     icon: <FaCog className="menu-icon" />,
     path: "/production/Settings",
   },
-  
+
 ];

@@ -602,12 +602,6 @@ function EmployeeJobTracker() {
 
       {loading && <div className="text-center">Loading jobs...</div>}
 
-      {error && (
-        <div className="alert alert-danger" role="alert">
-          Error loading jobs: {error}
-        </div>
-      )}
-
       {!loading && !error && employeeJobs.length === 0 && (
         <div className="alert alert-info" role="alert">
           {employeeId
